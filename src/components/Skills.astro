@@ -1,0 +1,195 @@
+---
+// Skills Section
+import { Image } from 'astro:assets';
+import csharpIcon from '../assets/languages/language_csharp.svg';
+import phpIcon from '../assets/languages/language_php.svg';
+import jsIcon from '../assets/languages/language_javascript.svg';
+import tsIcon from '../assets/languages/language_typescript.svg';
+import tailwindIcon from '../assets/languages/language_tailwindcss.svg';
+import dotnetIcon from '../assets/languages/language_dotnet.svg';
+import blazorIcon from '../assets/languages/language_blazor.svg';
+import reactIcon from '../assets/languages/language_react.svg';
+import laravelIcon from '../assets/languages/language_laravel.svg';
+import d365Icon from '../assets/languages/language_d365.svg';
+import sqlServerIcon from '../assets/languages/language_sqlserver.svg';
+import mysqlIcon from '../assets/languages/language_mysql.svg';
+
+const skills = [
+  { name: "C#", level: 5 },
+  { name: "PHP", level: 5 },
+  { name: "JavaScript", level: 5 },
+  { name: "TypeScript", level: 5 },
+  { name: "X++", level: 5 },
+  { name: "T-SQL", level: 5 },
+  { name: "CSS", level: 5 }
+];
+
+const frameworks = [
+  { name: "C#", url: "https://docs.microsoft.com/en-us/dotnet/csharp/", icon: csharpIcon },
+  { name: "PHP", url: "https://www.php.net/", icon: phpIcon },
+  { name: "JavaScript", url: "https://www.javascript.com/", icon: jsIcon },
+  { name: "TypeScript", url: "https://www.typescriptlang.org/", icon: tsIcon },
+  { name: "Tailwind CSS", url: "https://tailwindcss.com/", icon: tailwindIcon },
+  { name: ".Net", url: "https://dotnet.microsoft.com/", icon: dotnetIcon },
+  { name: "Blazor", url: "https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor", icon: blazorIcon },
+  { name: "React", url: "https://reactjs.org/", icon: reactIcon },
+  { name: "Laravel", url: "https://laravel.com/", icon: laravelIcon },
+  { name: "Dynamics 365", url: "https://dynamics.microsoft.com/", icon: d365Icon },
+  { name: "SQL Server", url: "https://www.microsoft.com/en-us/sql-server/", icon: sqlServerIcon },
+  { name: "MySQL", url: "https://www.mysql.com/", icon: mysqlIcon }
+];
+---
+
+<section id="skills" class="section">
+  <h2 class="section-title">Skills</h2>
+  
+  <div class="skills-content">
+    <h3 class="subsection-title">Programming Languages, Frameworks & Stacks</h3>
+    <div class="frameworks-grid">
+      {frameworks.map((framework) => (
+        <a href={framework.url} target="_blank" rel="noopener noreferrer" class="framework-item">
+          <div class="framework-icon">
+            <Image src={framework.icon} alt={framework.name} width={32} height={32} />
+          </div>
+          <span class="framework-name">{framework.name}</span>
+        </a>
+      ))}
+    </div>
+
+    <h3 class="subsection-title skill-rating-title">Skill Ratings</h3>
+    <div class="skills-list">
+      {skills.map((skill) => (
+        <div class="skill-item">
+          <span class="skill-name">{skill.name}</span>
+          <div class="skill-rating">
+            {Array.from({ length: 5 }, (_, i) => (
+              <svg 
+                class={i < skill.level ? "star filled" : "star"} 
+                width="16" 
+                height="16" 
+                viewBox="0 0 24 24" 
+                fill={i < skill.level ? "currentColor" : "none"} 
+                stroke="currentColor" 
+                stroke-width="2"
+              >
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section {
+    margin-bottom: 6rem;
+    scroll-margin-top: 4rem;
+  }
+
+  .section-title {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(8px);
+    background-color: rgba(15, 23, 42, 0.8);
+    padding: 1.5rem 0;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--slate-200);
+  }
+
+  @media (min-width: 1024px) {
+    .section-title {
+      display: none;
+    }
+  }
+
+  .skills-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .subsection-title {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--slate-200);
+    margin-bottom: 1rem;
+  }
+
+  .skill-rating-title {
+    margin-top: 2rem;
+  }
+
+  .frameworks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+  }
+
+  .framework-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background-color: rgba(30, 41, 59, 0.3);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+
+  .framework-item:hover {
+    background-color: rgba(30, 41, 59, 0.5);
+    border-color: var(--teal-400);
+    transform: translateY(-4px);
+  }
+
+  .framework-icon {
+    color: var(--teal-300);
+  }
+
+  .framework-name {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--slate-300);
+  }
+
+  .skills-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .skill-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .skill-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--slate-200);
+  }
+
+  .skill-rating {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .star {
+    color: var(--slate-600);
+  }
+
+  .star.filled {
+    color: var(--teal-400);
+  }
+</style>
+

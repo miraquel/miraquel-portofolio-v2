@@ -1,0 +1,87 @@
+---
+// About Section
+---
+
+<section id="about" class="section">
+  <h2 class="section-title">About</h2>
+  <div class="about-content">
+    <p>
+      My name is <strong>Chaidir Ali Assegaf</strong>. I am a software developer skilled in various programming languages and frameworks,
+      with extensive experience in famous ERP systems.
+    </p>
+    <p>
+      I specialize in <a href="https://dynamics.microsoft.com/" target="_blank" class="link">Microsoft Dynamics</a> ecosystem development,
+      including Dynamics AX 2012 R3, Dynamics 365 Finance and Operations, Dynamics 365 Business Central, PowerApps, and Power Automate.
+      My expertise spans across multiple technologies including C#, X++, TypeScript, JavaScript, PHP, and modern web frameworks like Blazor, React, and Laravel.
+    </p>
+    <p>
+      Throughout my career, I have delivered custom ERP solutions, data integration projects, and enterprise applications
+      for various industries, helping businesses optimize their operations through tailored software solutions.
+    </p>
+  </div>
+</section>
+
+<style>
+  .section {
+    margin-bottom: 6rem;
+    scroll-margin-top: 4rem;
+  }
+
+  .section-title {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(8px);
+    background-color: rgba(15, 23, 42, 0.8);
+    padding: 1.5rem 0;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--slate-200);
+  }
+
+  @media (min-width: 1024px) {
+    .section-title {
+      display: none;
+    }
+  }
+
+  .about-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .about-content p {
+    color: var(--slate-400);
+    line-height: 1.7;
+  }
+
+  .link {
+    color: var(--slate-200);
+    font-weight: 500;
+    transition: color 0.2s ease;
+    position: relative;
+  }
+
+  .link:hover {
+    color: var(--teal-300);
+  }
+
+  .link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--teal-300);
+    transition: width 0.2s ease;
+  }
+
+  .link:hover::after {
+    width: 100%;
+  }
+</style>

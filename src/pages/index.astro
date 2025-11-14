@@ -1,11 +1,107 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Skills from '../components/Skills.astro';
+import Experience from '../components/Experience.astro';
+import Projects from '../components/Projects.astro';
 ---
 
 <Layout>
-	<Welcome />
+	<div class="container">
+		<div class="sidebar">
+			<Hero />
+		</div>
+		<main class="main-content">
+			<About />
+			<Skills />
+			<Experience />
+			<Projects />
+		</main>
+	</div>
 </Layout>
+
+<style>
+	.container {
+		min-height: 100vh;
+		padding: 0 1.5rem;
+		max-width: 1280px;
+		margin: 0 auto;
+	}
+
+	@media (min-width: 1024px) {
+		.container {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 4rem;
+			padding: 0 3rem;
+		}
+	}
+
+	.sidebar {
+		width: 100%;
+	}
+
+	.main-content {
+		padding: 6rem 0;
+	}
+
+	@media (max-width: 1023px) {
+		.main-content {
+			padding: 2rem 0 4rem;
+		}
+	}
+</style>
+
+<script>
+	// Smooth scroll spy for navigation
+	const sections = document.querySelectorAll('section[id]');
+	const navLinks = document.querySelectorAll('.nav-link');
+
+	function setActiveNav() {
+		let currentSection = '';
+		
+		sections.forEach(section => {
+			const htmlSection = section as HTMLElement;
+			const sectionTop = htmlSection.offsetTop;
+			const sectionHeight = htmlSection.clientHeight;
+			
+			if (window.pageYOffset >= sectionTop - 200) {
+				currentSection = section.getAttribute('id') || '';
+			}
+		});
+
+		navLinks.forEach(link => {
+			link.classList.remove('active');
+			if (link.getAttribute('href') === `#${currentSection}`) {
+				link.classList.add('active');
+			}
+		});
+	}
+
+	window.addEventListener('scroll', setActiveNav);
+	window.addEventListener('load', setActiveNav);
+
+	// Mouse spotlight effect
+	document.addEventListener('mousemove', (e) => {
+		const spotlight = document.createElement('div');
+		spotlight.style.cssText = `
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			pointer-events: none;
+			z-index: 9999;
+			background: radial-gradient(600px circle at ${e.clientX}px ${e.clientY}px, rgba(94, 234, 212, 0.05), transparent 80%);
+		`;
+		
+		const existingSpotlight = document.querySelector('.mouse-spotlight');
+		if (existingSpotlight) {
+			existingSpotlight.remove();
+		}
+		
+		spotlight.classList.add('mouse-spotlight');
+		document.body.appendChild(spotlight);
+	});
+</script>
