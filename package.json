@@ -6,9 +6,21 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "add-post": "tsx scripts/add-post.ts",
+    "add-sample": "tsx scripts/add-sample-post.ts",
+    "migrate-data": "tsx scripts/migrate-all-data.ts",
+    "cleanup-images": "tsx scripts/cleanup-images.ts"
   },
   "dependencies": {
-    "astro": "^5.13.5"
+    "@tailwindcss/vite": "^4.1.17",
+    "astro": "^5.13.5",
+    "firebase": "^12.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "dotenv": "^17.2.3",
+    "tailwindcss": "^4.1.17",
+    "tsx": "^4.20.6"
   }
 }

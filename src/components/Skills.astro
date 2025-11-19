@@ -14,7 +14,13 @@ import d365Icon from '../assets/languages/language_d365.svg';
 import sqlServerIcon from '../assets/languages/language_sqlserver.svg';
 import mysqlIcon from '../assets/languages/language_mysql.svg';
 
-const skills = [
+export interface Skill {
+  name: string;
+  level: number;
+  order?: number;
+}
+
+const skills: Skill[] = [
   { name: "C#", level: 5 },
   { name: "PHP", level: 3 },
   { name: "JavaScript", level: 4 },
@@ -26,7 +32,14 @@ const skills = [
   { name: "Dart", level: 4 },
 ];
 
-const frameworks = [
+export interface Framework {
+  name: string;
+  url: string;
+  icon: ImageMetadata;
+  order?: number;
+}
+
+const frameworks: Framework[] = [
   { name: "C#", url: "https://docs.microsoft.com/en-us/dotnet/csharp/", icon: csharpIcon },
   { name: "PHP", url: "https://www.php.net/", icon: phpIcon },
   { name: "JavaScript", url: "https://www.javascript.com/", icon: jsIcon },
@@ -42,31 +55,31 @@ const frameworks = [
 ];
 ---
 
-<section id="skills" class="section">
-  <h2 class="section-title">Skills</h2>
+<section id="skills" class="mb-24 scroll-mt-16">
+  <h2 class="sticky top-0 z-10 backdrop-blur-sm bg-slate-900/80 py-6 mb-6 text-sm font-semibold uppercase tracking-widest text-slate-200 lg:hidden">Skills</h2>
   
-  <div class="skills-content">
-    <h3 class="subsection-title">Programming Languages, Frameworks & Stacks</h3>
-    <div class="frameworks-grid">
+  <div class="flex flex-col gap-8">
+    <h3 class="text-lg font-medium text-slate-200 mb-4">Programming Languages, Frameworks & Stacks</h3>
+    <div class="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-4">
       {frameworks.map((framework) => (
-        <a href={framework.url} target="_blank" rel="noopener noreferrer" class="framework-item">
-          <div class="framework-icon">
-            <Image src={framework.icon} alt={framework.name} width={32} height={32} />
+        <a href={framework.url} target="_blank" rel="noopener noreferrer" class="flex flex-col items-center gap-2 p-4 bg-slate-800/30 border border-slate-400/10 rounded-lg transition-all duration-300 text-center hover:bg-slate-800/50 hover:border-teal-400 hover:-translate-y-1">
+          <div class="text-teal-300">
+            <Image src={framework.icon} alt={framework.name} width="32" height="32" />
           </div>
-          <span class="framework-name">{framework.name}</span>
+          <span class="text-xs font-medium text-slate-300">{framework.name}</span>
         </a>
       ))}
     </div>
 
-    <h3 class="subsection-title skill-rating-title">Skill Ratings</h3>
-    <div class="skills-list">
+    <h3 class="text-lg font-medium text-slate-200 mb-4 mt-8">Skill Ratings</h3>
+    <div class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6">
       {skills.map((skill) => (
-        <div class="skill-item">
-          <span class="skill-name">{skill.name}</span>
-          <div class="skill-rating">
+        <div class="flex flex-col gap-2">
+          <span class="text-sm font-medium text-slate-200">{skill.name}</span>
+          <div class="flex gap-1">
             {Array.from({ length: 5 }, (_, i) => (
               <svg 
-                class={i < skill.level ? "star filled" : "star"} 
+                class={i < skill.level ? "text-teal-400" : "text-slate-600"} 
                 width="16" 
                 height="16" 
                 viewBox="0 0 24 24" 
@@ -83,115 +96,4 @@ const frameworks = [
     </div>
   </div>
 </section>
-
-<style>
-  .section {
-    margin-bottom: 6rem;
-    scroll-margin-top: 4rem;
-  }
-
-  .section-title {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    backdrop-filter: blur(8px);
-    background-color: rgba(15, 23, 42, 0.8);
-    padding: 1.5rem 0;
-    margin-bottom: 1.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--slate-200);
-  }
-
-  @media (min-width: 1024px) {
-    .section-title {
-      display: none;
-    }
-  }
-
-  .skills-content {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-
-  .subsection-title {
-    font-size: 1.125rem;
-    font-weight: 500;
-    color: var(--slate-200);
-    margin-bottom: 1rem;
-  }
-
-  .skill-rating-title {
-    margin-top: 2rem;
-  }
-
-  .frameworks-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 1rem;
-  }
-
-  .framework-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    background-color: rgba(30, 41, 59, 0.3);
-    border: 1px solid rgba(148, 163, 184, 0.1);
-    border-radius: 0.5rem;
-    transition: all 0.3s ease;
-    text-align: center;
-  }
-
-  .framework-item:hover {
-    background-color: rgba(30, 41, 59, 0.5);
-    border-color: var(--teal-400);
-    transform: translateY(-4px);
-  }
-
-  .framework-icon {
-    color: var(--teal-300);
-  }
-
-  .framework-name {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--slate-300);
-  }
-
-  .skills-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .skill-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .skill-name {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--slate-200);
-  }
-
-  .skill-rating {
-    display: flex;
-    gap: 0.25rem;
-  }
-
-  .star {
-    color: var(--slate-600);
-  }
-
-  .star.filled {
-    color: var(--teal-400);
-  }
-</style>
 

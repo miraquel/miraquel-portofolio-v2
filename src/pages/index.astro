@@ -5,53 +5,23 @@ import About from '../components/About.astro';
 import Skills from '../components/Skills.astro';
 import Experience from '../components/Experience.astro';
 import Projects from '../components/Projects.astro';
+import Blog from '../components/Blog.astro';
 ---
 
 <Layout>
-	<div class="container">
-		<div class="sidebar">
+	<div class="min-h-screen px-6 max-w-screen-xl mx-auto lg:grid lg:grid-cols-2 lg:gap-16 lg:px-12">
+		<div class="w-full">
 			<Hero />
 		</div>
-		<main class="main-content">
+		<main class="py-24 lg:py-24 max-lg:py-8 max-lg:pb-16">
 			<About />
 			<Skills />
 			<Experience />
 			<Projects />
+			<Blog />
 		</main>
 	</div>
 </Layout>
-
-<style>
-	.container {
-		min-height: 100vh;
-		padding: 0 1.5rem;
-		max-width: 1280px;
-		margin: 0 auto;
-	}
-
-	@media (min-width: 1024px) {
-		.container {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 4rem;
-			padding: 0 3rem;
-		}
-	}
-
-	.sidebar {
-		width: 100%;
-	}
-
-	.main-content {
-		padding: 6rem 0;
-	}
-
-	@media (max-width: 1023px) {
-		.main-content {
-			padding: 2rem 0 4rem;
-		}
-	}
-</style>
 
 <script>
 	// Smooth scroll spy for navigation
@@ -60,16 +30,24 @@ import Projects from '../components/Projects.astro';
 
 	function setActiveNav() {
 		let currentSection = '';
+		const scrollPosition = window.scrollY + window.innerHeight / 3;
 		
 		sections.forEach(section => {
 			const htmlSection = section as HTMLElement;
 			const sectionTop = htmlSection.offsetTop;
 			const sectionHeight = htmlSection.clientHeight;
+			const sectionBottom = sectionTop + sectionHeight;
 			
-			if (window.pageYOffset >= sectionTop - 200) {
+			if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
 				currentSection = section.getAttribute('id') || '';
 			}
 		});
+
+		// If we're at the bottom of the page, activate the last section
+		if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+			const lastSection = sections[sections.length - 1];
+			currentSection = lastSection.getAttribute('id') || '';
+		}
 
 		navLinks.forEach(link => {
 			link.classList.remove('active');

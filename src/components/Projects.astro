@@ -1,10 +1,21 @@
 ---
 // Projects Section
 import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import giselImage from '../assets/projects/gisel.png';
 import futuristImage from '../assets/projects/futurist.png';
 
-const projects = [
+interface Project {
+  title: string;
+  description: string;
+  image?: string | ImageMetadata;
+  projectUrl: string;
+  repositories?: { name: string; url: string }[];
+  period: string;
+  technologies: string[];
+}
+
+const projects: Project[] = [
   {
     title: "Generated Information Service Level System (GiselX)",
     description: "Full-stack enterprise web application using ASP.NET Core 9.0 with clean architecture. Features secure authentication/authorization with ASP.NET Core Identity, custom permission-based policies, and scalable data access layer using Entity Framework Core supporting SQL Server and SQLite.",
@@ -24,7 +35,6 @@ const projects = [
   {
     title: "Sparepart Management System v2",
     description: "Sparepart Management integration to AX 2012 R2 using ASP.NET Web API and Flutter for PT. Gandum Mas Kencana. A comprehensive system for managing spare parts inventory and orders.",
-    image: "/images/project1.jpg",
     projectUrl: "#",
     repositories: [
       { name: "Backend API", url: "https://github.com/miraquel/SparepartManagementSystem" },
@@ -36,7 +46,6 @@ const projects = [
   {
     title: "AXFinMobile",
     description: "Journal Payment integration to AX 2012 R2 using ASP.NET Web API and Flutter for PT. Gandum Mas Kencana. Mobile application for processing financial journal entries and payments.",
-    image: "/images/project2.jpg",
     projectUrl: "#",
     period: "November 2023 — February 2024",
     technologies: ["Dynamics AX 2012 R2", "X++", "C#", "Dart", "Flutter"]
@@ -44,7 +53,6 @@ const projects = [
   {
     title: "Dynamics AX 2012 R3 Data Forensics",
     description: "Data forensics project for PT. Mega Akses Persada (Fiberstar). Analyzing and investigating data integrity and business process flows in the ERP system.",
-    image: "/images/project3.jpg",
     projectUrl: "#",
     period: "June 2023 — July 2023",
     technologies: ["Dynamics AX 2012 R3", "X++"]
@@ -52,7 +60,6 @@ const projects = [
   {
     title: "Dynamics 365 Finance and Operations Migration",
     description: "AX 2012 R3 Migration to Dynamics 365 Finance and Operations for PT. Mitra Pinasthika Mustika Rent. Complete system migration and modernization.",
-    image: "/images/project4.jpg",
     projectUrl: "#",
     period: "April 2022 — April 2023",
     technologies: ["Dynamics 365 F&O", "X++"]
@@ -60,7 +67,6 @@ const projects = [
   {
     title: "Price Calc",
     description: "Car Rental Price Calculator App for PT. Mitra Pinasthika Mustika Rent. Built with Blazor WebAssembly for fast, responsive pricing calculations.",
-    image: "/images/project5.jpg",
     projectUrl: "#",
     period: "September 2021 — February 2022",
     technologies: ["Blazor WebAssembly", ".Net 5", "C#"]
@@ -68,7 +74,6 @@ const projects = [
   {
     title: "API Gateway with CMS",
     description: "ASP.Net Core API Gateway with CMS for PT. Gunung Raja Paksi. Centralized API management and content management system.",
-    image: "/images/project6.jpg",
     projectUrl: "#",
     period: "April 2021 — August 2021",
     technologies: ["ASP.Net Core", ".Net Core 2.1", "C#"]
@@ -76,7 +81,6 @@ const projects = [
   {
     title: "Report Transfer Order & Transactional Demand",
     description: "ERP Custom Development for PT. Indotruck Utama using Dynamics 365 Business Central platform.",
-    image: "/images/project7.jpg",
     projectUrl: "#",
     period: "January 2020 — December 2020",
     technologies: ["Dynamics 365 Business Central", "AL Language"]
@@ -84,7 +88,6 @@ const projects = [
   {
     title: "Dynamics 365 Business Central - PT. Alliance One Indonesia",
     description: "ERP Change Request for Dynamics AX 2012 R3 system.",
-    image: "/images/project8.jpg",
     projectUrl: "#",
     period: "November 2020 — December 2020",
     technologies: ["Dynamics AX 2012 R3", "X++"]
@@ -92,7 +95,6 @@ const projects = [
   {
     title: "Dynamics 365 Talent",
     description: "Microsoft Talent:Attract Custom Development for PT. Intikom Berlian Mustika.",
-    image: "/images/project9.jpg",
     projectUrl: "#",
     period: "September 2020 — October 2020",
     technologies: ["Dynamics 365 Platform"]
@@ -100,7 +102,6 @@ const projects = [
   {
     title: "Dynamics 365 Business Central - PT. Saritama Food Processing",
     description: "ERP Custom Development using Dynamics 365 Platform.",
-    image: "/images/project10.jpg",
     projectUrl: "#",
     period: "September 2020 — October 2020",
     technologies: ["Dynamics 365 Business Central", "AL Language"]
@@ -108,7 +109,6 @@ const projects = [
   {
     title: "Dynamics 365 Finance and Operations Assessment",
     description: "Assessment Project for PT. Mitra Pinasthika Mustika Rent, HO.",
-    image: "/images/project11.jpg",
     projectUrl: "#",
     period: "July 2020 — December 2020",
     technologies: ["Dynamics 365 F&O", "X++"]
@@ -116,7 +116,6 @@ const projects = [
   {
     title: "Dynamics 365 Human Resource",
     description: "Human Resource Custom Development for PT. Intikom Berlian Mustika.",
-    image: "/images/project12.jpg",
     projectUrl: "#",
     period: "February 2020 — September 2020",
     technologies: ["Dynamics 365 Platform"]
@@ -124,7 +123,6 @@ const projects = [
   {
     title: "Dynamics 365 Business Central - PT. Karanganyar Indo Auto System",
     description: "ERP Custom Development using Dynamics 365 Platform.",
-    image: "/images/project13.jpg",
     projectUrl: "#",
     period: "June 2020 — July 2020",
     technologies: ["Dynamics 365 Business Central", "AL Language"]
@@ -132,7 +130,6 @@ const projects = [
   {
     title: "DTS Migration - Phase 2",
     description: "SSIS Development for data flow automation for PT. Bank Central Asia Finance.",
-    image: "/images/project14.jpg",
     projectUrl: "#",
     period: "March 2020 — June 2020",
     technologies: ["SQL Server", "SSIS", "C#"]
@@ -140,7 +137,6 @@ const projects = [
   {
     title: "DTS Migration - Phase 1",
     description: "SSIS Development for data flow automation for PT. Bank Central Asia Finance.",
-    image: "/images/project15.jpg",
     projectUrl: "#",
     period: "January 2019 — February 2019",
     technologies: ["SQL Server", "SSIS", "C#"]
@@ -148,7 +144,6 @@ const projects = [
   {
     title: "Shipping Order Report & Invoice Report",
     description: "Dynamics AX 2012 R3 Change Request for PT. Natural Java Spice.",
-    image: "/images/project16.jpg",
     projectUrl: "#",
     period: "March 2018 — December 2018",
     technologies: ["Dynamics AX 2012 R3", "X++"]
@@ -156,7 +151,6 @@ const projects = [
   {
     title: "Dynamics AX 2012 R3 Implementation",
     description: "Dynamics AX 2012 R3 Development for PT. Visionet International.",
-    image: "/images/project17.jpg",
     projectUrl: "#",
     period: "March 2018 — December 2018",
     technologies: ["Dynamics AX 2012 R3", "X++"]
@@ -164,48 +158,52 @@ const projects = [
 ];
 ---
 
-<section id="projects" class="section">
-  <h2 class="section-title">Projects</h2>
-  <div class="projects-list">
+<section id="projects" class="mb-24 scroll-mt-16">
+  <h2 class="sticky top-0 z-10 backdrop-blur-sm bg-slate-900/80 py-6 mb-6 text-sm font-semibold uppercase tracking-widest text-slate-200 lg:hidden">Projects</h2>
+  <div class="flex flex-col gap-8">
     {projects.map((project) => (
-      <div class="project-card">
-        <div class="project-image-container" data-image-modal>
-          {typeof project.image === 'string' ? (
-            <div class="project-image-placeholder">
+      <div class="grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-4 p-6 rounded-lg transition-all duration-300 hover:bg-slate-800/50 hover:shadow-[0_0_0_1px_rgba(148,163,184,0.1)] group">
+        <div class="w-full aspect-video rounded overflow-hidden border border-slate-400/20 bg-slate-900/50 relative cursor-pointer group/image" data-image-modal>
+          {project.image ? (
+            <>
+              {typeof project.image === 'string' ? (
+                <img src={project.image} alt={project.title} class="w-full h-full object-cover" />
+              ) : (
+                <Image src={project.image} alt={project.title} class="w-full h-full object-cover" />
+              )}
+              <div class="absolute top-0 left-0 w-full h-full bg-slate-900/70 flex items-center justify-center opacity-0 transition-opacity duration-300 text-teal-300 pointer-events-none group-hover/image:opacity-100">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>
+                </svg>
+              </div>
+            </>
+          ) : (
+            <div class="w-full h-full bg-gradient-to-br from-slate-800/80 to-slate-700/80 flex items-center justify-center text-slate-600">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                 <circle cx="8.5" cy="8.5" r="1.5"></circle>
                 <polyline points="21 15 16 10 5 21"></polyline>
               </svg>
             </div>
-          ) : (
-            <>
-              <Image src={project.image} alt={project.title} class="project-image" />
-              <div class="image-overlay">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>
-                </svg>
-              </div>
-            </>
           )}
         </div>
-        <div class="project-content">
-          <h3 class="project-title">
-            <a href={project.projectUrl} target="_blank" rel="noopener noreferrer" class="project-title-link">
-              {project.title}
-              <svg class="external-link" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="flex flex-col gap-3">
+          <h3 class="flex items-center gap-2 text-base font-medium text-slate-200 m-0">
+            <a href={project.projectUrl} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-slate-200 transition-colors duration-200 group-hover:text-teal-300">
+              <span class="group-hover:text-teal-300">{project.title}</span>
+              <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="7" y1="17" x2="17" y2="7"></line>
                 <polyline points="7 7 17 7 17 17"></polyline>
               </svg>
             </a>
           </h3>
-          <p class="project-period">{project.period}</p>
-          <p class="project-description">{project.description}</p>
+          <p class="text-slate-400 text-xs uppercase tracking-wide">{project.period}</p>
+          <p class="text-slate-400 leading-relaxed text-sm">{project.description}</p>
           {project.repositories && (
-            <div class="repository-links">
+            <div class="flex flex-wrap gap-2 mt-1">
               {project.repositories.map((repo) => (
-                <a href={repo.url} target="_blank" rel="noopener noreferrer" class="repo-link">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <a href={repo.url} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-400/10 border border-slate-400/20 text-slate-300 rounded-md text-xs font-medium transition-all duration-200 hover:bg-teal-400/10 hover:border-teal-400 hover:text-teal-300">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="flex-shrink-0">
                     <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
                   </svg>
                   {repo.name}
@@ -213,33 +211,33 @@ const projects = [
               ))}
             </div>
           )}
-          <div class="tech-tags">
+          <div class="flex flex-wrap gap-2 mt-2">
             {project.technologies.map((tech) => (
-              <span class="tech-tag">{tech}</span>
+              <span class="inline-block px-3 py-1 bg-teal-400/10 text-teal-300 rounded-full text-xs font-medium">{tech}</span>
             ))}
           </div>
         </div>
       </div>
     ))}
   </div>
-  <!-- <a href="/archive" class="archive-link">
+  <!-- <a href="/archive" class="inline-flex items-center gap-2 mt-8 text-slate-200 font-medium transition-all duration-200 hover:text-teal-300 group">
     <span>View Full Project Archive</span>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1">
       <line x1="7" y1="17" x2="17" y2="7"></line>
       <polyline points="7 7 17 7 17 17"></polyline>
     </svg>
   </a> -->
 
   <!-- Image Modal -->
-  <div id="imageModal" class="modal">
-    <button class="modal-close" aria-label="Close modal">
+  <div id="imageModal" class="fixed top-0 left-0 w-full h-full bg-slate-900/95 backdrop-blur-sm flex items-center justify-center z-[9999] opacity-0 invisible transition-all duration-300 p-8">
+    <button class="modal-close fixed top-8 right-8 bg-slate-800/80 border border-slate-400/20 rounded-lg p-3 text-slate-200 cursor-pointer transition-all duration-200 z-[10000] flex items-center justify-center hover:bg-slate-800 hover:text-teal-300 hover:rotate-90" aria-label="Close modal">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
     </button>
-    <div class="modal-content">
-      <img id="modalImage" src="" alt="" />
+    <div class="max-w-[90vw] max-h-[90vh] relative animate-[modalZoom_0.3s_ease]">
+      <img id="modalImage" src="" alt="" class="max-w-full max-h-[90vh] w-auto h-auto rounded-lg shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-slate-400/20" />
     </div>
   </div>
 </section>
@@ -252,7 +250,7 @@ const projects = [
   const imageContainers = document.querySelectorAll('[data-image-modal]');
 
   imageContainers.forEach(container => {
-    const img = container.querySelector('.project-image') as HTMLImageElement;
+    const img = container.querySelector('img');
     if (img) {
       container.addEventListener('click', () => {
         modal?.classList.add('active');
@@ -286,259 +284,6 @@ const projects = [
 </script>
 
 <style>
-  .section {
-    margin-bottom: 6rem;
-    scroll-margin-top: 4rem;
-  }
-
-  .section-title {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    backdrop-filter: blur(8px);
-    background-color: rgba(15, 23, 42, 0.8);
-    padding: 1.5rem 0;
-    margin-bottom: 1.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--slate-200);
-  }
-
-  @media (min-width: 1024px) {
-    .section-title {
-      display: none;
-    }
-  }
-
-  .projects-list {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-
-  .project-card {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    transition: all 0.3s ease;
-  }
-
-  @media (min-width: 640px) {
-    .project-card {
-      grid-template-columns: 200px 1fr;
-    }
-  }
-
-  .project-card:hover {
-    background-color: rgba(30, 41, 59, 0.5);
-    box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.1);
-  }
-
-  .project-card:hover .project-title-link {
-    color: var(--teal-300);
-  }
-
-  .project-card:hover .external-link {
-    transform: translate(4px, -4px);
-  }
-
-  .project-image-container {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    border-radius: 0.25rem;
-    overflow: hidden;
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    background-color: rgba(15, 23, 42, 0.5);
-    position: relative;
-    cursor: pointer;
-  }
-
-  .project-image-container:has(.project-image):hover .image-overlay {
-    opacity: 1;
-  }
-
-  .image-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(15, 23, 42, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    color: var(--teal-300);
-    pointer-events: none;
-  }
-
-  .project-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .project-image-placeholder {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.8) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--slate-600);
-  }
-
-  .project-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .project-title {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--slate-200);
-    margin: 0;
-  }
-
-  .project-title-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--slate-200);
-    transition: color 0.2s ease;
-  }
-
-  .project-title-link:hover {
-    color: var(--teal-300);
-  }
-
-  .external-link {
-    transition: transform 0.2s ease;
-  }
-
-  .project-period {
-    color: var(--slate-400);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .project-description {
-    color: var(--slate-400);
-    line-height: 1.6;
-    font-size: 0.9rem;
-  }
-
-  .repository-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.25rem;
-  }
-
-  .repo-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.375rem 0.75rem;
-    background-color: rgba(148, 163, 184, 0.1);
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    color: var(--slate-300);
-    border-radius: 0.375rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-  }
-
-  .repo-link:hover {
-    background-color: rgba(94, 234, 212, 0.1);
-    border-color: var(--teal-400);
-    color: var(--teal-300);
-  }
-
-  .repo-link svg {
-    flex-shrink: 0;
-  }
-
-  .tech-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-  }
-
-  .tech-tag {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    background-color: rgba(94, 234, 212, 0.1);
-    color: var(--teal-300);
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-
-  .archive-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
-    color: var(--slate-200);
-    font-weight: 500;
-    transition: all 0.2s ease;
-  }
-
-  .archive-link:hover {
-    color: var(--teal-300);
-  }
-
-  .archive-link svg {
-    transition: transform 0.2s ease;
-  }
-
-  .archive-link:hover svg {
-    transform: translate(4px, -4px);
-  }
-
-  /* Image Modal Styles */
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(15, 23, 42, 0.95);
-    backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    padding: 2rem;
-  }
-
-  .modal.active {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .modal-content {
-    max-width: 90vw;
-    max-height: 90vh;
-    position: relative;
-    animation: modalZoom 0.3s ease;
-  }
-
   @keyframes modalZoom {
     from {
       transform: scale(0.8);
@@ -548,36 +293,8 @@ const projects = [
     }
   }
 
-  .modal-content img {
-    max-width: 100%;
-    max-height: 90vh;
-    width: auto;
-    height: auto;
-    border-radius: 0.5rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(148, 163, 184, 0.2);
-  }
-
-  .modal-close {
-    position: fixed;
-    top: 2rem;
-    right: 2rem;
-    background: rgba(30, 41, 59, 0.8);
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    border-radius: 0.5rem;
-    padding: 0.75rem;
-    color: var(--slate-200);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .modal-close:hover {
-    background: rgba(30, 41, 59, 1);
-    color: var(--teal-300);
-    transform: rotate(90deg);
+  #imageModal.active {
+    opacity: 1;
+    visibility: visible;
   }
 </style>
