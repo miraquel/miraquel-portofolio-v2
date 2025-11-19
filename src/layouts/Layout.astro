@@ -16,5 +16,23 @@ import "../styles/global.css";
 	</head>
 	<body class="m-0 w-full min-h-screen bg-slate-900 text-slate-400 font-sans leading-normal">
 		<slot />
+
+		<!-- Firebase Analytics -->
+		<script>
+			import { app } from '../lib/firebase';
+			import { getAnalytics, logEvent } from 'firebase/analytics';
+
+			// Initialize analytics only in browser
+			if (typeof window !== 'undefined') {
+				const analytics = getAnalytics(app);
+
+				// Log page view
+				logEvent(analytics, 'page_view', {
+					page_title: document.title,
+					page_location: window.location.href,
+					page_path: window.location.pathname
+				});
+			}
+		</script>
 	</body>
 </html>

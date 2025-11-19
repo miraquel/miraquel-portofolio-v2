@@ -1,8 +1,7 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApp, type FirebaseApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
 // Your Firebase configuration
-// Replace these with your actual Firebase project credentials
 const firebaseConfig = {
   apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY,
   authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -12,10 +11,21 @@ const firebaseConfig = {
   appId: import.meta.env.PUBLIC_FIREBASE_APP_ID
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Get or initialize Firebase app (prevents duplicate initialization)
+function getFirebaseApp(): FirebaseApp {
+  try {
+    return getApp();
+  } catch {
+    return initializeApp(firebaseConfig);
+  }
+}
+
+const app = getFirebaseApp();
 
 // Initialize Firestore
 // For default database, use: getFirestore(app)
 // For named database (Blaze plan only), use: getFirestore(app, 'database-name')
 export const db = getFirestore(app);
+
+// Export the app for use in other modules (like analytics)
+export { app };
