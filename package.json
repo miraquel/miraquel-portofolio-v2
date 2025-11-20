@@ -14,7 +14,7 @@
     "init-statuses": "tsx scripts/init-statuses.ts"
   },
   "dependencies": {
-    "@astrojs/vercel": "^8.1.5",
+    "@astrojs/vercel": "^9.0.1",
     "@iconify-json/material-symbols": "^1.2.46",
     "@tailwindcss/vite": "^4.1.17",
     "astro": "^5.13.5",

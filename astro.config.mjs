@@ -5,16 +5,15 @@ import tailwindcss from '@tailwindcss/vite';
 
 import icon from 'astro-icon';
 
-import vercel from '@astrojs/vercel/serverless';
+import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
   integrations: [icon()],
-  
-  output: 'hybrid',
-  adapter: vercel(),
 
   vite: {
     plugins: [tailwindcss()]
-  }
+  },
+
+  adapter: vercel()
 });
