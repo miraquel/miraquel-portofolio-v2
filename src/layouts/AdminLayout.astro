@@ -6,6 +6,15 @@ interface Props {
 }
 
 const { title = 'Admin Panel' } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+// Determine active state
+const isActive = (path: string) => {
+  if (path === '/admin' && currentPath === '/admin') return true;
+  if (path === '/admin/posts' && currentPath === '/admin/posts') return true;
+  if (path === '/admin/posts/new' && currentPath.startsWith('/admin/posts/new')) return true;
+  return false;
+};
 ---
 
 <!doctype html>
@@ -28,14 +37,49 @@ const { title = 'Admin Panel' } = Astro.props;
           <div class="flex items-center gap-8">
             <h1 class="text-xl font-bold text-slate-200">Admin Panel</h1>
             <div class="hidden md:flex gap-4">
-              <a href="/admin" class="px-4 py-2 text-slate-300 hover:text-teal-300 transition-colors rounded-lg hover:bg-slate-700/50">
-                Dashboard
+              <a 
+                href="/admin" 
+                class={`group px-4 py-2 transition-colors rounded-lg ${
+                  isActive('/admin') 
+                    ? 'bg-slate-700/70' 
+                    : 'hover:bg-slate-700/50'
+                }`}
+              >
+                <span class={`transition-colors ${
+                  isActive('/admin')
+                    ? 'text-teal-300 font-medium'
+                    : 'text-slate-300 group-hover:text-teal-300'
+                }`}>Dashboard</span>
               </a>
-              <a href="/admin/posts" class="px-4 py-2 text-slate-300 hover:text-teal-300 transition-colors rounded-lg hover:bg-slate-700/50">
-                Blog Posts
+              <a 
+                href="/admin/posts" 
+                class={`group px-4 py-2 transition-colors rounded-lg ${
+                  isActive('/admin/posts') 
+                    ? 'bg-slate-700/70' 
+                    : 'hover:bg-slate-700/50'
+                }`}
+              >
+                <span class={`transition-colors ${
+                  isActive('/admin/posts')
+                    ? 'text-teal-300 font-medium'
+                    : 'text-slate-300 group-hover:text-teal-300'
+                }`}>Blog Posts</span>
               </a>
-              <a href="/admin/posts/new" class="px-4 py-2 text-slate-300 hover:text-teal-300 transition-colors rounded-lg hover:bg-slate-700/50">
-                New Post
+              <a 
+                href="/admin/posts/new" 
+                class={`group px-4 py-2 transition-colors rounded-lg ${
+                  isActive('/admin/posts/new') 
+                    ? 'bg-slate-700/70' 
+                    : 'hover:bg-slate-700/50'
+                }`}
+              >
+                <span class={`transition-colors ${
+                  isActive('/admin/posts/new')
+                    ? 'text-teal-300 font-medium'
+                    : 'text-slate-300 group-hover:text-teal-300'
+                }`}>
+                  New Post
+                </span>
               </a>
             </div>
           </div>
