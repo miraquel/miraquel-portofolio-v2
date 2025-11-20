@@ -12,7 +12,18 @@ export default defineConfig({
   integrations: [icon()],
 
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+            'ckeditor': ['ckeditor5']
+          }
+        }
+      },
+      chunkSizeWarningLimit: 1000
+    }
   },
 
   adapter: vercel()
