@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, getDocs, getDoc, doc, query, orderBy, limit, type DocumentData } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc, query, orderBy, type DocumentData } from 'firebase/firestore';
 
 export interface Status {
   id: string;
