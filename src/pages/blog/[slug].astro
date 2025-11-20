@@ -1,17 +1,15 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getAllBlogPosts, getBlogPostBySlug } from '../../lib/blog';
+import { getBlogPostBySlug } from '../../lib/blog';
 
-export async function getStaticPaths() {
-  const posts = await getAllBlogPosts();
-  
-  return posts.map(post => ({
-    params: { slug: post.slug },
-    props: { post }
-  }));
+export const prerender = false;
+
+const { slug } = Astro.params;
+const post = await getBlogPostBySlug(slug!);
+
+if (!post) {
+  return Astro.redirect('/blog');
 }
-
-const { post } = Astro.props;
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat('en-US', { 
@@ -57,9 +55,12 @@ function formatDate(date: Date): string {
       {post.tags.length > 0 && (
         <div class="flex flex-wrap gap-2">
           {post.tags.map((tag) => (
-            <span class="inline-block px-3 py-1 bg-teal-400/10 text-teal-300 rounded-full text-sm font-medium">
-              {tag}
-            </span>
+            <a
+              href={`/blog?tag=${encodeURIComponent(tag)}`}
+              class="px-3 pb-1 bg-teal-400/10 hover:bg-teal-400/20 hover:shadow-md rounded-full font-medium transition-all duration-200"
+            >
+              <span class="text-teal-300 text-sm inline-flex items-center">{tag}</span>
+            </a>
           ))}
         </div>
       )}

@@ -1,0 +1,98 @@
+---
+interface FilterItem {
+  label: string;
+  count: number;
+  value: string;
+  color?: string;
+}
+
+interface Props {
+  title: string;
+  items: FilterItem[];
+  selectedValue: string | null;
+  baseUrl: string;
+  paramName: string;
+  otherParams?: Record<string, string | null>;
+  showAll?: boolean;
+  allLabel?: string;
+  showClear?: boolean;
+}
+
+const { 
+  title, 
+  items, 
+  selectedValue, 
+  baseUrl, 
+  paramName,
+  otherParams = {},
+  showAll = true,
+  allLabel = 'All',
+  showClear = false
+} = Astro.props;
+
+// Build URL with other params
+const buildUrl = (value?: string) => {
+  const params = new URLSearchParams();
+  
+  // Add other params
+  Object.entries(otherParams).forEach(([key, val]) => {
+    if (val) params.set(key, val);
+  });
+  
+  // Add current filter value
+  if (value) {
+    params.set(paramName, value);
+  }
+  
+  return params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+};
+
+const totalCount = items.reduce((sum, item) => sum + item.count, 0);
+---
+
+<div>
+  <h3 class="text-sm font-medium text-slate-300 mb-2">{title}</h3>
+  <div class="flex flex-wrap gap-2">
+    {showClear && selectedValue && (
+      <a 
+        href={buildUrl()}
+        class="px-3 py-1 bg-slate-700 hover:bg-slate-600 font-medium rounded-lg transition-colors"
+      >
+        <span class="text-slate-300 text-sm">
+          ✕ Clear filter
+        </span>
+      </a>
+    )}
+    
+    {showAll && (
+      <a 
+        href={buildUrl()}
+        class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+          !selectedValue
+            ? 'bg-teal-500'
+            : 'bg-slate-800/50 hover:bg-slate-700'
+        }`}
+      >
+        <span class={!selectedValue ? 'text-slate-200' : 'text-slate-300'}>
+          {allLabel} ({totalCount})
+        </span>
+      </a>
+    )}
+    
+    {items.map(item => (
+      <a 
+        href={buildUrl(item.value)}
+        class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+          selectedValue === item.value
+            ? 'bg-teal-500'
+            : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700'
+        }`}
+        style={selectedValue === item.value && item.color ? `background-color: ${item.color}` : ''}
+      >
+        <span class={selectedValue === item.value ? 'text-slate-200' : 'text-slate-300'}>
+          {item.label} ({item.count})
+        </span>
+      </a>
+    ))}
+  </div>
+</div>

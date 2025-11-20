@@ -1,0 +1,275 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { db } from '../../lib/firebase';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import type { BlogPost } from '../../lib/blog';
+import { getAllStatuses } from '../../lib/blog';
+import FilterButtons from '../../components/FilterButtons.astro';
+
+export const prerender = false;
+
+const selectedTag = Astro.url.searchParams.get('tag');
+const selectedStatus = Astro.url.searchParams.get('status');
+
+// Get all statuses from the status collection
+const statuses = await getAllStatuses();
+const statusMap = new Map(statuses.map(s => [s.name, s]));
+
+let posts: BlogPost[] = [];
+let allPosts: BlogPost[] = [];
+let error = false;
+let tagCounts: Record<string, number> = {};
+
+try {
+  // Get all posts for tag counts and status counts
+  const allPostsQuery = query(collection(db, 'posts'), orderBy('publishedAt', 'desc'));
+  const allPostsSnapshot = await getDocs(allPostsQuery);
+  
+  allPosts = allPostsSnapshot.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      title: data.title,
+      slug: data.slug,
+      excerpt: data.excerpt,
+      content: data.content || '',
+      author: data.author,
+      publishedAt: data.publishedAt.toDate(),
+      tags: data.tags || [],
+      imageUrl: data.imageUrl,
+      status: data.status || 'published'
+    };
+  });
+  
+  // Calculate tag counts from posts (filtered by status if selected)
+  const postsForTagCount = selectedStatus 
+    ? allPosts.filter(post => post.status === selectedStatus)
+    : allPosts;
+    
+  const allTags: string[] = [];
+  postsForTagCount.forEach(post => {
+    if (post.tags && Array.isArray(post.tags)) {
+      allTags.push(...post.tags);
+    }
+  });
+  
+  tagCounts = allTags.reduce((acc, tag) => {
+    acc[tag] = (acc[tag] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Apply filters
+  posts = allPosts;
+  
+  if (selectedTag) {
+    posts = posts.filter(post => post.tags.includes(selectedTag));
+  }
+  
+  if (selectedStatus) {
+    posts = posts.filter(post => post.status === selectedStatus);
+  }
+} catch (err) {
+  console.error('Error loading posts:', err);
+  error = true;
+}
+
+// Calculate status counts dynamically
+const statusCounts: Record<string, number> = { all: allPosts.length };
+allPosts.forEach(post => {
+  const status = post.status || 'published';
+  statusCounts[status] = (statusCounts[status] || 0) + 1;
+});
+
+// Get all statuses from master collection and add their counts
+const availableStatuses = statuses.map(status => ({
+  ...status,
+  count: statusCounts[status.name] || 0
+})).sort((a, b) => a.order - b.order);
+
+// Prepare filter items for components
+const statusFilterItems = availableStatuses.map(status => ({
+  label: status.displayName,
+  count: status.count,
+  value: status.name,
+  color: status.color
+}));
+
+const tagFilterItems = Object.entries(tagCounts)
+  .sort((a, b) => b[1] - a[1])
+  .map(([tag, count]) => ({
+    label: tag,
+    count,
+    value: tag
+  }));
+---
+
+<AdminLayout title="Blog Posts">
+  <div class="mb-8 flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-200 mb-2">Blog Posts</h1>
+      <p class="text-slate-400">Manage all your blog posts</p>
+    </div>
+    <a 
+      href="/admin/posts/new" 
+      class="inline-flex items-center gap-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 font-semibold rounded-lg transition-colors"
+    >
+      <svg class="w-5 h-5 text-slate-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      <span class="text-slate-200">New Post</span>
+    </a>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="mb-6 space-y-4">
+    <!-- Status Filter -->
+    <FilterButtons 
+      title="Filter by Status:"
+      items={statusFilterItems}
+      selectedValue={selectedStatus}
+      baseUrl="/admin/posts"
+      paramName="status"
+      otherParams={{ tag: selectedTag }}
+      showAll={true}
+      allLabel="All"
+    />
+
+    <!-- Tag Filter -->
+    {tagFilterItems.length > 0 && (
+      <FilterButtons 
+        title="Filter by Tag:"
+        items={tagFilterItems}
+        selectedValue={selectedTag}
+        baseUrl="/admin/posts"
+        paramName="tag"
+        otherParams={{ status: selectedStatus }}
+        showAll={false}
+        showClear={true}
+      />
+    )}
+  </div>
+
+  <div class="space-y-4">
+    {error ? (
+      <div class="text-center py-12 text-red-400">
+        <p>Error loading posts. Please try again.</p>
+      </div>
+    ) : posts.length === 0 ? (
+      <div class="text-center py-12 text-slate-400">
+        <p class="mb-4">{selectedStatus || selectedTag ? 'No posts match the selected filters.' : 'No blog posts yet.'}</p>
+        <a 
+          href="/admin/posts" 
+          class="text-teal-300 hover:text-teal-200"
+        >
+          {selectedStatus || selectedTag ? 'Clear filters' : 'Create your first post'} →
+        </a>
+      </div>
+    ) : (
+      posts.map((post) => (
+        <div class="bg-slate-800/50 border border-slate-700 rounded-lg p-6 hover:border-slate-600 transition-colors">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <h3 class="text-xl font-semibold text-slate-200">{post.title}</h3>
+                {(() => {
+                  const status = statusMap.get(post.status || 'published');
+                  return status ? (
+                    <span 
+                      class="px-2 py-1 rounded text-xs font-medium text-white"
+                      style={`background-color: ${status.color}; opacity: 0.9;`}
+                    >
+                      {status.displayName}
+                    </span>
+                  ) : (
+                    <span class="px-2 py-1 rounded text-xs font-medium bg-slate-600/50 text-slate-400">
+                      {post.status}
+                    </span>
+                  );
+                })()}
+              </div>
+              <p class="text-slate-400 text-sm mb-3">{post.excerpt}</p>
+              <div class="flex items-center gap-4 text-xs text-slate-500">
+                <span>{post.author}</span>
+                <span>•</span>
+                <span>{post.publishedAt.toLocaleDateString()}</span>
+                <span>•</span>
+                <span>/blog/{post.slug}</span>
+              </div>
+              {post.tags.length > 0 && (
+                <div class="flex flex-wrap gap-2 mt-3">
+                  {post.tags.map((tag) => (
+                    <a 
+                      href={`/blog?tag=${encodeURIComponent(tag)}`}
+                      target="_blank" 
+                      class="px-2 pb-1 bg-teal-400/10 hover:bg-teal-600/50 rounded transition-colors"
+                    >
+                      <span class="text-teal-300 text-xs">{tag}</span>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div class="flex gap-2">
+              <a 
+                href={`/blog/${post.slug}`}
+                target="_blank"
+                class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded transition-colors text-sm"
+                title="View Post"
+              >
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </a>
+              <a 
+                href={`/admin/posts/edit/${post.id}`}
+                class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded transition-colors text-sm"
+                title="Edit Post"
+              >
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </a>
+              <button 
+                class="delete-btn px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded transition-colors text-sm"
+                title="Delete Post"
+                data-post-id={post.id}
+                data-post-title={post.title}
+              >
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      ))
+    )}
+  </div>
+</AdminLayout>
+
+<script>
+  import { db } from '../../lib/firebase';
+  import { deleteDoc, doc } from 'firebase/firestore';
+
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const target = e.currentTarget as HTMLButtonElement;
+      const postId = target.dataset.postId;
+      const postTitle = target.dataset.postTitle;
+
+      if (postId && postTitle && confirm(`Are you sure you want to delete "${postTitle}"? This cannot be undone.`)) {
+        try {
+          await deleteDoc(doc(db, 'posts', postId));
+          window.location.reload();
+        } catch (error) {
+          console.error('Error deleting post:', error);
+          alert('Failed to delete post. Please try again.');
+        }
+      }
+    });
+  });
+</script>

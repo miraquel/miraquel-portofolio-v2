@@ -1,0 +1,24 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Blog posts collection
+    match /posts/{post} {
+      // Anyone can read published posts
+      allow read: if true;
+      
+      // Only authenticated users can create, update, or delete
+      allow create, update, delete: if request.auth != null;
+    }
+    
+    // Status master collection
+    match /statuses/{status} {
+      // Anyone can read statuses
+      allow read: if true;
+      
+      // Allow initial creation (for init script) and authenticated write
+      allow create, update, delete: if true;
+    }
+    
+  }
+}

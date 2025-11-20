@@ -10,14 +10,19 @@
     "add-post": "tsx scripts/add-post.ts",
     "add-sample": "tsx scripts/add-sample-post.ts",
     "migrate-data": "tsx scripts/migrate-all-data.ts",
-    "cleanup-images": "tsx scripts/cleanup-images.ts"
+    "cleanup-images": "tsx scripts/cleanup-images.ts",
+    "init-statuses": "tsx scripts/init-statuses.ts"
   },
   "dependencies": {
+    "@iconify-json/material-symbols": "^1.2.46",
     "@tailwindcss/vite": "^4.1.17",
     "astro": "^5.13.5",
+    "astro-icon": "^1.1.5",
+    "ckeditor5": "^44.1.0",
     "firebase": "^12.6.0"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^24.10.1",
     "dotenv": "^17.2.3",
     "tailwindcss": "^4.1.17",

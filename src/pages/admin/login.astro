@@ -1,0 +1,105 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout>
+  <div class="min-h-screen flex items-center justify-center px-6 py-12 bg-slate-900">
+    <div class="w-full max-w-md">
+      <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg shadow-xl p-8">
+        <h1 class="text-3xl font-bold text-slate-200 mb-2">Admin Login</h1>
+        <p class="text-slate-400 mb-8">Sign in to manage blog posts</p>
+        
+        <form id="loginForm" class="space-y-6">
+          <div>
+            <label for="email" class="block text-sm font-medium text-slate-300 mb-2">
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="email"
+              required
+              class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+              placeholder="admin@example.com"
+            />
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium text-slate-300 mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              required
+              class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+              placeholder="••••••••"
+            />
+          </div>
+
+          <div id="errorMessage" class="hidden p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+          </div>
+
+          <button
+            type="submit"
+            id="loginButton"
+            class="w-full px-4 py-3 bg-teal-500 hover:bg-teal-600 text-slate-900 font-semibold rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+          >
+            Sign In
+          </button>
+        </form>
+
+        <div class="mt-6 text-center">
+          <a href="/" class="text-sm text-slate-400 hover:text-teal-300 transition-colors">
+            ← Back to Home
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { auth } from '../../lib/firebase';
+  import { signInWithEmailAndPassword } from 'firebase/auth';
+
+  const form = document.getElementById('loginForm') as HTMLFormElement;
+  const emailInput = document.getElementById('email') as HTMLInputElement;
+  const passwordInput = document.getElementById('password') as HTMLInputElement;
+  const errorMessage = document.getElementById('errorMessage') as HTMLDivElement;
+  const loginButton = document.getElementById('loginButton') as HTMLButtonElement;
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = emailInput.value;
+    const password = passwordInput.value;
+
+    // Hide previous error
+    errorMessage.classList.add('hidden');
+    
+    // Disable button during login
+    loginButton.disabled = true;
+    loginButton.textContent = 'Signing in...';
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      // Redirect to admin dashboard
+      window.location.href = '/admin';
+    } catch (error: any) {
+      // Show error message
+      errorMessage.classList.remove('hidden');
+      errorMessage.textContent = error.message || 'Failed to sign in. Please check your credentials.';
+      
+      // Re-enable button
+      loginButton.disabled = false;
+      loginButton.textContent = 'Sign In';
+    }
+  });
+
+  // Check if already logged in
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      window.location.href = '/admin';
+    }
+  });
+</script>

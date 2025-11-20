@@ -1,5 +1,6 @@
 import { initializeApp, getApp, type FirebaseApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -26,6 +27,9 @@ const app = getFirebaseApp();
 // For default database, use: getFirestore(app)
 // For named database (Blaze plan only), use: getFirestore(app, 'database-name')
 export const db = getFirestore(app);
+
+// Initialize Firebase Auth
+export const auth = getAuth(app);
 
 // Export the app for use in other modules (like analytics)
 export { app };

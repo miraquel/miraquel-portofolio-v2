@@ -1,0 +1,360 @@
+---
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { getAllStatuses } from '../../../../lib/blog';
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const statuses = await getAllStatuses();
+---
+
+<AdminLayout title="Edit Blog Post">
+  <div class="max-w-4xl">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-slate-200 mb-2">Edit Post</h1>
+      <p class="text-slate-400">Update blog post details</p>
+    </div>
+
+    <div id="loadingMessage" class="text-center py-12 text-slate-400">
+      Loading post...
+    </div>
+
+    <form id="postForm" class="space-y-6 hidden">
+      <input type="hidden" id="postId" value={id} />
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="md:col-span-2">
+          <label for="title" class="block text-sm font-medium text-slate-300 mb-2">
+            Title *
+          </label>
+          <input
+            type="text"
+            id="title"
+            required
+            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+          />
+        </div>
+
+        <div class="md:col-span-2">
+          <label for="slug" class="block text-sm font-medium text-slate-300 mb-2">
+            Slug *
+          </label>
+          <input
+            type="text"
+            id="slug"
+            required
+            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+          />
+        </div>
+
+        <div class="md:col-span-2">
+          <label for="excerpt" class="block text-sm font-medium text-slate-300 mb-2">
+            Excerpt *
+          </label>
+          <textarea
+            id="excerpt"
+            required
+            rows="3"
+            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+          ></textarea>
+        </div>
+
+        <div class="md:col-span-2">
+          <label for="content" class="block text-sm font-medium text-slate-300 mb-2">
+            Content *
+          </label>
+          <div class="prose prose-slate max-w-none bg-white rounded-lg">
+            <div id="editor"></div>
+          </div>
+          <input type="hidden" id="content" required />
+        </div>
+
+        <div>
+          <label for="author" class="block text-sm font-medium text-slate-300 mb-2">
+            Author *
+          </label>
+          <input
+            type="text"
+            id="author"
+            required
+            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+          />
+        </div>
+
+        <div>
+          <label for="publishedAt" class="block text-sm font-medium text-slate-300 mb-2">
+            Published Date *
+          </label>
+          <input
+            type="datetime-local"
+            id="publishedAt"
+            required
+            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+          />
+        </div>
+
+        <div>
+          <label for="imageUrl" class="block text-sm font-medium text-slate-300 mb-2">
+            Image URL
+          </label>
+          <input
+            type="url"
+            id="imageUrl"
+            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+          />
+        </div>
+
+        <div>
+          <label for="tags" class="block text-sm font-medium text-slate-300 mb-2">
+            Tags
+          </label>
+          <input
+            type="text"
+            id="tags"
+            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+          />
+          <p class="mt-1 text-xs text-slate-500">Comma-separated tags</p>
+        </div>
+
+        <div>
+          <label for="status" class="block text-sm font-medium text-slate-300 mb-2">
+            Status *
+          </label>
+          <select
+            id="status"
+            required
+            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+          >
+            {statuses.map(status => (
+              <option 
+                value={status.name}
+                data-status-id={status.id}
+              >
+                {status.displayName}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label for="readingTime" class="block text-sm font-medium text-slate-300 mb-2">
+            Reading Time (minutes)
+          </label>
+          <input
+            type="number"
+            id="readingTime"
+            min="1"
+            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+          />
+        </div>
+      </div>
+
+      <div id="errorMessage" class="hidden p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+      </div>
+
+      <div class="flex gap-4">
+        <button
+          type="submit"
+          id="submitButton"
+          class="px-6 py-3 bg-teal-500 hover:bg-teal-600 text-slate-900 font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+        >
+          Update Post
+        </button>
+        <a
+          href="/admin/posts"
+          class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold rounded-lg transition-colors text-center"
+        >
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</AdminLayout>
+
+<script>
+  import { ClassicEditor, Bold, Essentials, Italic, Paragraph, Undo, Heading, Link, List, BlockQuote, CodeBlock, Image, ImageUpload, MediaEmbed, Table, Indent, Underline, Strikethrough, Code } from 'ckeditor5';
+  import 'ckeditor5/ckeditor5.css';
+
+  import { db } from '../../../../lib/firebase';
+  import { doc, getDoc, updateDoc, Timestamp, collection, query, where, getDocs } from 'firebase/firestore';
+
+  const postId = (document.getElementById('postId') as HTMLInputElement)?.value;
+  const form = document.getElementById('postForm') as HTMLFormElement;
+  const loadingMessage = document.getElementById('loadingMessage') as HTMLDivElement;
+  const errorMessage = document.getElementById('errorMessage') as HTMLDivElement;
+  const submitButton = document.getElementById('submitButton') as HTMLButtonElement;
+  const contentInput = document.getElementById('content') as HTMLInputElement;
+  let originalSlug = '';
+
+  // Check if slug already exists (excluding current post)
+  async function isSlugUnique(slug: string): Promise<boolean> {
+    if (slug === originalSlug) return true; // Same slug as before is OK
+    const q = query(collection(db, 'posts'), where('slug', '==', slug));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.empty;
+  }
+
+  async function loadPost() {
+    if (!postId) {
+      loadingMessage.textContent = 'Post ID not found';
+      return;
+    }
+
+    try {
+      const docRef = doc(db, 'posts', postId);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        loadingMessage.textContent = 'Post not found';
+        return;
+      }
+
+      const data = docSnap.data();
+
+      // Store original slug for validation
+      originalSlug = data.slug;
+
+      // Populate form
+      (document.getElementById('title') as HTMLInputElement).value = data.title;
+      (document.getElementById('slug') as HTMLInputElement).value = data.slug;
+      (document.getElementById('excerpt') as HTMLTextAreaElement).value = data.excerpt;
+      (document.getElementById('author') as HTMLInputElement).value = data.author;
+      (document.getElementById('imageUrl') as HTMLInputElement).value = data.imageUrl || '';
+      (document.getElementById('tags') as HTMLInputElement).value = (data.tags || []).join(', ');
+      (document.getElementById('status') as HTMLSelectElement).value = data.status || 'published';
+      (document.getElementById('readingTime') as HTMLInputElement).value = data.readingTime || '';
+
+      // Format date for datetime-local input
+      const publishedDate = data.publishedAt.toDate();
+      publishedDate.setMinutes(publishedDate.getMinutes() - publishedDate.getTimezoneOffset());
+      (document.getElementById('publishedAt') as HTMLInputElement).value = publishedDate.toISOString().slice(0, 16);
+
+      // Show form, hide loading
+      loadingMessage.classList.add('hidden');
+      form.classList.remove('hidden');
+
+      // Initialize CKEditor with loaded content
+      ClassicEditor
+        .create(document.querySelector('#editor') as HTMLElement, {
+          licenseKey: 'GPL',
+          plugins: [Essentials, Bold, Italic, Underline, Strikethrough, Code, Paragraph, Heading, Link, List, BlockQuote, CodeBlock, Image, ImageUpload, MediaEmbed, Table, Indent, Undo],
+          toolbar: {
+            items: [
+              'undo', 'redo', '|',
+              'heading', '|',
+              'bold', 'italic', 'underline', 'strikethrough', 'code', '|',
+              'link', 'blockQuote', 'codeBlock', '|',
+              'bulletedList', 'numberedList', 'outdent', 'indent', '|',
+              'insertTable', 'mediaEmbed'
+            ]
+          },
+          htmlSupport: {
+            allow: [
+              {
+                name: /.*/,
+                attributes: true,
+                classes: true,
+                styles: true
+              }
+            ]
+          },
+          heading: {
+            options: [
+              { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+              { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+              { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+              { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
+            ]
+          },
+          initialData: data.content
+        })
+        .then((editor: any) => {
+          
+          // Sync editor content to hidden input
+          editor.model.document.on('change:data', () => {
+            contentInput.value = editor.getData();
+          });
+
+          // Set initial value
+          contentInput.value = editor.getData();
+        })
+        .catch((error: any) => {
+          console.error('Error initializing editor:', error);
+        });
+    } catch (error) {
+      console.error('Error loading post:', error);
+      loadingMessage.textContent = 'Error loading post';
+    }
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    errorMessage.classList.add('hidden');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Updating...';
+
+    try {
+      const title = (document.getElementById('title') as HTMLInputElement).value;
+      const slug = (document.getElementById('slug') as HTMLInputElement).value;
+      const excerpt = (document.getElementById('excerpt') as HTMLTextAreaElement).value;
+      const content = (document.getElementById('content') as HTMLTextAreaElement).value;
+      const author = (document.getElementById('author') as HTMLInputElement).value;
+      const publishedAt = (document.getElementById('publishedAt') as HTMLInputElement).value;
+      const imageUrl = (document.getElementById('imageUrl') as HTMLInputElement).value;
+      const tagsInput = (document.getElementById('tags') as HTMLInputElement).value;
+      const status = (document.getElementById('status') as HTMLSelectElement).value;
+      const readingTimeInput = (document.getElementById('readingTime') as HTMLInputElement).value;
+
+      // Validate slug uniqueness
+      const slugUnique = await isSlugUnique(slug);
+      if (!slugUnique) {
+        throw new Error(`Slug "${slug}" already exists. Please use a different slug.`);
+      }
+
+      const tags = tagsInput
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(tag => tag.length > 0);
+
+      // Get statusId from selected option
+      const statusSelect = document.getElementById('status') as HTMLSelectElement;
+      const selectedOption = statusSelect.options[statusSelect.selectedIndex];
+      const statusId = selectedOption.getAttribute('data-status-id');
+
+      const postData: any = {
+        title,
+        slug,
+        excerpt,
+        content,
+        author,
+        publishedAt: Timestamp.fromDate(new Date(publishedAt)),
+        tags,
+        status,
+        statusId,
+        updatedAt: Timestamp.now()
+      };
+
+      if (imageUrl) {
+        postData.imageUrl = imageUrl;
+      }
+
+      if (readingTimeInput) {
+        postData.readingTime = parseInt(readingTimeInput);
+      }
+
+      await updateDoc(doc(db, 'posts', postId), postData);
+
+      window.location.href = '/admin/posts';
+    } catch (error: any) {
+      console.error('Error updating post:', error);
+      errorMessage.classList.remove('hidden');
+      errorMessage.textContent = error.message || 'Failed to update post. Please try again.';
+
+      submitButton.disabled = false;
+      submitButton.textContent = 'Update Post';
+    }
+  });
+
+  loadPost();
+</script>
