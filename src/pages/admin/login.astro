@@ -1,60 +1,44 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import '../../styles/admin.css';
 ---
 
 <Layout>
-  <div class="min-h-screen flex items-center justify-center px-6 py-12 bg-slate-900">
-    <div class="w-full max-w-md">
-      <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg shadow-xl p-8">
-        <h1 class="text-3xl font-bold text-slate-200 mb-2">Admin Login</h1>
-        <p class="text-slate-400 mb-8">Sign in to manage blog posts</p>
-        
-        <form id="loginForm" class="space-y-6">
+  <div class="admin-login-page">
+    <section class="admin-login-intro">
+      <div class="admin-login-wordmark">Chaidir Ali Assegaf · Content Studio</div>
+      <div class="admin-login-intro-copy">
+        <div class="admin-eyebrow">Private workspace</div>
+        <h1>Write with focus.<br />Publish with intent.</h1>
+        <p>A quiet workspace for shaping articles, managing drafts, and keeping your portfolio current.</p>
+      </div>
+      <div class="admin-login-footnote">Portfolio publishing system</div>
+    </section>
+
+    <section class="admin-login-panel">
+      <div class="admin-login-form-wrap">
+        <h2>Welcome back</h2>
+        <p>Sign in to continue to your workspace.</p>
+
+        <form id="loginForm" class="space-y-5">
           <div>
-            <label for="email" class="block text-sm font-medium text-slate-300 mb-2">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              required
-              class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-              placeholder="admin@example.com"
-            />
+            <label for="email">Email address</label>
+            <input type="email" id="email" required autocomplete="email" placeholder="admin@example.com" />
           </div>
 
           <div>
-            <label for="password" class="block text-sm font-medium text-slate-300 mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              required
-              class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-              placeholder="••••••••"
-            />
+            <label for="password">Password</label>
+            <input type="password" id="password" required autocomplete="current-password" placeholder="••••••••" />
           </div>
 
-          <div id="errorMessage" class="hidden p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
-          </div>
+          <div id="errorMessage" class="hidden p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-xs"></div>
 
-          <button
-            type="submit"
-            id="loginButton"
-            class="w-full px-4 py-3 bg-teal-500 hover:bg-teal-600 text-slate-900 font-semibold rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-slate-900"
-          >
-            Sign In
-          </button>
+          <button type="submit" id="loginButton" class="admin-login-submit">Sign in</button>
         </form>
 
-        <div class="mt-6 text-center">
-          <a href="/" class="text-sm text-slate-400 hover:text-teal-300 transition-colors">
-            ← Back to Home
-          </a>
-        </div>
+        <a href="/" class="admin-login-back">← Return to portfolio</a>
       </div>
-    </div>
+    </section>
   </div>
 </Layout>
 
@@ -97,7 +81,7 @@ import Layout from '../../layouts/Layout.astro';
       
       // Re-enable button
       loginButton.disabled = false;
-      loginButton.textContent = 'Sign In';
+      loginButton.textContent = 'Sign in';
     }
   });
 

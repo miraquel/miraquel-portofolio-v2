@@ -5,22 +5,35 @@ export const prerender = false;
 ---
 
 <AdminLayout title="Dashboard">
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-slate-200 mb-2">Dashboard</h1>
-    <p class="text-slate-400">Overview of your blog content</p>
-  </div>
+  <header class="admin-page-header">
+    <div>
+      <div class="admin-eyebrow">Workspace</div>
+      <h1 class="admin-page-title">Dashboard</h1>
+      <p class="admin-page-description">A focused view of your publishing activity.</p>
+    </div>
+    <a href="/admin/posts/new" class="admin-primary-button">Create post <span aria-hidden="true">＋</span></a>
+  </header>
 
-  <div id="loadingStats" class="text-slate-400">Loading dashboard…</div>
-  <div id="stats" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"></div>
+  <div id="loadingStats" class="admin-page-description">Loading publishing data…</div>
+  <div id="stats" class="admin-metric-rail hidden"></div>
   <div id="statsError" class="hidden p-4 rounded-lg bg-red-500/10 text-red-400"></div>
 
-  <div class="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-    <h2 class="text-xl font-bold text-slate-200 mb-4">Quick Actions</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <a href="/admin/posts/new" class="p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-teal-300">Create New Post</a>
-      <a href="/admin/posts" class="p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-teal-300">Manage Posts</a>
+  <section class="admin-command-section">
+    <div>
+      <h2 class="admin-section-title">Continue working</h2>
+      <p class="admin-section-copy">Jump back into the two tasks you use most.</p>
     </div>
-  </div>
+    <div class="admin-command-list">
+      <a href="/admin/posts/new" class="admin-command">
+        <span><strong>Write a new post</strong><span>Start in the editor with a clean draft.</span></span>
+        <span aria-hidden="true">→</span>
+      </a>
+      <a href="/admin/posts" class="admin-command">
+        <span><strong>Review your library</strong><span>Edit, filter, publish, or archive existing work.</span></span>
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
 </AdminLayout>
 
 <script>
@@ -57,13 +70,12 @@ export const prerender = false;
 
       for (const card of cards) {
         const element = document.createElement('div');
-        element.className = 'bg-slate-800/50 border border-slate-700 rounded-lg p-6';
+        element.className = 'admin-metric';
         const label = document.createElement('div');
-        label.className = 'text-sm text-slate-400 mb-2';
+        label.className = 'admin-metric-label';
         label.textContent = String(card.label);
         const count = document.createElement('div');
-        count.className = 'text-3xl font-bold';
-        count.style.color = String(card.color);
+        count.className = 'admin-metric-value';
         count.textContent = String(card.count);
         element.append(label, count);
         stats.append(element);

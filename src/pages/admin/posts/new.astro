@@ -8,13 +8,16 @@ const statuses = await getAllStatuses();
 ---
 
 <AdminLayout title="New Blog Post">
-  <div class="max-w-4xl">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-slate-200 mb-2">Create New Post</h1>
-      <p class="text-slate-400">Fill in the details to create a new blog post</p>
-    </div>
+  <div class="max-w-5xl">
+    <header class="admin-page-header">
+      <div>
+        <div class="admin-eyebrow">Editor</div>
+        <h1 class="admin-page-title">Create a new post</h1>
+        <p class="admin-page-description">Shape the story first. Publishing controls stay close at hand.</p>
+      </div>
+    </header>
 
-    <form id="postForm" class="space-y-6">
+    <form id="postForm" class="admin-form space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="md:col-span-2">
           <label for="title" class="block text-sm font-medium text-slate-300 mb-2">
@@ -158,13 +161,13 @@ const statuses = await getAllStatuses();
         <button
           type="submit"
           id="submitButton"
-          class="px-6 py-3 bg-teal-500 hover:bg-teal-600 text-slate-200 font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+          class="admin-primary-button"
         >
           Create Post
         </button>
         <a
           href="/admin/posts"
-          class="px-4 py-3 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-center"
+          class="admin-action-button inline-flex items-center justify-center px-4"
         >
           <span class="text-slate-200 font-medium">
             Cancel

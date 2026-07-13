@@ -5,18 +5,19 @@ export const prerender = false;
 ---
 
 <AdminLayout title="Blog Posts">
-  <div class="flex items-center justify-between mb-8">
+  <header class="admin-page-header">
     <div>
-      <h1 class="text-3xl font-bold text-slate-200 mb-2">Blog Posts</h1>
-      <p class="text-slate-400">Manage all blog posts</p>
+      <div class="admin-eyebrow">Content library</div>
+      <h1 class="admin-page-title">Blog posts</h1>
+      <p class="admin-page-description">Find, review, and manage everything you have written.</p>
     </div>
-    <a href="/admin/posts/new" class="px-4 py-3 bg-teal-500 hover:bg-teal-600 text-slate-900 font-semibold rounded-lg">New Post</a>
-  </div>
+    <a href="/admin/posts/new" class="admin-primary-button">New post <span aria-hidden="true">＋</span></a>
+  </header>
 
-  <div id="postFilters" class="hidden mb-6 space-y-3"></div>
-  <div id="loadingPosts" class="text-slate-400">Loading posts…</div>
+  <div id="postFilters" class="admin-filterbar hidden"></div>
+  <div id="loadingPosts" class="admin-page-description">Loading your library…</div>
   <div id="postsError" class="hidden p-4 rounded-lg bg-red-500/10 text-red-400"></div>
-  <div id="posts" class="hidden space-y-4"></div>
+  <div id="posts" class="admin-post-list hidden"></div>
 </AdminLayout>
 
 <script>
@@ -46,7 +47,7 @@ export const prerender = false;
     const params = new URLSearchParams(window.location.search);
     value ? params.set(param, value) : params.delete(param);
     link.href = params.size ? `/admin/posts?${params}` : '/admin/posts';
-    link.className = `inline-block px-3 py-1.5 rounded-full text-xs ${active ? 'bg-teal-500 text-slate-900' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`;
+    link.className = `admin-filter-chip ${active ? 'is-active' : ''}`;
     link.textContent = label;
     return link;
   }
@@ -63,11 +64,11 @@ export const prerender = false;
       const statuses = [...new Set((allPostData as any[]).map(post => post.status || 'draft'))].sort();
       const tags = [...new Set((allPostData as any[]).flatMap(post => post.tags || []))].sort();
       const statusRow = document.createElement('div');
-      statusRow.className = 'flex flex-wrap gap-2';
+      statusRow.className = 'admin-filter-row';
       statusRow.append(filterLink('All statuses', 'status', null, !selectedStatus));
       for (const status of statuses) statusRow.append(filterLink(status, 'status', status, selectedStatus === status));
       const tagRow = document.createElement('div');
-      tagRow.className = 'flex flex-wrap gap-2';
+      tagRow.className = 'admin-filter-row';
       tagRow.append(filterLink('All tags', 'tag', null, !selectedTag));
       for (const tag of tags) tagRow.append(filterLink(tag, 'tag', tag, selectedTag === tag));
       filters.append(statusRow, tagRow);
@@ -80,28 +81,28 @@ export const prerender = false;
 
       for (const post of postData) {
         const card = document.createElement('article');
-        card.className = 'bg-slate-800/50 border border-slate-700 rounded-lg p-6 flex flex-col md:flex-row md:items-center justify-between gap-4';
+        card.className = 'admin-post-row';
         const details = document.createElement('div');
         details.append(
-          textElement('h2', post.title, 'text-xl font-semibold text-slate-200'),
-          textElement('p', post.excerpt, 'text-sm text-slate-400 mt-1'),
-          textElement('p', `Status: ${post.status || 'draft'}`, 'text-xs text-teal-300 mt-2')
+          textElement('h2', post.title, 'admin-post-title'),
+          textElement('p', post.excerpt, 'admin-post-excerpt'),
+          textElement('span', post.status || 'draft', 'admin-post-status')
         );
 
         const actions = document.createElement('div');
-        actions.className = 'flex gap-3';
+        actions.className = 'admin-post-actions';
         const view = document.createElement('a');
         view.href = `/blog/${encodeURIComponent(post.slug)}`;
         view.target = '_blank';
         view.rel = 'noopener noreferrer';
-        view.className = 'px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg';
+        view.className = 'admin-action-button';
         view.textContent = 'View';
         const edit = document.createElement('a');
         edit.href = `/admin/posts/edit/${encodeURIComponent(post.id)}`;
-        edit.className = 'px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg';
+        edit.className = 'admin-action-button';
         edit.textContent = 'Edit';
         const remove = document.createElement('button');
-        remove.className = 'px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg';
+        remove.className = 'admin-action-button is-danger';
         remove.textContent = 'Delete';
         remove.addEventListener('click', async () => {
           if (!confirm(`Delete "${post.title}"? This cannot be undone.`)) return;
@@ -119,7 +120,7 @@ export const prerender = false;
         posts.append(card);
       }
 
-      if (postData.length === 0) posts.append(textElement('p', 'No posts found.', 'text-slate-400'));
+      if (postData.length === 0) posts.append(textElement('p', 'No posts match these filters.', 'admin-page-description'));
       loading.classList.add('hidden');
       posts.classList.remove('hidden');
     } catch (error) {

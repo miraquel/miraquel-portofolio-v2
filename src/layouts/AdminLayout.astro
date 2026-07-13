@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import '../styles/admin.css';
 
 interface Props {
   title?: string;
@@ -8,13 +9,18 @@ interface Props {
 const { title = 'Admin Panel' } = Astro.props;
 const currentPath = Astro.url.pathname;
 
-// Determine active state
 const isActive = (path: string) => {
-  if (path === '/admin' && currentPath === '/admin') return true;
-  if (path === '/admin/posts' && currentPath === '/admin/posts') return true;
-  if (path === '/admin/posts/new' && currentPath.startsWith('/admin/posts/new')) return true;
+  if (path === '/admin') return currentPath === '/admin';
+  if (path === '/admin/posts/new') return currentPath.startsWith('/admin/posts/new');
+  if (path === '/admin/posts') return currentPath.startsWith('/admin/posts') && !currentPath.startsWith('/admin/posts/new');
   return false;
 };
+
+const navItems = [
+  { href: '/admin', label: 'Dashboard', icon: 'home' },
+  { href: '/admin/posts', label: 'Blog Posts', icon: 'document' },
+  { href: '/admin/posts/new', label: 'New Post', icon: 'plus' }
+];
 ---
 
 <!doctype html>
@@ -24,105 +30,88 @@ const isActive = (path: string) => {
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <title>{title} - Chaidir Ali Assegaf</title>
   </head>
-  <body class="m-0 w-full min-h-screen bg-slate-900 text-slate-400 font-sans leading-normal">
-    <!-- Admin Navigation -->
-    <nav class="bg-slate-800/50 backdrop-blur-sm border-b border-slate-700 sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-6 py-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-8">
-            <h1 class="text-xl font-bold text-slate-200">Admin Panel</h1>
-            <div class="hidden md:flex gap-4">
-              <a 
-                href="/admin" 
-                class={`group px-4 py-2 transition-colors rounded-lg ${
-                  isActive('/admin') 
-                    ? 'bg-slate-700/70' 
-                    : 'hover:bg-slate-700/50'
-                }`}
-              >
-                <span class={`transition-colors ${
-                  isActive('/admin')
-                    ? 'text-teal-300 font-medium'
-                    : 'text-slate-300 group-hover:text-teal-300'
-                }`}>Dashboard</span>
-              </a>
-              <a 
-                href="/admin/posts" 
-                class={`group px-4 py-2 transition-colors rounded-lg ${
-                  isActive('/admin/posts') 
-                    ? 'bg-slate-700/70' 
-                    : 'hover:bg-slate-700/50'
-                }`}
-              >
-                <span class={`transition-colors ${
-                  isActive('/admin/posts')
-                    ? 'text-teal-300 font-medium'
-                    : 'text-slate-300 group-hover:text-teal-300'
-                }`}>Blog Posts</span>
-              </a>
-              <a 
-                href="/admin/posts/new" 
-                class={`group px-4 py-2 transition-colors rounded-lg ${
-                  isActive('/admin/posts/new') 
-                    ? 'bg-slate-700/70' 
-                    : 'hover:bg-slate-700/50'
-                }`}
-              >
-                <span class={`transition-colors ${
-                  isActive('/admin/posts/new')
-                    ? 'text-teal-300 font-medium'
-                    : 'text-slate-300 group-hover:text-teal-300'
-                }`}>
-                  New Post
-                </span>
-              </a>
-            </div>
-          </div>
-          <div class="flex items-center gap-4">
-            <a href="/" target="_blank" class="text-slate-400 hover:text-teal-300 transition-colors">
-              View Site →
+  <body class="admin-shell">
+    <div class="admin-frame">
+      <aside class="admin-sidebar">
+        <a href="/admin" class="admin-brand">
+          <span class="admin-brand-mark">CA</span>
+          <span class="admin-brand-copy">
+            <strong>Content Studio</strong>
+            <span>Portfolio admin</span>
+          </span>
+        </a>
+
+        <nav class="admin-nav" aria-label="Admin navigation">
+          <div class="admin-nav-label">Workspace</div>
+          {navItems.map(item => (
+            <a href={item.href} class={`admin-nav-link ${isActive(item.href) ? 'is-active' : ''}`}>
+              {item.icon === 'home' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/></svg>}
+              {item.icon === 'document' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l3 3v15H6z"/><path d="M9 11h6M9 15h6"/></svg>}
+              {item.icon === 'plus' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>}
+              <span>{item.label}</span>
             </a>
-            <button id="logoutButton" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition-colors">
-              Logout
-            </button>
-          </div>
+          ))}
+        </nav>
+
+        <div class="admin-sidebar-footer">
+          <a href="/" target="_blank" rel="noopener noreferrer" class="admin-sidebar-action">
+            <span>View live site</span><span>↗</span>
+          </a>
+          <button class="admin-sidebar-action js-logout">
+            <span>Sign out</span><span>→</span>
+          </button>
         </div>
+      </aside>
+
+      <div class="admin-workspace">
+        <header class="admin-mobile-header">
+          <span class="admin-mobile-brand">Content Studio</span>
+          <span class="admin-mobile-actions">
+            <a href="/" target="_blank" rel="noopener noreferrer">View site ↗</a>
+            <button class="admin-mobile-logout js-logout">Sign out</button>
+          </span>
+        </header>
+
+        <main class="admin-main">
+          <slot />
+        </main>
+
+        <nav class="admin-mobile-nav" aria-label="Mobile admin navigation">
+          {navItems.map(item => (
+            <a href={item.href} class={`admin-nav-link ${isActive(item.href) ? 'is-active' : ''}`}>
+              {item.icon === 'home' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/></svg>}
+              {item.icon === 'document' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l3 3v15H6z"/><path d="M9 11h6M9 15h6"/></svg>}
+              {item.icon === 'plus' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>}
+              <span>{item.label}</span>
+            </a>
+          ))}
+        </nav>
       </div>
-    </nav>
+    </div>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-6 py-8">
-      <slot />
-    </main>
-
-    <!-- Auth Check Script -->
     <script>
       import { auth } from '../lib/firebase';
       import { signOut, onAuthStateChanged } from 'firebase/auth';
       import { isAdmin } from '../lib/admin';
 
-      // Check authentication
-      onAuthStateChanged(auth, async (user) => {
+      onAuthStateChanged(auth, async user => {
         if (!(await isAdmin(user)) && !window.location.pathname.includes('/admin/login')) {
           await signOut(auth);
           window.location.replace('/admin/login');
         }
       });
 
-      // Logout handler
-      const logoutButton = document.getElementById('logoutButton');
-      logoutButton?.addEventListener('click', async () => {
-        try {
-          await signOut(auth);
-          window.location.href = '/admin/login';
-        } catch (error) {
-          console.error('Logout failed:', error);
-        }
+      document.querySelectorAll('.js-logout').forEach(button => {
+        button.addEventListener('click', async () => {
+          try {
+            await signOut(auth);
+            window.location.href = '/admin/login';
+          } catch (error) {
+            console.error('Logout failed:', error);
+          }
+        });
       });
     </script>
   </body>
