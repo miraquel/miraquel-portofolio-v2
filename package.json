@@ -2,31 +2,39 @@
   "name": "miraquel-portofolio",
   "type": "module",
   "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0",
+    "npm": ">=9.6.5"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "test": "tsx --test tests/**/*.test.ts",
     "astro": "astro",
     "add-post": "tsx scripts/add-post.ts",
     "add-sample": "tsx scripts/add-sample-post.ts",
-    "migrate-data": "tsx scripts/migrate-all-data.ts",
-    "cleanup-images": "tsx scripts/cleanup-images.ts",
     "init-statuses": "tsx scripts/init-statuses.ts"
   },
   "dependencies": {
-    "@astrojs/vercel": "^9.0.1",
-    "@iconify-json/material-symbols": "^1.2.46",
-    "@tailwindcss/vite": "^4.1.17",
-    "astro": "^5.13.5",
-    "astro-icon": "^1.1.5",
-    "ckeditor5": "^44.1.0",
-    "firebase": "^12.6.0"
+    "@astrojs/vercel": "^11.0.2",
+    "@tailwindcss/vite": "^4.3.2",
+    "astro": "^7.0.7",
+    "ckeditor5": "^48.3.0",
+    "firebase": "^12.16.0",
+    "sanitize-html": "^2.17.6"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.19",
-    "@types/node": "^24.10.1",
-    "dotenv": "^17.2.3",
-    "tailwindcss": "^4.1.17",
-    "tsx": "^4.20.6"
+    "@astrojs/check": "^0.9.9",
+    "@tailwindcss/typography": "^0.5.20",
+    "@types/node": "^26.1.1",
+    "@types/sanitize-html": "^2.16.1",
+    "dotenv": "^17.4.2",
+    "tailwindcss": "^4.3.2",
+    "tsx": "^4.23.0",
+    "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "path-to-regexp": "^6.3.0"
   }
 }

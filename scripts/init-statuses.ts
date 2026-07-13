@@ -3,6 +3,7 @@ dotenv.config();
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, addDoc, getDocs } from 'firebase/firestore';
+import { signInAsAdmin } from './firebase-admin-login';
 
 const firebaseConfig = {
   apiKey: process.env.PUBLIC_FIREBASE_API_KEY,
@@ -55,6 +56,7 @@ const defaultStatuses: Omit<Status, 'id'>[] = [
 
 async function initStatuses() {
   try {
+    await signInAsAdmin(app);
     console.log('Initializing status collection...');
 
     const statusesRef = collection(db, 'statuses');

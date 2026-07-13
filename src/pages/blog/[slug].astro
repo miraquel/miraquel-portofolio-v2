@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getBlogPostBySlug } from '../../lib/blog';
+import { sanitizePostContent } from '../../lib/sanitize';
 
 export const prerender = false;
 
@@ -10,6 +11,8 @@ const post = await getBlogPostBySlug(slug!);
 if (!post) {
   return Astro.redirect('/blog');
 }
+
+const safeContent = sanitizePostContent(post.content);
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat('en-US', { 
@@ -67,7 +70,7 @@ function formatDate(date: Date): string {
     </header>
 
     <div class="prose prose-invert prose-slate max-w-none">
-      <div class="text-slate-300 leading-relaxed space-y-4" set:html={post.content} />
+      <div class="text-slate-300 leading-relaxed space-y-4" set:html={safeContent} />
     </div>
   </article>
 </Layout>

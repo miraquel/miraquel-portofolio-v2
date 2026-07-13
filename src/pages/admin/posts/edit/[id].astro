@@ -177,8 +177,11 @@ const statuses = await getAllStatuses();
   import { ClassicEditor, Bold, Essentials, Italic, Paragraph, Undo, Heading, Link, List, BlockQuote, CodeBlock, Image, ImageUpload, MediaEmbed, Table, Indent, Underline, Strikethrough, Code } from 'ckeditor5';
   import 'ckeditor5/ckeditor5.css';
 
-  import { db } from '../../../../lib/firebase';
-  import { doc, getDoc, updateDoc, Timestamp, collection, query, where, getDocs } from 'firebase/firestore';
+  import { auth, db } from '../../../../lib/firebase';
+  import { deleteField, doc, getDoc, Timestamp } from 'firebase/firestore';
+  import { onAuthStateChanged } from 'firebase/auth';
+  import { updatePost } from '../../../../lib/post-writes';
+  import { isAdmin } from '../../../../lib/admin';
 
   const postId = (document.getElementById('postId') as HTMLInputElement)?.value;
   const form = document.getElementById('postForm') as HTMLFormElement;
@@ -187,14 +190,6 @@ const statuses = await getAllStatuses();
   const submitButton = document.getElementById('submitButton') as HTMLButtonElement;
   const contentInput = document.getElementById('content') as HTMLInputElement;
   let originalSlug = '';
-
-  // Check if slug already exists (excluding current post)
-  async function isSlugUnique(slug: string): Promise<boolean> {
-    if (slug === originalSlug) return true; // Same slug as before is OK
-    const q = query(collection(db, 'posts'), where('slug', '==', slug));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.empty;
-  }
 
   async function loadPost() {
     if (!postId) {
@@ -237,7 +232,8 @@ const statuses = await getAllStatuses();
 
       // Initialize CKEditor with loaded content
       ClassicEditor
-        .create(document.querySelector('#editor') as HTMLElement, {
+        .create({
+          attachTo: document.querySelector('#editor') as HTMLElement,
           licenseKey: 'GPL',
           plugins: [Essentials, Bold, Italic, Underline, Strikethrough, Code, Paragraph, Heading, Link, List, BlockQuote, CodeBlock, Image, ImageUpload, MediaEmbed, Table, Indent, Undo],
           toolbar: {
@@ -268,7 +264,9 @@ const statuses = await getAllStatuses();
               { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
             ]
           },
-          initialData: data.content
+          root: {
+            initialData: data.content
+          }
         })
         .then((editor: any) => {
           
@@ -308,12 +306,6 @@ const statuses = await getAllStatuses();
       const status = (document.getElementById('status') as HTMLSelectElement).value;
       const readingTimeInput = (document.getElementById('readingTime') as HTMLInputElement).value;
 
-      // Validate slug uniqueness
-      const slugUnique = await isSlugUnique(slug);
-      if (!slugUnique) {
-        throw new Error(`Slug "${slug}" already exists. Please use a different slug.`);
-      }
-
       const tags = tagsInput
         .split(',')
         .map(tag => tag.trim())
@@ -337,15 +329,10 @@ const statuses = await getAllStatuses();
         updatedAt: Timestamp.now()
       };
 
-      if (imageUrl) {
-        postData.imageUrl = imageUrl;
-      }
+      postData.imageUrl = imageUrl || deleteField();
+      postData.readingTime = readingTimeInput ? parseInt(readingTimeInput) : deleteField();
 
-      if (readingTimeInput) {
-        postData.readingTime = parseInt(readingTimeInput);
-      }
-
-      await updateDoc(doc(db, 'posts', postId), postData);
+      await updatePost(postId, originalSlug, postData);
 
       window.location.href = '/admin/posts';
     } catch (error: any) {
@@ -358,5 +345,7 @@ const statuses = await getAllStatuses();
     }
   });
 
-  loadPost();
+  onAuthStateChanged(auth, async user => {
+    if (await isAdmin(user)) await loadPost();
+  });
 </script>

@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, getDocs, getDoc, doc, query, orderBy, type DocumentData } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc, query, where, limit, orderBy, type DocumentData } from 'firebase/firestore';
 
 export interface Status {
   id: string;
@@ -111,15 +111,12 @@ export async function getStatusByName(name: string): Promise<Status | null> {
 export async function getAllBlogPosts(): Promise<BlogPost[]> {
   try {
     const postsRef = collection(db, 'posts');
-    const q = query(postsRef, orderBy('publishedAt', 'desc'));
+    const q = query(postsRef, where('status', '==', 'published'));
     const querySnapshot = await getDocs(q);
     
     return querySnapshot.docs
       .map(doc => docToBlogPost(doc.id, doc.data()))
-      .filter(post => {
-        const data = querySnapshot.docs.find(d => d.id === post.id)?.data();
-        return data?.status === 'published' || !data?.status;
-      });
+      .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
   } catch (error) {
     console.error('Error fetching blog posts:', error);
     return [];
@@ -130,15 +127,12 @@ export async function getAllBlogPosts(): Promise<BlogPost[]> {
 export async function getRecentBlogPosts(count: number = 5): Promise<BlogPost[]> {
   try {
     const postsRef = collection(db, 'posts');
-    const q = query(postsRef, orderBy('publishedAt', 'desc'));
+    const q = query(postsRef, where('status', '==', 'published'));
     const querySnapshot = await getDocs(q);
     
     return querySnapshot.docs
-      .filter(doc => {
-        const data = doc.data();
-        return data.status === 'published' || !data.status;
-      })
       .map(doc => docToBlogPost(doc.id, doc.data()))
+      .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime())
       .slice(0, count);
   } catch (error) {
     console.error('Error fetching recent blog posts:', error);
@@ -150,13 +144,10 @@ export async function getRecentBlogPosts(count: number = 5): Promise<BlogPost[]>
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
   try {
     const postsRef = collection(db, 'posts');
-    const q = query(postsRef);
+    const q = query(postsRef, where('slug', '==', slug), where('status', '==', 'published'), limit(1));
     const querySnapshot = await getDocs(q);
     
-    const postDoc = querySnapshot.docs.find(doc => {
-      const data = doc.data();
-      return data.slug === slug && (data.status === 'published' || !data.status);
-    });
+    const postDoc = querySnapshot.docs[0];
     
     if (!postDoc) {
       return null;
@@ -190,15 +181,13 @@ export async function getBlogPostById(id: string): Promise<BlogPost | null> {
 export async function getAllTags(): Promise<string[]> {
   try {
     const postsRef = collection(db, 'posts');
-    const querySnapshot = await getDocs(postsRef);
+    const querySnapshot = await getDocs(query(postsRef, where('status', '==', 'published')));
     
     const tagsSet = new Set<string>();
     querySnapshot.docs.forEach(doc => {
       const data = doc.data();
-      if (data.status === 'published' || !data.status) {
-        const tags = data.tags || [];
-        tags.forEach((tag: string) => tagsSet.add(tag));
-      }
+      const tags = data.tags || [];
+      tags.forEach((tag: string) => tagsSet.add(tag));
     });
     
     return Array.from(tagsSet).sort();
@@ -212,16 +201,13 @@ export async function getAllTags(): Promise<string[]> {
 export async function getBlogPostsByTag(tag: string): Promise<BlogPost[]> {
   try {
     const postsRef = collection(db, 'posts');
-    const q = query(postsRef, orderBy('publishedAt', 'desc'));
+    const q = query(postsRef, where('status', '==', 'published'));
     const querySnapshot = await getDocs(q);
     
     return querySnapshot.docs
-      .filter(doc => {
-        const data = doc.data();
-        return data.status === 'published' || !data.status;
-      })
       .map(doc => docToBlogPost(doc.id, doc.data()))
-      .filter(post => post.tags.includes(tag));
+      .filter(post => post.tags.includes(tag))
+      .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
   } catch (error) {
     console.error('Error fetching blog posts by tag:', error);
     return [];
@@ -232,17 +218,15 @@ export async function getBlogPostsByTag(tag: string): Promise<BlogPost[]> {
 export async function getTagCounts(): Promise<Record<string, number>> {
   try {
     const postsRef = collection(db, 'posts');
-    const querySnapshot = await getDocs(postsRef);
+    const querySnapshot = await getDocs(query(postsRef, where('status', '==', 'published')));
     
     const tagCounts: Record<string, number> = {};
     querySnapshot.docs.forEach(doc => {
       const data = doc.data();
-      if (data.status === 'published' || !data.status) {
-        const tags = data.tags || [];
-        tags.forEach((tag: string) => {
-          tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-        });
-      }
+      const tags = data.tags || [];
+      tags.forEach((tag: string) => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      });
     });
     
     return tagCounts;

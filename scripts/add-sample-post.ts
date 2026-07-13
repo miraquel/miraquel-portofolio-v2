@@ -1,6 +1,8 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, addDoc, collection, Timestamp } from 'firebase/firestore';
+import { getFirestore, Timestamp } from 'firebase/firestore';
 import 'dotenv/config';
+import { signInAsAdmin } from './firebase-admin-login';
+import { createPost } from './create-post';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -52,30 +54,28 @@ const samplePost = {
   author: "Chaidir Ali Assegaf",
   publishedAt: Timestamp.now(),
   tags: ["astro", "firebase", "web development", "tutorial"],
+  status: "published",
   imageUrl: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800"
 };
 
 async function addSamplePost() {
   try {
+    await signInAsAdmin(app);
     console.log('Adding sample blog post to Firestore...\n');
 
-    // print firebase configuration for debugging
-    console.log('Firebase Configuration:');
-    console.log(JSON.stringify(firebaseConfig, null, 2));
-    console.log('\n');
-    
-    const docRef = await addDoc(collection(db, 'posts'), samplePost);
+    const postId = await createPost(db, samplePost);
     
     console.log('✅ Sample post added successfully!');
-    console.log(`Document ID: ${docRef.id}`);
+    console.log(`Document ID: ${postId}`);
     console.log(`Title: ${samplePost.title}`);
     console.log(`URL: /blog/${samplePost.slug}`);
     console.log(`\nYou can view this post at: http://localhost:4321/blog/${samplePost.slug}`);
     
   } catch (error) {
     console.error('❌ Error adding sample post:', error);
+    process.exitCode = 1;
   } finally {
-    process.exit(0);
+    // Let Node exit naturally so failures retain a non-zero exit code.
   }
 }
 

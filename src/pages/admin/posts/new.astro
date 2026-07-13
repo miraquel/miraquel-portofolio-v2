@@ -179,8 +179,8 @@ const statuses = await getAllStatuses();
   import { ClassicEditor, Bold, Essentials, Italic, Paragraph, Undo, Heading, Link, List, BlockQuote, CodeBlock, Image, ImageUpload, MediaEmbed, Table, Indent, Underline, Strikethrough, Code } from 'ckeditor5';
   import 'ckeditor5/ckeditor5.css';
 
-  import { db } from '../../../lib/firebase';
-  import { collection, addDoc, Timestamp, query, where, getDocs } from 'firebase/firestore';
+  import { Timestamp } from 'firebase/firestore';
+  import { createPost } from '../../../lib/post-writes';
 
   const form = document.getElementById('postForm') as HTMLFormElement;
   const titleInput = document.getElementById('title') as HTMLInputElement;
@@ -188,11 +188,10 @@ const statuses = await getAllStatuses();
   const errorMessage = document.getElementById('errorMessage') as HTMLDivElement;
   const submitButton = document.getElementById('submitButton') as HTMLButtonElement;
   const contentInput = document.getElementById('content') as HTMLInputElement;
-  let editorInstance: ClassicEditor;
-
   // Initialize CKEditor
   ClassicEditor
-    .create(document.querySelector('#editor') as HTMLElement, {
+    .create({
+      attachTo: document.querySelector('#editor') as HTMLElement,
       licenseKey: 'GPL',
       plugins: [Essentials, Bold, Italic, Underline, Strikethrough, Code, Paragraph, Heading, Link, List, BlockQuote, CodeBlock, Image, ImageUpload, MediaEmbed, Table, Indent, Undo],
       toolbar: {
@@ -215,8 +214,6 @@ const statuses = await getAllStatuses();
       }
     })
     .then((editor: any) => {
-      editorInstance = editor;
-      
       // Add prose class to editor content area
       const editableElement = editor.ui.view.editable.element;
       if (editableElement) {
@@ -231,13 +228,6 @@ const statuses = await getAllStatuses();
     .catch((error: any) => {
       console.error('Error initializing editor:', error);
     });
-
-  // Check if slug already exists
-  async function isSlugUnique(slug: string): Promise<boolean> {
-    const q = query(collection(db, 'posts'), where('slug', '==', slug));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.empty;
-  }
 
   // Auto-generate slug from title
   titleInput?.addEventListener('input', () => {
@@ -276,12 +266,6 @@ const statuses = await getAllStatuses();
       const status = (document.getElementById('status') as HTMLSelectElement).value;
       const readingTimeInput = (document.getElementById('readingTime') as HTMLInputElement).value;
 
-      // Validate slug uniqueness
-      const slugUnique = await isSlugUnique(slug);
-      if (!slugUnique) {
-        throw new Error(`Slug "${slug}" already exists. Please use a different slug.`);
-      }
-
       const tags = tagsInput
         .split(',')
         .map(tag => tag.trim())
@@ -314,7 +298,7 @@ const statuses = await getAllStatuses();
         postData.readingTime = parseInt(readingTimeInput);
       }
 
-      await addDoc(collection(db, 'posts'), postData);
+      await createPost(postData);
 
       // Redirect to posts list
       window.location.href = '/admin/posts';

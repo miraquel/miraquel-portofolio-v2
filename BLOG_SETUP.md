@@ -33,7 +33,18 @@ This portfolio now includes a blog feature powered by Firebase Firestore as the 
 3. Choose "Start in production mode" or "Start in test mode" (for development)
 4. Select a location for your database
 
-### 4. Create the Blog Posts Collection
+### 4. Configure Administrator Access
+1. Enable Email/Password authentication in Firebase Authentication.
+2. Create the administrator account and copy its Firebase user UID.
+3. In Firestore, create an `admins` collection.
+4. Create a document whose ID is the administrator UID. The document may contain a descriptive `email` field.
+5. Deploy the checked-in rules with `firebase deploy --only firestore:rules`.
+
+Only users listed in `admins/{uid}` can read drafts or modify posts and statuses. The
+`admins` collection cannot be modified by the web application, preventing users from
+granting themselves access.
+
+### 5. Create the Blog Posts Collection
 In Firestore, create a collection called `posts` with documents containing:
 
 ```javascript
@@ -45,11 +56,12 @@ In Firestore, create a collection called `posts` with documents containing:
   author: "Your Name",
   publishedAt: Timestamp,  // Firebase Timestamp
   tags: ["tag1", "tag2"],
+  status: "published",
   imageUrl: "https://example.com/image.jpg"  // Optional
 }
 ```
 
-### 5. Example: Adding a Blog Post via Firebase Console
+### 6. Example: Adding a Blog Post via Firebase Console
 1. Go to Firestore Database
 2. Click "Start collection" and enter `posts` as the collection ID
 3. Add a document with an auto-generated ID
@@ -61,6 +73,7 @@ In Firestore, create a collection called `posts` with documents containing:
    - `author` (string): "Chaidir Ali Assegaf"
    - `publishedAt` (timestamp): Click "Add timestamp" and select current date/time
    - `tags` (array): ["astro", "web development"]
+   - `status` (string): "published"
    - `imageUrl` (string): "https://example.com/astro.jpg" (optional)
 
 ## Blog Structure
@@ -100,17 +113,20 @@ npm run preview
 
 ## Firestore Security Rules
 
-For production, set up proper security rules in Firebase Console:
+Deploy the checked-in `firestore.rules`. Public visitors can read only posts whose
+`status` is `published`; administrator membership is checked using `admins/{uid}`.
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read access to all posts
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
     match /posts/{post} {
-      allow read: if true;
-      // Only allow write access to authenticated users (you'll need to set up Firebase Auth)
-      allow write: if request.auth != null;
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow write: if isAdmin();
     }
   }
 }
@@ -118,25 +134,16 @@ service cloud.firestore {
 
 ## Adding Blog Posts Programmatically
 
-You can also use the Firebase Admin SDK or create an admin panel to add posts. Here's an example using the Admin SDK:
+Use the included authenticated scripts or the `/admin` panel:
 
-```javascript
-import { addDoc, collection, Timestamp } from 'firebase/firestore';
-import { db } from './src/lib/firebase';
-
-const newPost = {
-  title: "My New Blog Post",
-  slug: "my-new-blog-post",
-  excerpt: "This is a short excerpt",
-  content: "<p>Full content goes here...</p>",
-  author: "Your Name",
-  publishedAt: Timestamp.now(),
-  tags: ["javascript", "typescript"],
-  imageUrl: "https://example.com/image.jpg"
-};
-
-await addDoc(collection(db, 'posts'), newPost);
+```bash
+FIREBASE_ADMIN_EMAIL=admin@example.com
+FIREBASE_ADMIN_PASSWORD=your-local-password
+npm run add-post
 ```
+
+Keep the administrator password in local environment variables or a secret manager;
+never commit it.
 
 ## Troubleshooting
 
@@ -144,7 +151,7 @@ await addDoc(collection(db, 'posts'), newPost);
 - Check that your `.env` file has the correct Firebase credentials
 - Verify that the Firestore collection is named `posts` (case-sensitive)
 - Check browser console for any errors
-- Ensure Firestore rules allow read access
+- Ensure the post has `status: "published"`; drafts are intentionally private
 
 ### Build errors
 - Make sure Firebase is properly initialized
@@ -155,6 +162,5 @@ await addDoc(collection(db, 'posts'), newPost);
 - Add search functionality
 - Implement pagination
 - Add comments using Firestore
-- Create an admin panel for managing posts
 - Add markdown support
 - Implement draft/publish states

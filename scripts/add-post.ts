@@ -1,6 +1,9 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, addDoc, collection, Timestamp } from 'firebase/firestore';
+import { getFirestore, Timestamp } from 'firebase/firestore';
 import * as readline from 'readline';
+import 'dotenv/config';
+import { signInAsAdmin } from './firebase-admin-login';
+import { createPost } from './create-post';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -28,6 +31,7 @@ function question(query: string): Promise<string> {
 
 async function addBlogPost() {
   try {
+    await signInAsAdmin(app);
     console.log('\n=== Add New Blog Post ===\n');
 
     const title = await question('Title: ');
@@ -55,21 +59,22 @@ async function addBlogPost() {
       author,
       publishedAt: Timestamp.now(),
       tags,
+      status: 'published',
       ...(imageUrl && { imageUrl })
     };
 
     console.log('\nAdding post to Firestore...');
-    const docRef = await addDoc(collection(db, 'posts'), newPost);
+    const postId = await createPost(db, newPost);
     
     console.log('\n✅ Post added successfully!');
-    console.log(`Document ID: ${docRef.id}`);
+    console.log(`Document ID: ${postId}`);
     console.log(`URL: /blog/${slug}`);
 
   } catch (error) {
     console.error('\n❌ Error adding post:', error);
+    process.exitCode = 1;
   } finally {
     rl.close();
-    process.exit(0);
   }
 }
 

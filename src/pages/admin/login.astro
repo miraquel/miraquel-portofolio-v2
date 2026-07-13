@@ -60,7 +60,8 @@ import Layout from '../../layouts/Layout.astro';
 
 <script>
   import { auth } from '../../lib/firebase';
-  import { signInWithEmailAndPassword } from 'firebase/auth';
+  import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+  import { isAdmin } from '../../lib/admin';
 
   const form = document.getElementById('loginForm') as HTMLFormElement;
   const emailInput = document.getElementById('email') as HTMLInputElement;
@@ -82,7 +83,11 @@ import Layout from '../../layouts/Layout.astro';
     loginButton.textContent = 'Signing in...';
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      if (!(await isAdmin(credential.user))) {
+        await signOut(auth);
+        throw new Error('This account does not have administrator access.');
+      }
       // Redirect to admin dashboard
       window.location.href = '/admin';
     } catch (error: any) {
@@ -97,8 +102,8 @@ import Layout from '../../layouts/Layout.astro';
   });
 
   // Check if already logged in
-  auth.onAuthStateChanged((user) => {
-    if (user) {
+  auth.onAuthStateChanged(async (user) => {
+    if (await isAdmin(user)) {
       window.location.href = '/admin';
     }
   });

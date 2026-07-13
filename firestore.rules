@@ -2,13 +2,15 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
     // Blog posts collection
     match /posts/{post} {
-      // Anyone can read published posts
-      allow read: if true;
-      
-      // Only authenticated users can create, update, or delete
-      allow create, update, delete: if request.auth != null;
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow create, update, delete: if isAdmin();
     }
     
     // Status master collection
@@ -16,8 +18,17 @@ service cloud.firestore {
       // Anyone can read statuses
       allow read: if true;
       
-      // Allow initial creation (for init script) and authenticated write
-      allow create, update, delete: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Transactional slug ownership prevents two posts from claiming one URL.
+    match /postSlugs/{slug} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /admins/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false;
     }
     
   }

@@ -1,108 +1,80 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import { db } from '../../lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
-import { getAllStatuses, type Status } from '../../lib/blog';
-import { Icon } from 'astro-icon/components';
 
 export const prerender = false;
-
-let totalPosts = 0;
-let statusStats: Array<Status & { count: number }> = [];
-
-try {
-  // Get all statuses from master collection
-  const statuses = await getAllStatuses();
-  
-  // Get all posts
-  const querySnapshot = await getDocs(collection(db, 'posts'));
-  totalPosts = querySnapshot.size;
-
-  // Count posts by status
-  const statusCounts: Record<string, number> = {};
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
-    const status = data.status || 'published';
-    statusCounts[status] = (statusCounts[status] || 0) + 1;
-  });
-
-  // Combine statuses with their counts
-  statusStats = statuses.map(status => ({
-    ...status,
-    count: statusCounts[status.name] || 0
-  })).sort((a, b) => a.order - b.order);
-} catch (error) {
-  console.error('Error loading stats:', error);
-}
 ---
 
 <AdminLayout title="Dashboard">
   <div class="mb-8">
     <h1 class="text-3xl font-bold text-slate-200 mb-2">Dashboard</h1>
-    <p class="text-slate-400">Welcome to your admin panel</p>
+    <p class="text-slate-400">Overview of your blog content</p>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-sm font-medium text-slate-400">Total Posts</h3>
-        <svg class="w-8 h-8 text-teal-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-        </svg>
-      </div>
-      <div class="text-3xl font-bold text-slate-200">{totalPosts}</div>
-    </div>
-
-    {statusStats.map((status) => (
-      <div class="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-medium text-slate-400">{status.displayName}</h3>
-          <Icon 
-            name={status.icon}
-            class="w-8 h-8" 
-            style={`color: ${status.color}`}
-          />
-        </div>
-        <div class="text-3xl font-bold text-slate-200">{status.count}</div>
-      </div>
-    ))}
-  </div>
+  <div id="loadingStats" class="text-slate-400">Loading dashboard…</div>
+  <div id="stats" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"></div>
+  <div id="statsError" class="hidden p-4 rounded-lg bg-red-500/10 text-red-400"></div>
 
   <div class="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
     <h2 class="text-xl font-bold text-slate-200 mb-4">Quick Actions</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <a 
-        href="/admin/posts/new" 
-        class="flex items-center gap-3 p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-colors group"
-      >
-        <svg class="w-6 h-6 text-teal-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        <div>
-          <h3 class="font-medium text-slate-200 group-hover:text-teal-300">Create New Post</h3>
-          <p class="text-sm text-slate-400">Write a new blog post</p>
-        </div>
-      </a>
-
-      <a 
-        href="/admin/posts" 
-        class="flex items-center gap-3 p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-colors group"
-      >
-        <svg class="w-6 h-6 text-teal-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="6" x2="21" y2="6"></line>
-          <line x1="8" y1="12" x2="21" y2="12"></line>
-          <line x1="8" y1="18" x2="21" y2="18"></line>
-          <line x1="3" y1="6" x2="3.01" y2="6"></line>
-          <line x1="3" y1="12" x2="3.01" y2="12"></line>
-          <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        <div>
-          <h3 class="font-medium text-slate-200 group-hover:text-teal-300">Manage Posts</h3>
-          <p class="text-sm text-slate-400">View and edit all posts</p>
-        </div>
-      </a>
+      <a href="/admin/posts/new" class="p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-teal-300">Create New Post</a>
+      <a href="/admin/posts" class="p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-teal-300">Manage Posts</a>
     </div>
   </div>
 </AdminLayout>
+
+<script>
+  import { onAuthStateChanged } from 'firebase/auth';
+  import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+  import { auth, db } from '../../lib/firebase';
+  import { isAdmin } from '../../lib/admin';
+
+  const loading = document.getElementById('loadingStats')!;
+  const stats = document.getElementById('stats')!;
+  const errorBox = document.getElementById('statsError')!;
+
+  onAuthStateChanged(auth, async user => {
+    if (!(await isAdmin(user))) return;
+
+    try {
+      const [statusesSnapshot, postsSnapshot] = await Promise.all([
+        getDocs(query(collection(db, 'statuses'), orderBy('order', 'asc'))),
+        getDocs(collection(db, 'posts'))
+      ]);
+      const counts: Record<string, number> = {};
+      postsSnapshot.forEach(post => {
+        const status = post.data().status || 'draft';
+        counts[status] = (counts[status] || 0) + 1;
+      });
+
+      const cards = [
+        { label: 'Total Posts', count: postsSnapshot.size, color: '#5eead4' },
+        ...statusesSnapshot.docs
+          .map(status => status.data())
+          .filter(status => status.isActive)
+          .map(status => ({ label: status.displayName, count: counts[status.name] || 0, color: status.color }))
+      ];
+
+      for (const card of cards) {
+        const element = document.createElement('div');
+        element.className = 'bg-slate-800/50 border border-slate-700 rounded-lg p-6';
+        const label = document.createElement('div');
+        label.className = 'text-sm text-slate-400 mb-2';
+        label.textContent = String(card.label);
+        const count = document.createElement('div');
+        count.className = 'text-3xl font-bold';
+        count.style.color = String(card.color);
+        count.textContent = String(card.count);
+        element.append(label, count);
+        stats.append(element);
+      }
+
+      loading.classList.add('hidden');
+      stats.classList.remove('hidden');
+    } catch (error) {
+      loading.classList.add('hidden');
+      errorBox.textContent = error instanceof Error ? error.message : 'Failed to load dashboard.';
+      errorBox.classList.remove('hidden');
+    }
+  });
+</script>
