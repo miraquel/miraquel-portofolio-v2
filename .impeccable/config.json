@@ -32,6 +32,15 @@
         "value": "manrope",
         "createdAt": "2026-10-08T06:07:13.108Z",
         "reason": "Admin workspace (src/styles/admin.css) keeps its own type system; out of the bill-of-lading scope per the homepage surface brief (admin untouched)"
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "scripts/og-card/post-card.html"
+        ],
+        "createdAt": "2026-10-08T16:02:23.741Z",
+        "reason": "claude: the flagged text is the paper token #e3ede3 on the form band #24543f (about 7.2:1), the site's standard dark band, the same as card.html and the live Notices band"
       }
     ]
   }

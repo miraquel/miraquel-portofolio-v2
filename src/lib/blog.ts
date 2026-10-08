@@ -22,6 +22,8 @@ export interface BlogPost {
   publishedAt: Date;
   tags: string[];
   imageUrl?: string;
+  /** A site path to this post's 1200x630 link-preview card */
+  socialImage?: string;
   status?: string;
   statusId?: string;
 }
@@ -38,6 +40,7 @@ function docToBlogPost(id: string, data: DocumentData): BlogPost {
     publishedAt: data.publishedAt?.toDate() || new Date(),
     tags: data.tags || [],
     imageUrl: data.imageUrl,
+    socialImage: data.socialImage,
     status: data.status || 'published',
     statusId: data.statusId
   };

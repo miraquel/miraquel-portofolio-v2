@@ -4,6 +4,8 @@ import Strip from '../../components/lading/Strip.astro';
 import { findPublishedPostBySlug } from '../../lib/blog';
 import { formatDay } from '../../lib/format';
 import { sanitizePostContent } from '../../lib/sanitize';
+import { postSocialMeta } from '../../lib/social-meta';
+import { profile } from '../../data/profile';
 
 export const prerender = false;
 
@@ -23,14 +25,19 @@ if (!post) {
 }
 
 const safeContent = post ? sanitizePostContent(post.content) : '';
+const social = post ? postSocialMeta(post, profile.name) : undefined;
 const field = 'bg-paper px-4 py-4 sm:px-5';
 const label = 'text-[0.8125rem] font-semibold text-form';
 const button = 'inline-flex min-h-11 items-center border-2 border-form bg-form px-5 text-sm font-semibold text-paper transition-colors duration-150 hover:border-ink hover:bg-ink';
 ---
 
 <Layout
-  title={post ? `${post.title}: Chaidir Ali Assegaf` : loadFailed ? "Post couldn't load" : 'Post not found'}
+  title={social?.title ?? (loadFailed ? "Post couldn't load" : 'Post not found')}
   description={post?.excerpt || undefined}
+  ogTitle={social?.ogTitle}
+  type={social?.type}
+  image={social?.image}
+  publishedTime={social?.publishedTime}
 >
   <Strip />
   <main id="main" class="mx-auto max-w-[85rem] px-4 pb-24 pt-5 sm:px-8 lg:pt-7">

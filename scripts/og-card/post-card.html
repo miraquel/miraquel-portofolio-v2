@@ -1,0 +1,177 @@
+<!doctype html>
+<!--
+  The 1200x630 link-preview card for one blog post (public/blog/<slug>/og.png), in the same
+  tokens and self-hosted fonts as card.html. scripts/og-card/render.py post ... fills it
+  through window.render() once the fonts have loaded.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face {
+    font-family: 'Big Shoulders Stencil Variable';
+    src: url('../../node_modules/@fontsource-variable/big-shoulders-stencil/files/big-shoulders-stencil-latin-opsz-normal.woff2') format('woff2-variations');
+    font-weight: 100 900;
+  }
+  @font-face {
+    font-family: 'Overpass Variable';
+    src: url('../../node_modules/@fontsource-variable/overpass/files/overpass-latin-wght-normal.woff2') format('woff2-variations');
+    font-weight: 100 900;
+  }
+  @font-face {
+    font-family: 'Overpass Mono Variable';
+    src: url('../../node_modules/@fontsource-variable/overpass-mono/files/overpass-mono-latin-wght-normal.woff2') format('woff2-variations');
+    font-weight: 300 700;
+  }
+  :root {
+    --paper: #e3ede3;
+    --form: #24543f;
+    --ink: #17212b;
+    --stamp: #b3261e;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1200px; height: 630px; }
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: 40px 48px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Overpass Variable', sans-serif;
+    overflow: hidden;
+  }
+  .band {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 22px;
+    background: var(--form);
+    color: var(--paper);
+  }
+  .band-title {
+    font-family: 'Big Shoulders Stencil Variable', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .band-url { font-family: 'Overpass Mono Variable', monospace; font-size: 18px; }
+  .form {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    grid-template-rows: 1fr auto;
+    flex: 1;
+    gap: 2px;
+    background: var(--form);
+    border: 2px solid var(--form);
+    border-top: 0;
+    min-height: 0;
+  }
+  .field {
+    position: relative;
+    padding: 18px 22px;
+    background: var(--paper);
+    overflow: hidden;
+  }
+  .label {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    color: var(--form);
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .label span { font-family: 'Overpass Mono Variable', monospace; font-size: 15px; font-weight: 500; }
+  .subject {
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .headline-box { flex: 1; min-height: 0; margin-top: 12px; padding-right: 230px; }
+  .headline {
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+  }
+  .stamp {
+    position: absolute;
+    top: 26px;
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 16px 6px;
+    border: 5px double var(--stamp);
+    color: var(--stamp);
+    transform: rotate(-6deg);
+    mix-blend-mode: multiply;
+  }
+  .stamp-word {
+    font-family: 'Big Shoulders Stencil Variable', sans-serif;
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .stamp-date {
+    margin-top: 4px;
+    font-family: 'Overpass Mono Variable', monospace;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .value { margin-top: 6px; font-size: 27px; font-weight: 800; line-height: 1.15; }
+  .small { margin-top: 2px; font-size: 18px; font-weight: 600; color: var(--form); }
+  .tags { margin-top: 6px; font-family: 'Overpass Mono Variable', monospace; font-size: 22px; font-weight: 600; line-height: 1.35; }
+</style>
+</head>
+<body>
+  <div class="band">
+    <p class="band-title">Notice</p>
+    <p class="band-url">chaidiraliassegaf.vercel.app/blog</p>
+  </div>
+  <div class="form">
+    <div class="field subject">
+      <p class="label"><span>09</span>Notices</p>
+      <div class="headline-box" id="box"><p class="headline" id="headline"></p></div>
+      <p class="stamp"><span class="stamp-word">Posted</span><span class="stamp-date" id="stamp-date"></span></p>
+    </div>
+    <div class="field">
+      <p class="label">Written by</p>
+      <p class="value" id="author"></p>
+      <p class="small" id="role"></p>
+    </div>
+    <div class="field">
+      <p class="label">Tags</p>
+      <p class="tags" id="tags"></p>
+    </div>
+  </div>
+
+  <script>
+    // Called by render.py after document.fonts.ready, so the fit below measures real glyphs
+    window.render = ({ title, author, role, date, tags }) => {
+      document.getElementById('author').textContent = author;
+      document.getElementById('role').textContent = role;
+      document.getElementById('tags').textContent = tags.join('  ·  ');
+      document.getElementById('stamp-date').textContent = new Intl.DateTimeFormat('en-GB', {
+        day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC',
+      }).format(new Date(`${date}T00:00:00Z`));
+
+      // Largest size at which the whole title fits its field
+      const box = document.getElementById('box');
+      const headline = document.getElementById('headline');
+      headline.textContent = title;
+      let size = 76;
+      headline.style.fontSize = `${size}px`;
+      while (size > 36 && (headline.scrollHeight > box.clientHeight || headline.scrollWidth > box.clientWidth)) {
+        size -= 2;
+        headline.style.fontSize = `${size}px`;
+      }
+      return size;
+    };
+  </script>
+</body>
+</html>
