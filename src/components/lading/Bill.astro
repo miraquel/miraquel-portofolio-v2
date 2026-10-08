@@ -84,15 +84,17 @@ const [firstName, ...lastNames] = profile.name.split(' ');
                 data-container-link={container.slug}
                 class="group flex h-full flex-col gap-2.5 px-4 py-5 transition-colors duration-150 hover:bg-paper-deep sm:px-5"
               >
-                <span class="flex items-center gap-2.5">
-                  <span class:list={['size-3.5 shrink-0', container.steel === 'cobalt' ? 'bg-cobalt' : 'bg-oxide']} aria-hidden="true"></span>
-                  <Mark mark={container.mark} size="md" />
-                </span>
-                <span class="text-lg font-extrabold leading-snug underline decoration-transparent decoration-2 underline-offset-4 transition-colors duration-150 group-hover:decoration-form">
+                <span class="text-xl font-extrabold leading-snug text-balance underline decoration-transparent decoration-2 underline-offset-4 transition-colors duration-150 group-hover:decoration-form">
                   {container.title}
                 </span>
                 <span class="text-[0.9375rem] leading-snug">{container.line}</span>
-                <span class="mt-auto pt-1 font-data text-xs text-form">{formatPeriod(container.period)}</span>
+                <span class="mt-auto flex flex-col gap-1.5 pt-2">
+                  <span class="flex items-center gap-2" aria-hidden="true">
+                    <span class:list={['size-3.5 shrink-0', container.steel === 'cobalt' ? 'bg-cobalt' : 'bg-oxide']}></span>
+                    <Mark mark={container.mark} size="sm" decorative />
+                  </span>
+                  <span class="font-data text-xs text-form">{formatPeriod(container.period)}</span>
+                </span>
               </a>
             </li>
           ))}

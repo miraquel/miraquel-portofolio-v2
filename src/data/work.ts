@@ -51,7 +51,7 @@ const caseStudies: CaseStudy[] = [
   {
     slug: 'fo-migration',
     steel: 'cobalt',
-    title: 'AX 2012 R3 to Dynamics 365 F&O migration',
+    title: 'AX 2012 R3 to Dynamics\u00a0365 F&O migration',
     line: "A car-rental group's ERP, code and data, moved to Dynamics 365 F&O",
     client: 'PT Mitra Pinasthika Mustika Rent',
     period: { start: '2022-04', end: '2023-04' },
@@ -155,7 +155,7 @@ const lines: ManifestLine[] = [
   { title: 'Sparepart Management System v2', client: 'PT Gandum Mas Kencana', platform: 'Dynamics AX 2012 R2, ASP.NET Web API, Flutter', period: { start: '2024-02', end: '2024-07' }, caseStudy: 'sparepart-management' },
   { title: 'AXFinMobile', client: 'PT Gandum Mas Kencana', platform: 'Dynamics AX 2012 R2, ASP.NET Web API, Flutter', period: { start: '2023-11', end: '2024-02' }, caseStudy: 'axfinmobile' },
   { title: 'Data forensics on business process flows', client: 'PT Mega Akses Persada (Fiberstar)', platform: 'Dynamics AX 2012 R3, X++', period: { start: '2023-06', end: '2023-07' } },
-  { title: 'AX 2012 R3 to Dynamics 365 F&O migration', client: 'PT Mitra Pinasthika Mustika Rent', platform: 'Dynamics 365 F&O, X++', period: { start: '2022-04', end: '2023-04' }, caseStudy: 'fo-migration' },
+  { title: 'AX 2012 R3 to Dynamics\u00a0365 F&O migration', client: 'PT Mitra Pinasthika Mustika Rent', platform: 'Dynamics 365 F&O, X++', period: { start: '2022-04', end: '2023-04' }, caseStudy: 'fo-migration' },
   { title: 'Price Calc, a car-rental price calculator', client: 'PT Mitra Pinasthika Mustika Rent', platform: 'Blazor WebAssembly, .NET 5', period: { start: '2021-09', end: '2022-02' } },
   { title: 'API gateway with CMS', client: 'PT Gunung Raja Paksi', platform: 'ASP.NET Core, .NET Core 2.1', period: { start: '2021-04', end: '2021-08' } },
   { title: 'ERP change request', client: 'PT Alliance One Indonesia', platform: 'Dynamics 365 Business Central, AL', period: { start: '2020-11', end: '2020-12' } },
