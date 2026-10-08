@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, getDocs, getDoc, doc, query, where, limit, orderBy, type DocumentData } from 'firebase/firestore';
+import { collection, getDocs, getDocsFromServer, getDoc, doc, query, where, limit, orderBy, type DocumentData } from 'firebase/firestore';
 
 export interface Status {
   id: string;
@@ -107,16 +107,34 @@ export async function getStatusByName(name: string): Promise<Status | null> {
   }
 }
 
+// Get all published posts, newest first. Throws when Firestore can't answer, so a page can
+// tell "the read failed" apart from "there are no posts". getDocs would not throw there:
+// it falls back to the empty local cache and reports zero posts.
+export async function getPublishedPosts(): Promise<BlogPost[]> {
+  const postsRef = collection(db, 'posts');
+  const q = query(postsRef, where('status', '==', 'published'));
+  const querySnapshot = await getDocsFromServer(q);
+
+  return querySnapshot.docs
+    .map(doc => docToBlogPost(doc.id, doc.data()))
+    .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+}
+
+// Count how many of the given posts carry each tag
+export function countTags(posts: BlogPost[]): Record<string, number> {
+  const tagCounts: Record<string, number> = {};
+  posts.forEach(post => {
+    post.tags.forEach(tag => {
+      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+    });
+  });
+  return tagCounts;
+}
+
 // Get all blog posts
 export async function getAllBlogPosts(): Promise<BlogPost[]> {
   try {
-    const postsRef = collection(db, 'posts');
-    const q = query(postsRef, where('status', '==', 'published'));
-    const querySnapshot = await getDocs(q);
-    
-    return querySnapshot.docs
-      .map(doc => docToBlogPost(doc.id, doc.data()))
-      .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+    return await getPublishedPosts();
   } catch (error) {
     console.error('Error fetching blog posts:', error);
     return [];
@@ -140,20 +158,26 @@ export async function getRecentBlogPosts(count: number = 5): Promise<BlogPost[]>
   }
 }
 
+// Find a published post by slug. Returns null when no such post exists and throws when
+// Firestore can't answer (see getPublishedPosts), so a page can answer 404 and 503 differently.
+export async function findPublishedPostBySlug(slug: string): Promise<BlogPost | null> {
+  const postsRef = collection(db, 'posts');
+  const q = query(postsRef, where('slug', '==', slug), where('status', '==', 'published'), limit(1));
+  const querySnapshot = await getDocsFromServer(q);
+
+  const postDoc = querySnapshot.docs[0];
+
+  if (!postDoc) {
+    return null;
+  }
+
+  return docToBlogPost(postDoc.id, postDoc.data());
+}
+
 // Get single blog post by slug
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
   try {
-    const postsRef = collection(db, 'posts');
-    const q = query(postsRef, where('slug', '==', slug), where('status', '==', 'published'), limit(1));
-    const querySnapshot = await getDocs(q);
-    
-    const postDoc = querySnapshot.docs[0];
-    
-    if (!postDoc) {
-      return null;
-    }
-    
-    return docToBlogPost(postDoc.id, postDoc.data());
+    return await findPublishedPostBySlug(slug);
   } catch (error) {
     console.error('Error fetching blog post:', error);
     return null;
