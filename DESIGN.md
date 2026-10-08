@@ -21,12 +21,6 @@ typography:
     fontWeight: 800
     lineHeight: 0.9
     letterSpacing: "0.01em"
-  mark-lg:
-    fontFamily: "Big Shoulders Stencil Variable, Arial Narrow, sans-serif"
-    fontSize: "clamp(2.75rem, 6vw, 4.75rem)"
-    fontWeight: 800
-    lineHeight: 1
-    letterSpacing: "0.04em"
   mark-md:
     fontFamily: "Big Shoulders Stencil Variable, Arial Narrow, sans-serif"
     fontSize: "1.875rem"
@@ -226,13 +220,13 @@ A single-ink form palette (paper, green ink, carbon) with two container-steel pa
 
 ### Hierarchy
 - **Display** (stencil, 800, clamp 3.5rem to 6rem, line-height 0.9, uppercase): the name in the Shipper field. The 6rem ceiling is the largest type on the site.
-- **Mark** (stencil, 800, uppercase, 0.04em tracking, line-height 1): ISO 6346 container marks in three named sizes: large in a bay header, medium in the bill's Marks and numbers field, small in the manifest. No other mark sizes. The check digit sits in a box bordered at 0.07em.
+- **Mark** (stencil, 800, uppercase, 0.04em tracking, line-height 1): ISO 6346 container marks in two named sizes: medium in a bay header, after the title, client and period and keyed below by "Serial is the start month" in the label role (small on phones, so the title stays the largest thing in the head); small at the foot of each Marks and numbers card, beside its swatch and above the period, and in the manifest. No other mark sizes. A mark never leads: the project title does. The check digit sits in a box bordered at 0.07em.
 - **Band title** (stencil, 800, 1.375rem, 0.08em tracking, uppercase): printed band titles ("Bill of lading", "Notices") reversed out of the form band, and the name in the strip.
 - **Headline** (Overpass, 800, clamp 2rem to 3.25rem, line-height 1, -0.02em): section heads, preceded by their mono section number in form green. Blog and post titles use the same weight and tracking up to 4rem.
-- **Title** (Overpass, 800, clamp 1.875rem to 2.5rem, line-height 1.1): a container's project title.
+- **Title** (Overpass, 800, clamp 1.875rem to 2.5rem, line-height 1.1, balanced): a container's project title; it leads its bay. In a Marks and numbers card the same role runs at 1.25rem.
 - **Field value** (Overpass, 800, 1.625rem): the typed answer in a primary field; 1.25rem and 1.125rem for denser fields and list entries.
 - **Secondary** (Overpass, 400 or 600, 0.9375rem, line-height 1.375): supporting lines under a field value, section notes, route stop descriptions and leg labels, return flows, credential details, employer roles, the manifest's platform column.
-- **Body** (Overpass, 400, 1.0625rem, line-height 1.625): reading text, held to 50 to 62ch. Post bodies run at 1.125rem, line-height 1.75, in a 68ch column.
+- **Body** (Overpass, 400, 1.0625rem, line-height 1.625): reading text, held to about 55 to 65 characters a line. Overpass's ch is about 1.4 average characters, so body copy, notes and excerpts use 44 to 48ch. Post bodies run at 1.125rem, line-height 1.75: prose at 48ch (about 60 characters) inside a 42rem column that code blocks and headings fill, so a 66-character line of 0.9375rem mono fits without scrolling. Inline code wraps anywhere rather than widen the page.
 - **Label** (Overpass, 600, 0.8125rem, form green, sentence case): field labels, column headers, section notes.
 - **Data** (Overpass Mono, 500, 0.75rem to 0.875rem, tabular lining figures): field numbers, dates, periods, line numbers, tech lists.
 
@@ -291,7 +285,7 @@ No public inputs. "Field" means a form box, above.
 The strip: sticky, paper ground, 2px form bottom rule. The name in stencil at left; section links in Overpass 600 at 0.875rem, form green, turning carbon and underlined on hover. Below 768px the strip keeps Work (the phone's short label for the case studies), Blog and Contact; below 360px Blog drops to the footer so Work and Contact fit beside the name. The strip's name steps down to 1rem, and 1.125rem from 380px, so the links fit without crowding the 16px gutters. Every link is 44px tall. A skip link appears on focus on signal yellow.
 
 ### Container Bay (signature)
-A case study as a full-bleed band of steel: the large mark, title, client and period on the left; on the right the hold, a paper card framed 2px in carbon carrying the Route; below the head, Cargo, Evidence and Status as stencil-white labelled fields. The field is titled Evidence only when something in it can be opened (source, a write-up, a file to download); a bay holding only facts on file and cross-references titles it Record. Links to other sites open a new tab and say so to screen readers; links within the site and downloads stay in the tab. Status always carries a "Delivered" stamp with its month, set on a paper slip. Below 1024px a bay stacks head, then its fields (cargo first), then the route, so the one-sentence explanation leads and the diagram follows as the detail. Focus outlines inside a bay turn signal yellow.
+A case study as a full-bleed band of steel: the title, client and period on the left, then the medium mark with its key; on the right the hold, a paper card framed 2px in carbon carrying the Route; below the head, Cargo, Evidence and Status as stencil-white labelled fields. The field is titled Evidence only when something in it can be opened (source, a write-up, a file to download); a bay holding only facts on file and cross-references titles it Record. Links to other sites open a new tab and say so to screen readers; links within the site and downloads stay in the tab. Status always carries a "Delivered" stamp with its month, set on a paper slip. Below 1024px a bay stacks head, then its fields (cargo first), then the route, so the one-sentence explanation leads and the diagram follows as the detail. Focus outlines inside a bay turn signal yellow.
 
 **Door-leaf material** (component-local, not palette): each leaf is painted in its bay's -deep steel (cobalt-deep or oxide-deep), corrugated by a repeating 90deg gradient of 14px plain, a 4px rib at rgb(0 0 0 / 0.16) and a 4px highlight at rgb(255 255 255 / 0.06); its edge is a 2px border at rgb(0 0 0 / 0.35); a 6px locking rod at rgb(0 0 0 / 0.4) runs from 6% to 94% of its height, 18% in from the meeting edge, ringed by the rod-ring shadow. These translucent values exist only on the leaves.
 
@@ -301,7 +295,7 @@ A case study as a full-bleed band of steel: the large mark, title, client and pe
 A data-flow diagram drawn in code: lettered stops (A, B, C) as 2px carbon-framed paper boxes with name, role and mono tech line; between stops, 2px stroked down-arrows labelled with what travels; return flows listed under a form hairline with a return arrow.
 
 ### Container Mark and Cross-highlight
-An ISO 6346 mark (owner code, serial, boxed check digit) with an accessible label spelling it out. Hovering or focusing a mark in Marks and numbers lights its manifest row in paper-deep, and the reverse.
+An ISO 6346 mark (owner code, serial, boxed check digit). Standalone (bay header, manifest) it is an image named "Container CAAU 202204, check digit 0"; inside a link it is hidden, so the link is named by its project title first. Hovering or focusing a mark in Marks and numbers lights its manifest row in paper-deep, and the reverse.
 
 ### Stamp
 A rubber stamp in stamp red: stencil word over a mono date, 3px double border, rotated -6deg, multiply-blended and roughened by the stamp-ink displacement filter. It carries a status and a date and nothing else (Delivered on bays, Expired on a lapsed certificate).

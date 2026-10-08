@@ -190,17 +190,13 @@
         "displayName": "Display (stencil)",
         "purpose": "The name in the Shipper field only; uppercase, 6rem ceiling."
       },
-      "mark-lg": {
-        "displayName": "Container mark, large",
-        "purpose": "ISO 6346 mark in a container bay header."
-      },
       "mark-md": {
         "displayName": "Container mark, medium",
-        "purpose": "Marks in the bill's Marks and numbers field."
+        "purpose": "ISO 6346 mark in a container bay header, after the title, client and period, keyed by \"Serial is the start month\"; small on phones."
       },
       "mark-sm": {
         "displayName": "Container mark, small",
-        "purpose": "Marks on container lines in the manifest."
+        "purpose": "Marks at the foot of each Marks and numbers card (beside the swatch, above the period) and on container lines in the manifest."
       },
       "band-title": {
         "displayName": "Band title",
@@ -212,7 +208,7 @@
       },
       "title": {
         "displayName": "Title",
-        "purpose": "A container's project title on steel."
+        "purpose": "A container's project title on steel; it leads its bay. 1.25rem in a Marks and numbers card."
       },
       "field-value": {
         "displayName": "Field value",
@@ -224,11 +220,11 @@
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Reading text, 50 to 62ch."
+        "purpose": "Reading text at about 55 to 65 characters a line: 44 to 48ch in Overpass."
       },
       "body-post": {
         "displayName": "Post body",
-        "purpose": "Blog post reading column, 68ch."
+        "purpose": "Blog post prose at 48ch inside a 42rem column that code blocks fill."
       },
       "label": {
         "displayName": "Label",

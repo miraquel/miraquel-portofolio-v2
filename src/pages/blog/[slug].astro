@@ -52,7 +52,7 @@ const button = 'inline-flex min-h-11 items-center border-2 border-form bg-form p
         <header>
           <div class="border-2 border-b-0 border-form bg-paper px-4 py-6 sm:px-5 sm:py-8">
             <h1 class="max-w-[24ch] text-[clamp(2.25rem,5.5vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.02em]">{post.title}</h1>
-            {post.excerpt && <p class="mt-4 max-w-[60ch] text-lg leading-relaxed">{post.excerpt}</p>}
+            {post.excerpt && <p class="mt-4 max-w-[48ch] text-lg leading-relaxed">{post.excerpt}</p>}
           </div>
           <dl class="grid grid-cols-12 gap-px border-2 border-form bg-form">
             <div class:list={[field, 'col-span-12 sm:col-span-4']}>
@@ -84,14 +84,14 @@ const button = 'inline-flex min-h-11 items-center border-2 border-form bg-form p
           )}
         </header>
 
-        <div class="post-body mx-auto mt-12 max-w-[68ch] text-[1.125rem] leading-[1.75]" set:html={safeContent} />
+        <div class="post-body mx-auto mt-12 max-w-[42rem] text-[1.125rem] leading-[1.75]" set:html={safeContent} />
       </article>
     ) : (
       <section class="border-2 border-form bg-paper px-4 py-10 sm:px-6">
         <h1 class="text-[clamp(2.25rem,5vw,3.5rem)] font-extrabold leading-tight tracking-[-0.02em]">
           {loadFailed ? "This post couldn't load" : 'Post not found'}
         </h1>
-        <p class="mt-3 max-w-[60ch] text-lg leading-relaxed">
+        <p class="mt-3 max-w-[48ch] text-lg leading-relaxed">
           {loadFailed
             ? "The blog's database didn't respond. Reload the page to try again."
             : "This post doesn't exist or is no longer published."}
@@ -157,6 +157,17 @@ const button = 'inline-flex min-h-11 items-center border-2 border-form bg-form p
 
   .post-body :global(a:hover) {
     text-decoration-color: var(--color-form);
+  }
+
+  /* Prose holds about 62 characters a line (Overpass's ch is wider than its average letter);
+     code blocks and headings use the full 42rem column, so a 66-character code line fits */
+  .post-body > :global(:is(p, ul, ol, blockquote)) {
+    max-width: 48ch;
+  }
+
+  /* A long path or URL in inline code wraps instead of widening the page on a phone */
+  .post-body :global(:not(pre) > code) {
+    overflow-wrap: anywhere;
   }
 
   .post-body :global(code) {
