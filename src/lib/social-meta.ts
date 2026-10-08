@@ -15,6 +15,8 @@ export interface SocialMeta {
   /** Undefined keeps the site's own card */
   image?: SocialImage;
   publishedTime?: string;
+  /** Read by LinkedIn's Post Inspector as the article's author */
+  author?: string;
 }
 
 interface SharedPost {
@@ -38,5 +40,6 @@ export function postSocialMeta(post: SharedPost, siteName: string): SocialMeta {
     type: 'article',
     image,
     publishedTime: post.publishedAt.toISOString(),
+    author: post.author,
   };
 }

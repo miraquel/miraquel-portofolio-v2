@@ -19,6 +19,7 @@ interface Props {
 	/** A page's own preview card; the site card otherwise */
 	image?: SocialImage;
 	publishedTime?: string;
+	author?: string;
 }
 
 const {
@@ -33,6 +34,7 @@ const {
 		alt: `Bill of lading for ${profile.name}, ${profile.title}: port of loading ${profile.based}, port of discharge open. Four container marks list the case studies.`,
 	},
 	publishedTime,
+	author = profile.name,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -50,6 +52,7 @@ const socialImage = new URL(image.path, Astro.site);
 		<meta name="theme-color" content="#24543f" />
 		<title>{title}</title>
 		<meta name="description" content={description} />
+		<meta name="author" content={author} />
 		<link rel="canonical" href={canonical} />
 		<meta property="og:type" content={type} />
 		<meta property="og:site_name" content={profile.name} />
