@@ -7,9 +7,13 @@ export const profile = {
   title: 'Dynamics 365 F&O & .NET Developer',
   summary:
     'I build and customise Dynamics AX 2012 and Dynamics 365 Finance & Operations, and the .NET services and mobile apps that connect to them.',
-  roles: 'For roles in Dynamics 365 F&O, Dynamics AX or .NET backend development.',
+  /** The Consignee value: the roles this is addressed to, stated plainly */
+  roles: 'Dynamics 365 F&O, AX or .NET backend roles',
   based: 'Indonesia',
+  /** The meta description's wording */
   relocation: 'Relocating with employer visa sponsorship',
+  /** Port of discharge, in words a recruiter reads without decoding the label */
+  discharge: { value: 'Open to relocating abroad', detail: 'With employer visa sponsorship' },
   email: 'ading.assegaf@gmail.com',
   linkedin: 'https://www.linkedin.com/in/chaidirassegaf/',
   github: 'https://github.com/miraquel',

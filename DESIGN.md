@@ -21,6 +21,12 @@ typography:
     fontWeight: 800
     lineHeight: 0.9
     letterSpacing: "0.01em"
+  display-compact:
+    fontFamily: "Big Shoulders Stencil Variable, Arial Narrow, sans-serif"
+    fontSize: "4rem"
+    fontWeight: 800
+    lineHeight: 0.9
+    letterSpacing: "0.01em"
   mark-md:
     fontFamily: "Big Shoulders Stencil Variable, Arial Narrow, sans-serif"
     fontSize: "1.875rem"
@@ -219,7 +225,7 @@ A single-ink form palette (paper, green ink, carbon) with two container-steel pa
 **Character:** A condensed military stencil, as painted on container doors, against a grotesk descended from US highway signage; the mono is that grotesk's own sibling, so codes sit in the same voice as the prose. All three are self-hosted.
 
 ### Hierarchy
-- **Display** (stencil, 800, clamp 3.5rem to 6rem, line-height 0.9, uppercase): the name in the Shipper field. The 6rem ceiling is the largest type on the site.
+- **Display** (stencil, 800, clamp 3.5rem to 6rem, line-height 0.9, uppercase): the name in the Shipper field. The 6rem ceiling is the largest type on the site. On a short desktop (1024px or wider, at most 820px tall) it is **Display compact**, 4rem, so the work reaches the fold.
 - **Contact address** (Overpass, 800, clamp 1.75rem to 3.5rem, line-height 1.05, -0.02em): the email in the closing Notify party, the page's primary action. The one reading-face size above the headline ceiling, and used nowhere else.
 - **Mark** (stencil, 800, uppercase, 0.04em tracking, line-height 1): ISO 6346 container marks in two named sizes: medium in a bay header, after the title, client and period and keyed below by "Serial is the start month" in the label role (small on phones, so the title stays the largest thing in the head); small at the foot of each Marks and numbers card, beside its swatch and above the period, and in the manifest. No other mark sizes. A mark never leads: the project title does. The check digit sits in a box bordered at 0.07em.
 - **Band title** (stencil, 800, 1.375rem, 0.08em tracking, uppercase): printed band titles ("Bill of lading", "Notices") reversed out of the form band, and the name in the strip.
@@ -238,13 +244,15 @@ A single-ink form palette (paper, green ink, carbon) with two container-steel pa
 
 **The Plain Heading Rule.** The shipping vocabulary lives in field labels, band titles, stamps and section notes ("Four projects, carried as containers"), never in a section heading. A heading says what the section holds in the reader's own words, so a skim never has to translate it.
 
+**The Plain Value Rule.** A field's label may speak shipping; its value never needs it. A recruiter reads the value alone: Port of discharge says "Open to relocating abroad" over "With employer visa sponsorship", Consignee names the roles ("Dynamics 365 F&O, AX or .NET backend roles"), Current carrier names the employer.
+
 ## Layout
 
-The page is the document. A 2px-ruled sticky strip (44px) sits above a centred container of 85rem with 16px gutters on mobile and 32px from 640px. The first viewport is the bill itself: a form band, then a 12-column `dl` grid whose fields span 7/5 at 1024px and wider (Shipper over two rows; Consignee and Notify party stacked), then 3/4/5 for the port and carrier row, then full-width Marks and numbers (4 columns from 1280px, 2 from 640px) and Description of goods. Every field collapses to 12 columns on mobile, and below 1024px the boxes reflow in the order a skimming reader needs them: Shipper, Port of loading, Port of discharge, Current carrier, Notify party, Consignee, then Marks and numbers, Description of goods and Notices. The numbers stay with their boxes, as on a printed form, and no moved box holds a link, so focus order is unchanged.
+The page is the document. A 2px-ruled sticky strip (44px) sits above a centred container of 85rem with 16px gutters on mobile and 32px from 640px. The first viewport is the bill itself: a form band, then a 12-column `dl` grid whose fields span 7/5 at 1024px and wider (Shipper over two rows; Consignee and Notify party stacked), then 3/4/5 for the port and carrier row, then full-width Marks and numbers (4 columns from 1280px, 2 from 640px) and Description of goods. Every field collapses to 12 columns on mobile, and below 1024px the boxes reflow in the order a skimming reader needs them: Shipper, Port of loading, Port of discharge, Current carrier, Notify party, Consignee, then Marks and numbers, Description of goods and Notices. The numbers stay with their boxes, as on a printed form, and no moved box holds a link, so focus order is unchanged. On a desktop that is 1024px or wider but at most 820px tall (the `short-desktop` variant: 720–800px laptop viewports), the first screen compacts: the name drops to 4rem, port and Consignee values to 1.375rem, and field padding to 12px, so the four case-study cards and their lines clear the fold (they start at about 563px). At 1440×900 and taller nothing changes. The bill ends with the same 64px / 96px as every section, so Case studies sits on the page's rhythm.
 
 Fields pad 16px on mobile and 20px from 640px, with a 10px gap between label and value. Sections pad 64px vertically, 96px from 1024px; section heads sit 32px above their content.
 
-Container bands break out full-bleed. Inside, a 5/7 two-column grid (head and fields left, route right) from 1024px, stacking head, route, fields below it, with 56px column and 40px row gaps and 80px vertical padding at desktop.
+Container bands break out full-bleed. Inside, a 5/7 two-column grid (head and fields left, route right) from 1024px, stacking head, fields (cargo first), then the route below 1024px, with 56px column and 40px row gaps and 80px vertical padding at desktop.
 
 The manifest is a real table that stacks below 64rem into a two-column grid per row (line number left, the rest right), its header visually hidden but kept for assistive technology.
 

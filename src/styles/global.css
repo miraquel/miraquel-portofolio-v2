@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* A desktop too short to show the work under the bill (720-800px laptop viewports): the
+   first screen tightens so the case-study cards reach the fold. 1440x900 is untouched. */
+@custom-variant short-desktop (@media (min-width: 64rem) and (max-height: 51.25rem));
+
 @theme {
   /* Legacy palette, still used by the admin workspace */
   --color-slate-900: #0f172a;
