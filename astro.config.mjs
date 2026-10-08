@@ -6,6 +6,8 @@ import tailwindcss from '@tailwindcss/vite';
 
 import vercel from '@astrojs/vercel';
 
+import { bundleOnBuild } from './integrations/bundle-on-build.mjs';
+
 /**
  * A package and everything it pulls in, read from package-lock.json with Node's resolution
  * (nearest node_modules first), so the list stays current when its dependencies change.
@@ -41,14 +43,6 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
-    ssr: {
-      // Bundle sanitize-html and its whole dependency tree. It is CommonJS and require()s the
-      // ESM-only htmlparser2 family, which Vercel's function loader refuses (ERR_REQUIRE_ESM)
-      // although plain Node 24 allows it. The whole tree, because Vercel's file tracing does not
-      // follow require() calls left inside bundled chunks: bundle part of it and the rest goes
-      // missing at runtime. Bundled whole, nothing is require()d.
-      noExternal: dependencyTree('sanitize-html')
-    },
     build: {
       rollupOptions: {
         output: {
@@ -66,6 +60,13 @@ export default defineConfig({
       chunkSizeWarningLimit: 1000
     }
   },
+
+  integrations: [
+    // Bundle sanitize-html and its whole dependency tree into builds (see the integration for
+    // why only builds). The whole tree, because Vercel's file tracing does not follow require()
+    // calls left inside bundled chunks: bundle part of it and the rest goes missing at runtime.
+    bundleOnBuild(dependencyTree('sanitize-html'))
+  ],
 
   adapter: vercel()
 });
