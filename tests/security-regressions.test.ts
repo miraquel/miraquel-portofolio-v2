@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import type { AstroIntegration } from 'astro';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { sanitizePostContent } from '../src/lib/sanitize';
@@ -50,9 +51,19 @@ test('sanitize-html and its whole dependency tree are bundled into the server bu
   // in production with ERR_REQUIRE_ESM (plain Node 24 allows it, which hides the bug locally).
   // Vercel's file tracing also ignores require() calls inside bundled chunks, so the bundle
   // must take sanitize-html's dependencies with it.
+  // The list is applied by the bundle-on-build integration, for `astro build` only (in dev,
+  // Vite's module runner cannot evaluate CommonJS), so read the config a build would get.
   const { default: config } = await import('../astro.config.mjs');
-  const bundled = config.vite?.ssr?.noExternal;
-  assert.ok(Array.isArray(bundled), 'astro.config.mjs must list ssr.noExternal packages');
+  const integration = config.integrations?.flat().find(
+    (entry): entry is AstroIntegration => Boolean(entry) && (entry as AstroIntegration).name === 'bundle-on-build'
+  );
+  assert.ok(integration, 'astro.config.mjs must include the bundle-on-build integration');
+  let bundled: unknown;
+  const setup = integration.hooks['astro:config:setup'] as (options: unknown) => void;
+  setup({ command: 'build', updateConfig: (update: { vite?: { ssr?: { noExternal?: unknown } } }) => {
+    bundled = update.vite?.ssr?.noExternal;
+  } });
+  assert.ok(Array.isArray(bundled), 'astro build must list ssr.noExternal packages');
 
   const manifest = JSON.parse(await readFile(new URL('../node_modules/sanitize-html/package.json', import.meta.url), 'utf8'));
   const required = ['sanitize-html', ...Object.keys(manifest.dependencies), 'domhandler', 'entities'];
