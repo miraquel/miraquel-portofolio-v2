@@ -85,8 +85,9 @@ const evidenceLink = 'inline-block py-3 underline decoration-stencil/50 decorati
 </article>
 
 <style>
+  /* On a phone the one-sentence cargo and its evidence come first, then the route as the detail */
   .bay-grid {
-    grid-template-areas: 'head' 'route' 'fields';
+    grid-template-areas: 'head' 'fields' 'route';
   }
 
   @media (min-width: 64rem) {
