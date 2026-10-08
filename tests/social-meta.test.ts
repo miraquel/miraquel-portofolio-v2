@@ -14,6 +14,7 @@ test('a post shares as an article under its own title', () => {
   assert.equal(meta.ogTitle, post.title);
   assert.equal(meta.type, 'article');
   assert.equal(meta.publishedTime, '2026-10-08T15:40:00.000Z');
+  assert.equal(meta.author, 'Chaidir Ali Assegaf');
 });
 
 test('a post without its own card keeps the site card', () => {
