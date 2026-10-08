@@ -80,9 +80,15 @@ import { formatPeriod } from '../../lib/format';
     background-color: var(--color-paper-deep);
   }
 
-  /* A link that lands on a line (a case study's record) clears the sticky strip */
+  /* A link that lands on a line (a case study's record) clears the sticky strip, and the line
+     takes the same inside frame as a crossed one: the tint alone is too faint to find */
   .manifest tbody tr {
     scroll-margin-top: 5rem;
+  }
+
+  .manifest tr:target {
+    outline: 2px solid var(--color-form);
+    outline-offset: -2px;
   }
 
   @media (max-width: 63.99rem) {
