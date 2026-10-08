@@ -67,7 +67,15 @@
   }
 }
 
-/* A container mark and its manifest line light together (see the page script) */
+/* A container mark and its manifest line light together (see the page script). A 2px form
+   frame, drawn inside the box, sets the pair apart from the standing tint of container lines.
+   This rule is unlayered, so it would beat the focus ring in @layer base: a keyboard-focused
+   card keeps the standard 3px carbon ring and only takes the tint. */
 [data-mark].is-crossed {
   background-color: var(--color-paper-deep);
+}
+
+[data-mark].is-crossed:not(:focus-visible) {
+  outline: 2px solid var(--color-form);
+  outline-offset: -2px;
 }

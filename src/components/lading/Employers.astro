@@ -15,7 +15,7 @@ import { formatPeriod } from '../../lib/format';
           <div class="lg:col-span-4">
             <p class="text-xl font-extrabold leading-tight">
               <a href={employer.href} target="_blank" rel="noopener noreferrer" class="inline-block py-2.5 -my-2.5 underline decoration-form/40 decoration-2 underline-offset-4 hover:decoration-form">
-                {employer.company}
+                {employer.company}<span class="sr-only"> (opens in a new tab)</span>
               </a>
             </p>
             <p class="mt-1 text-[0.9375rem] font-semibold leading-snug">{employer.role}</p>

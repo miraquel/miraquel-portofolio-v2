@@ -24,9 +24,9 @@ const year = profile.revised.slice(0, 4);
     </div>
 
     <ul class="mt-5 flex flex-wrap gap-x-7 text-base font-semibold">
-      <li><a href={profile.linkedin} target="_blank" rel="noopener noreferrer" class="inline-block py-3 underline decoration-form/40 underline-offset-4 hover:decoration-form">LinkedIn</a></li>
-      <li><a href={profile.github} target="_blank" rel="noopener noreferrer" class="inline-block py-3 underline decoration-form/40 underline-offset-4 hover:decoration-form">GitHub</a></li>
-      <li><a href={profile.resume} type="application/pdf" target="_blank" rel="noopener" class="inline-block py-3 underline decoration-form/40 underline-offset-4 hover:decoration-form">Résumé (PDF)</a></li>
+      <li><a href={profile.linkedin} target="_blank" rel="noopener noreferrer" class="inline-block py-3 underline decoration-form/40 underline-offset-4 hover:decoration-form">LinkedIn<span class="sr-only"> (opens in a new tab)</span></a></li>
+      <li><a href={profile.github} target="_blank" rel="noopener noreferrer" class="inline-block py-3 underline decoration-form/40 underline-offset-4 hover:decoration-form">GitHub<span class="sr-only"> (opens in a new tab)</span></a></li>
+      <li><a href={profile.resume} type="application/pdf" target="_blank" rel="noopener" class="inline-block py-3 underline decoration-form/40 underline-offset-4 hover:decoration-form">Résumé (PDF)<span class="sr-only"> (opens in a new tab)</span></a></li>
     </ul>
 
     <dl class="mt-14 grid grid-cols-12 gap-px border-2 border-form bg-form">

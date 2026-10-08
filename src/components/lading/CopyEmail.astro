@@ -48,8 +48,8 @@ const { email } = Astro.props;
           selection?.removeAllRanges();
           selection?.addRange(range);
         }
-        copyLabel.textContent = 'Address selected';
-        copyStatus.textContent = "Couldn't copy automatically. The address is selected, so copy it with your keyboard.";
+        copyLabel.textContent = 'Selected to copy';
+        copyStatus.textContent = "Couldn't copy automatically. The address is selected, so you can copy it yourself.";
       }
       resetTimer = setTimeout(() => {
         copyLabel.textContent = 'Copy address';
