@@ -220,6 +220,7 @@ A single-ink form palette (paper, green ink, carbon) with two container-steel pa
 
 ### Hierarchy
 - **Display** (stencil, 800, clamp 3.5rem to 6rem, line-height 0.9, uppercase): the name in the Shipper field. The 6rem ceiling is the largest type on the site.
+- **Contact address** (Overpass, 800, clamp 1.75rem to 3.5rem, line-height 1.05, -0.02em): the email in the closing Notify party, the page's primary action. The one reading-face size above the headline ceiling, and used nowhere else.
 - **Mark** (stencil, 800, uppercase, 0.04em tracking, line-height 1): ISO 6346 container marks in two named sizes: medium in a bay header, after the title, client and period and keyed below by "Serial is the start month" in the label role (small on phones, so the title stays the largest thing in the head); small at the foot of each Marks and numbers card, beside its swatch and above the period, and in the manifest. No other mark sizes. A mark never leads: the project title does. The check digit sits in a box bordered at 0.07em.
 - **Band title** (stencil, 800, 1.375rem, 0.08em tracking, uppercase): printed band titles ("Bill of lading", "Notices") reversed out of the form band, and the name in the strip.
 - **Headline** (Overpass, 800, clamp 2rem to 3.25rem, line-height 1, -0.02em): section heads, preceded by their mono section number in form green. Blog and post titles use the same weight and tracking up to 4rem.
@@ -295,7 +296,7 @@ A case study as a full-bleed band of steel: the title, client and period on the 
 A data-flow diagram drawn in code: lettered stops (A, B, C) as 2px carbon-framed paper boxes with name, role and mono tech line; between stops, 2px stroked down-arrows labelled with what travels; return flows listed under a form hairline with a return arrow.
 
 ### Container Mark and Cross-highlight
-An ISO 6346 mark (owner code, serial, boxed check digit). Standalone (bay header, manifest) it is an image named "Container CAAU 202204, check digit 0"; inside a link it is hidden, so the link is named by its project title first. Hovering or focusing a mark in Marks and numbers lights its manifest row in paper-deep, and the reverse.
+An ISO 6346 mark (owner code, serial, boxed check digit). Standalone (bay header, manifest) it is an image named "Container CAAU 202204, check digit 0"; inside a link it is hidden, so the link is named by its project title first. Hovering or focusing a Marks and numbers card lights its manifest row, and the reverse: paper-deep with a 2px form frame drawn inside the box (an outline at -2px, not a shadow), so a crossed line stands apart from the standing tint of container lines. Each card also prints the line that carries it ("Manifest line 06": the words in Overpass, the number in mono), so the connection reads without the hover, which on a phone never happens.
 
 ### Stamp
 A rubber stamp in stamp red: stencil word over a mono date, 3px double border, rotated -6deg, multiply-blended and roughened by the stamp-ink displacement filter. It carries a status and a date and nothing else (Delivered on bays, Expired on a lapsed certificate).

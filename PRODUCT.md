@@ -93,7 +93,7 @@ A pure ERP consultant or a pure .NET engineer can't truthfully claim that combin
   - Exam 764 (SQL Database Infrastructure), August 2019;
   - Bachelor of Information Technology, Universitas Islam Syekh Yusuf, 2017;
   - IELTS 7.0 (August 2023), CEFR C1 English.
-- **Blog:** one published post, "Getting Started with Astro and Firebase".
+- **Blog:** two published posts: "Settling AX 2012 vendor invoices from outside AX: a custom AIF service for payment journals" (8 October 2026, with a downloadable example XPO) and the earlier sample "Getting Started with Astro and Firebase".
 - **Absent, so never fabricate:** testimonials, client logos or permission to use them, measured outcomes beyond the allowed numbers above, imagery for the 17 projects without screenshots, and any further blog content.
 
 ## Product Principles

@@ -6,7 +6,10 @@ import Guilloche from './Guilloche.astro';
 import Mark from './Mark.astro';
 import { goods, profile } from '../../data/profile';
 import { employers } from '../../data/record';
-import { containers } from '../../data/work';
+import { containers, manifest } from '../../data/work';
+
+/** The manifest line that carries a container */
+const manifestLine = (slug: string) => manifest.find((line) => line.caseStudy === slug)?.number ?? 0;
 import { formatDay, formatMonth, formatPeriod } from '../../lib/format';
 
 const current = employers.find((employer) => !employer.period.end)!;
@@ -54,9 +57,9 @@ const [firstName, ...lastNames] = profile.name.split(' ');
           <CopyEmail email={profile.email} />
         </div>
         <ul class="mt-2 flex flex-wrap gap-x-5 text-[0.9375rem] font-semibold">
-          <li><a href={profile.linkedin} target="_blank" rel="noopener noreferrer" class="inline-block py-3 underline decoration-form/40 underline-offset-4 hover:decoration-form">LinkedIn</a></li>
-          <li><a href={profile.github} target="_blank" rel="noopener noreferrer" class="inline-block py-3 underline decoration-form/40 underline-offset-4 hover:decoration-form">GitHub</a></li>
-          <li><a href={profile.resume} type="application/pdf" target="_blank" rel="noopener" class="inline-block py-3 underline decoration-form/40 underline-offset-4 hover:decoration-form">Résumé (PDF)</a></li>
+          <li><a href={profile.linkedin} target="_blank" rel="noopener noreferrer" class="inline-block py-3 underline decoration-form/40 underline-offset-4 hover:decoration-form">LinkedIn<span class="sr-only"> (opens in a new tab)</span></a></li>
+          <li><a href={profile.github} target="_blank" rel="noopener noreferrer" class="inline-block py-3 underline decoration-form/40 underline-offset-4 hover:decoration-form">GitHub<span class="sr-only"> (opens in a new tab)</span></a></li>
+          <li><a href={profile.resume} type="application/pdf" target="_blank" rel="noopener" class="inline-block py-3 underline decoration-form/40 underline-offset-4 hover:decoration-form">Résumé (PDF)<span class="sr-only"> (opens in a new tab)</span></a></li>
         </ul>
       </Field>
 
@@ -93,7 +96,10 @@ const [firstName, ...lastNames] = profile.name.split(' ');
                     <span class:list={['size-3.5 shrink-0', container.steel === 'cobalt' ? 'bg-cobalt' : 'bg-oxide']}></span>
                     <Mark mark={container.mark} size="sm" decorative />
                   </span>
-                  <span class="font-data text-xs text-form">{formatPeriod(container.period)}</span>
+                  <span class="flex flex-wrap gap-x-3 gap-y-1 text-xs text-form">
+                    <span class="font-data">{formatPeriod(container.period)}</span>
+                    <span class="font-semibold">Manifest line <span class="font-data font-medium">{String(manifestLine(container.slug)).padStart(2, '0')}</span></span>
+                  </span>
                 </span>
               </a>
             </li>

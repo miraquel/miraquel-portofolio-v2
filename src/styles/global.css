@@ -67,7 +67,10 @@
   }
 }
 
-/* A container mark and its manifest line light together (see the page script) */
+/* A container mark and its manifest line light together (see the page script). A 2px form
+   frame, drawn inside the box, sets the pair apart from the standing tint of container lines. */
 [data-mark].is-crossed {
   background-color: var(--color-paper-deep);
+  outline: 2px solid var(--color-form);
+  outline-offset: -2px;
 }
