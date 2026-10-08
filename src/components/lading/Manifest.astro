@@ -76,8 +76,14 @@ import { formatPeriod } from '../../lib/format';
   }
 
   .manifest tr.is-container,
-  .manifest tr.is-crossed {
+  .manifest tr.is-crossed,
+  .manifest tr:target {
     background-color: var(--color-paper-deep);
+  }
+
+  /* A link that lands on a line (a case study's record) clears the sticky strip */
+  .manifest tbody tr {
+    scroll-margin-top: 5rem;
   }
 
   @media (max-width: 63.99rem) {

@@ -24,7 +24,17 @@ export interface CaseStudy {
   cargo: string;
   /** Stops in order; legs[i] is what travels from stops[i] to stops[i + 1] */
   route: { stops: RouteStop[]; legs: string[][]; returns: string[] };
-  evidence: { label: string; href?: string }[];
+  evidence: Evidence[];
+}
+
+export interface Evidence {
+  label: string;
+  /** Another site (opens in a new tab), or a page or file on this one */
+  href?: string;
+  /** Offer a file on this site to save instead of to open */
+  download?: boolean;
+  /** The title of a manifest line below; resolved to that line's anchor */
+  manifestLine?: string;
 }
 
 export interface ManifestLine {
@@ -57,7 +67,7 @@ const caseStudies: CaseStudy[] = [
     },
     evidence: [
       { label: 'Delivered at PT Intikom Berlian Mustika' },
-      { label: 'Follows my 2020 F&O assessment for the same client' },
+      { label: 'Follows my 2020 F&O assessment for the same client', manifestLine: 'Dynamics 365 F&O assessment' },
     ],
   },
   {
@@ -81,7 +91,15 @@ const caseStudies: CaseStudy[] = [
         'The same route runs invoice exchange (tukar faktur): preparation and billing.',
       ],
     },
-    evidence: [{ label: 'About 60% less manual entry' }],
+    evidence: [
+      { label: 'About 60% less manual entry' },
+      { label: 'Write-up: the custom AIF service, with X++', href: '/blog/ax-2012-aif-vendor-payment-settlement' },
+      {
+        label: 'Example service from the write-up (XPO, 22\u00a0KB)',
+        href: '/blog/ax-2012-aif-vendor-payment-settlement/MobVendPayment.xpo',
+        download: true,
+      },
+    ],
   },
   {
     slug: 'sparepart-management',
@@ -131,13 +149,6 @@ const caseStudies: CaseStudy[] = [
   },
 ];
 
-export const containers = caseStudies.map((caseStudy) => ({
-  ...caseStudy,
-  mark: containerMark(caseStudy.period.start) as ContainerMark,
-}));
-
-export type Container = (typeof containers)[number];
-
 const lines: ManifestLine[] = [
   { title: 'Generated Information Service Level System (GiselX)', client: 'PT Gandum Mas Kencana', platform: 'ASP.NET Core MVC, Entity Framework Core, SQL Server', period: { start: '2025-07', end: '2025-09' }, href: 'https://github.com/miraquel/GiselX' },
   { title: 'Futurist', client: 'PT Gandum Mas Kencana', platform: 'ASP.NET Core MVC, Hangfire, SignalR', period: { start: '2025-01', end: '2025-05' }, caseStudy: 'futurist' },
@@ -159,6 +170,33 @@ const lines: ManifestLine[] = [
   { title: 'Shipping order and invoice reports', client: 'PT Natural Java Spice', platform: 'Dynamics AX 2012 R3, X++', period: { start: '2018-03', end: '2018-12' } },
   { title: 'Dynamics AX 2012 R3 implementation', client: 'PT Visionet International', platform: 'Dynamics AX 2012 R3, X++', period: { start: '2018-03', end: '2018-12' } },
 ];
+
+/** The anchor of the manifest line with this title, which must name exactly one line */
+function manifestAnchor(title: string): string {
+  const numbers = lines.flatMap((line, index) => (line.title === title ? [index + 1] : []));
+  if (numbers.length !== 1) {
+    throw new Error(`Manifest line "${title}" matches ${numbers.length} lines, not one`);
+  }
+  return `#manifest-${numbers[0]}`;
+}
+
+export const containers = caseStudies.map((caseStudy) => ({
+  ...caseStudy,
+  evidence: caseStudy.evidence.map(({ manifestLine, ...item }) =>
+    manifestLine ? { ...item, href: manifestAnchor(manifestLine) } : item
+  ),
+  mark: containerMark(caseStudy.period.start) as ContainerMark,
+}));
+
+export type Container = (typeof containers)[number];
+
+/**
+ * A bay's field is "Evidence" when something in it can be opened: source, a write-up, a file.
+ * Facts on file (a delivery note, a cross-reference to the manifest) make it a "Record".
+ */
+export function evidenceLabel(container: { evidence: { href?: string }[] }): 'Evidence' | 'Record' {
+  return container.evidence.some((item) => item.href && !item.href.startsWith('#')) ? 'Evidence' : 'Record';
+}
 
 export const manifest = lines.map((line, index) => ({
   ...line,
