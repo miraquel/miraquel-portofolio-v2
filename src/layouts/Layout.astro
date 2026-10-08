@@ -1,38 +1,91 @@
 ---
-import "../styles/global.css";
+import '@fontsource-variable/big-shoulders-stencil/opsz.css';
+import '@fontsource-variable/overpass/wght.css';
+import '@fontsource-variable/overpass-mono/wght.css';
+import '../styles/global.css';
+import { profile } from '../data/profile';
+
+interface Props {
+	title?: string;
+	description?: string;
+	/** Keep the page out of search results (the admin sign-in) */
+	noindex?: boolean;
+	/** 'plain' is for the admin sign-in, which brings its own dark styles and fonts */
+	chrome?: 'lading' | 'plain';
+}
+
+const {
+	title = `${profile.name}: ${profile.title}`,
+	description = `${profile.title} based in ${profile.based}: Dynamics AX 2012 and Finance & Operations customisation, and the ASP.NET services and Flutter apps that connect to them. ${profile.relocation}.`,
+	noindex = false,
+	chrome = 'lading',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const socialImage = new URL('/og.png', Astro.site);
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" data-world={chrome === 'lading' ? 'lading' : undefined}>
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-		<title>Chaidir Ali Assegaf - Software Developer</title>
+		{noindex && <meta name="robots" content="noindex" />}
+		<meta name="theme-color" content="#24543f" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content={profile.name} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={socialImage} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta
+			property="og:image:alt"
+			content={`Bill of lading for ${profile.name}, ${profile.title}: port of loading ${profile.based}, port of discharge open. Four container marks list the case studies.`}
+		/>
+		<meta name="twitter:card" content="summary_large_image" />
 	</head>
-	<body class="m-0 w-full min-h-screen bg-slate-900 text-slate-400 font-sans leading-normal">
+	<body
+		class={chrome === 'lading'
+			? 'min-h-screen bg-paper font-body text-base leading-normal text-ink antialiased'
+			: 'm-0 min-h-screen w-full bg-slate-900 font-sans leading-normal text-slate-400'}
+	>
 		<slot />
+
+		<!-- Rubber-stamp ink: a slight displacement so stamp edges read as pressed ink, not vector -->
+		<svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false">
+			<filter id="stamp-ink" x="-5%" y="-5%" width="110%" height="110%">
+				<feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7" result="grain" />
+				<feDisplacementMap in="SourceGraphic" in2="grain" scale="1.6" />
+			</filter>
+		</svg>
 
 		<!-- Firebase Analytics -->
 		<script>
-			import { app } from '../lib/firebase';
-			import { getAnalytics, logEvent } from 'firebase/analytics';
+			import { app } from '../lib/firebase-app';
+			import { getAnalytics, isSupported, logEvent } from 'firebase/analytics';
 
-			// Initialize analytics only in browser
-			if (typeof window !== 'undefined') {
-				const analytics = getAnalytics(app);
+			// Analytics needs IndexedDB and cookies; private windows and blockers can refuse
+			// either, and a tracking failure must never surface as a page error
+			isSupported()
+				.then((supported) => {
+					if (!supported) return;
+					const analytics = getAnalytics(app);
 
-				// Log page view
-				logEvent(analytics, 'page_view', {
-					page_title: document.title,
-					page_location: window.location.href,
-					page_path: window.location.pathname
-				});
-			}
+					// Log page view
+					logEvent(analytics, 'page_view', {
+						page_title: document.title,
+						page_location: window.location.href,
+						page_path: window.location.pathname
+					});
+				})
+				.catch(() => {});
 		</script>
 	</body>
 </html>

@@ -1,0 +1,46 @@
+---
+// The thin printed strip above the document: who it belongs to, and the way around it.
+interface Props {
+  /** On the homepage section links stay in-page; elsewhere they lead back to it */
+  onHome?: boolean;
+}
+
+const { onHome = false } = Astro.props;
+const base = onHome ? '' : '/';
+
+const links = [
+  { href: `${base}#containers`, label: 'Case studies', wide: true },
+  { href: `${base}#manifest`, label: 'All projects', wide: true },
+  { href: `${base}#employers`, label: 'Employers', wide: true },
+  { href: '/blog', label: 'Blog', wide: false },
+  { href: `${base}#contact`, label: 'Contact', wide: false },
+];
+---
+
+<a
+  href="#main"
+  class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-2 focus:z-50 focus:bg-signal focus:px-4 focus:py-2.5 focus:font-semibold focus:text-ink"
+>
+  Skip to content
+</a>
+<header class="sticky top-0 z-40 border-b-2 border-form bg-paper">
+  <div class="mx-auto flex max-w-[85rem] items-center justify-between gap-6 px-4 sm:px-8">
+    <a href="/" class="py-[11px] font-stencil text-[1.375rem] font-extrabold uppercase leading-none tracking-[0.05em] text-ink">
+      Chaidir Ali Assegaf
+    </a>
+    <nav aria-label="Page">
+      <ul class="flex items-center">
+        {links.map((link) => (
+          <li class:list={[link.wide && 'hidden md:block']}>
+            <a
+              href={link.href}
+              class="inline-block px-2.5 py-[15px] text-sm font-semibold leading-none text-form underline-offset-4 transition-colors duration-150 hover:text-ink hover:underline"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>

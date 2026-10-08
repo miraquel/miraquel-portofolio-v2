@@ -1,0 +1,115 @@
+---
+// Every project as a manifest line, newest first. Lines that are containers above carry
+// their mark and lead to them. Below 64rem the rows stack; explicit roles keep the table
+// semantics that display changes would otherwise strip.
+import Mark from './Mark.astro';
+import SectionHead from './SectionHead.astro';
+import { manifest } from '../../data/work';
+import { formatPeriod } from '../../lib/format';
+---
+
+<section id="manifest" aria-labelledby="manifest-title" class="scroll-mt-14">
+  <div class="mx-auto max-w-[85rem] px-4 py-16 sm:px-8 lg:py-24">
+    <SectionHead
+      n={11}
+      id="manifest-title"
+      title="Manifest"
+      note={`All ${manifest.length} projects, newest first. Marked lines are the containers above.`}
+    />
+
+    <table role="table" class="manifest mt-8 w-full border-2 border-form text-left" aria-labelledby="manifest-title">
+      <thead role="rowgroup" class="bg-form text-paper">
+        <tr role="row">
+          <th role="columnheader" scope="col" class="w-14">Line</th>
+          <th role="columnheader" scope="col" class="w-44">Period</th>
+          <th role="columnheader" scope="col">Project</th>
+          <th role="columnheader" scope="col" class="w-[17%]">Client</th>
+          <th role="columnheader" scope="col" class="w-[22%]">Platform</th>
+          <th role="columnheader" scope="col" class="w-48">Marks</th>
+        </tr>
+      </thead>
+      <tbody role="rowgroup">
+        {manifest.map((line) => (
+          <tr
+            role="row"
+            id={`manifest-${line.number}`}
+            data-mark={line.container?.mark.id}
+            class:list={['border-t border-form/35 transition-colors duration-150 hover:bg-paper-deep', line.container && 'is-container']}
+          >
+            <td role="cell" class="font-data text-sm text-form">{String(line.number).padStart(2, '0')}</td>
+            <td role="cell" class="font-data text-[0.8125rem] whitespace-nowrap">{formatPeriod(line.period)}</td>
+            <td role="cell" class="font-bold leading-snug">
+              {line.container ? (
+                <a href={`#${line.container.slug}`} data-container-link={line.container.slug} class="inline-block py-3 -my-3 underline decoration-form/40 decoration-2 underline-offset-4 hover:decoration-form">
+                  {line.title}
+                </a>
+              ) : line.href ? (
+                <a href={line.href} target="_blank" rel="noopener noreferrer" class="inline-block py-3 -my-3 underline decoration-form/40 decoration-2 underline-offset-4 hover:decoration-form">
+                  {line.title}<span class="sr-only"> (source on GitHub, opens in a new tab)</span>
+                </a>
+              ) : (
+                line.title
+              )}
+            </td>
+            <td role="cell" class="leading-snug">{line.client}</td>
+            <td role="cell" class="text-[0.9375rem] leading-snug text-ink/85">{line.platform}</td>
+            <td role="cell">
+              {line.container && <Mark mark={line.container.mark} size="sm" />}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<style>
+  .manifest th {
+    padding: 0.75rem 1rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .manifest td {
+    padding: 0.875rem 1rem;
+    vertical-align: baseline;
+  }
+
+  .manifest tr.is-container,
+  .manifest tr.is-crossed {
+    background-color: var(--color-paper-deep);
+  }
+
+  @media (max-width: 63.99rem) {
+    .manifest thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+
+    .manifest tr {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: 0.75rem;
+      row-gap: 0.25rem;
+      padding: 1rem;
+    }
+
+    .manifest td {
+      display: block;
+      padding: 0;
+      grid-column: 2;
+    }
+
+    .manifest td:first-child {
+      grid-column: 1;
+      grid-row: 1 / span 5;
+    }
+
+    .manifest td:last-child:empty {
+      display: none;
+    }
+  }
+</style>

@@ -23,3 +23,13 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Impeccable working files: review screenshots, critique snapshots, live-mode sessions,
+# decision-page logs and the hook cache. The design records (design.json, config.json,
+# surfaces/, live/config.json) are tracked.
+.impeccable/review/
+.impeccable/critique/
+.impeccable/questions/
+.impeccable/live/sessions/
+.impeccable/live/annotations/
+.impeccable/hook.cache.json

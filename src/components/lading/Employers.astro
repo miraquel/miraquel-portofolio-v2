@@ -1,0 +1,33 @@
+---
+// The carriers: employers in order, the current one printed on signal yellow.
+import SectionHead from './SectionHead.astro';
+import { employers } from '../../data/record';
+import { formatPeriod } from '../../lib/format';
+---
+
+<section id="employers" aria-labelledby="employers-title" class="scroll-mt-14">
+  <div class="mx-auto max-w-[85rem] px-4 pb-16 sm:px-8 lg:pb-24">
+    <SectionHead n={12} id="employers-title" title="Employers" />
+
+    <ol class="mt-8 grid gap-px border-2 border-form bg-form">
+      {employers.map((employer) => (
+        <li class="grid gap-x-10 gap-y-3 bg-paper px-4 py-6 sm:px-6 lg:grid-cols-12">
+          <div class="lg:col-span-4">
+            <p class="text-xl font-extrabold leading-tight">
+              <a href={employer.href} target="_blank" rel="noopener noreferrer" class="inline-block py-2.5 -my-2.5 underline decoration-form/40 decoration-2 underline-offset-4 hover:decoration-form">
+                {employer.company}
+              </a>
+            </p>
+            <p class="mt-1 text-[0.9375rem] font-semibold leading-snug">{employer.role}</p>
+          </div>
+          <p class="lg:col-span-3">
+            <span class:list={['inline-block font-data text-sm', !employer.period.end && 'bg-signal px-2 py-1 font-semibold']}>
+              {formatPeriod(employer.period)}
+            </span>
+          </p>
+          <p class="max-w-[62ch] text-[1.0625rem] leading-relaxed lg:col-span-5">{employer.work}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>

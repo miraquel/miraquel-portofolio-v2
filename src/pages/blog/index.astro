@@ -1,151 +1,124 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getAllBlogPosts, getBlogPostsByTag, getTagCounts } from '../../lib/blog';
+import Strip from '../../components/lading/Strip.astro';
+import { countTags, getPublishedPosts, type BlogPost } from '../../lib/blog';
+import { formatDay } from '../../lib/format';
 
 export const prerender = false;
 
 const selectedTag = Astro.url.searchParams.get('tag');
-const allPosts = selectedTag ? await getBlogPostsByTag(selectedTag) : await getAllBlogPosts();
-const tagCounts = await getTagCounts();
-const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
 
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  }).format(date);
+// One read serves both the list and the tag counts; a failed read must not look like an empty blog
+let publishedPosts: BlogPost[] = [];
+let loadFailed = false;
+try {
+  publishedPosts = await getPublishedPosts();
+} catch (error) {
+  console.error('Error fetching blog posts:', error);
+  loadFailed = true;
+  Astro.response.status = 503;
 }
+
+const allPosts = selectedTag ? publishedPosts.filter(post => post.tags.includes(selectedTag)) : publishedPosts;
+const sortedTags = Object.entries(countTags(publishedPosts)).sort((a, b) => b[1] - a[1]);
+
+const button = 'inline-flex min-h-11 items-center border-2 border-form bg-form px-5 text-sm font-semibold text-paper transition-colors duration-150 hover:border-ink hover:bg-ink';
 ---
 
-<Layout>
-  <div class="min-h-screen px-6 max-w-5xl mx-auto py-24">
-    <a 
-      href="/" 
-      class="inline-flex items-center gap-2 text-slate-400 hover:text-teal-300 transition-colors duration-200 mb-8 block"
-    >
-      <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="19" y1="12" x2="5" y2="12"></line>
-        <polyline points="12 19 5 12 12 5"></polyline>
-      </svg>
-      Back to Home
-    </a>
-    
-    <div class="mb-8">
-      <h1 class="text-5xl font-bold text-slate-200 leading-tight mb-4">Blog</h1>
-      <p class="text-slate-400 text-lg">Thoughts, tutorials, and insights about software development</p>
+<Layout title="Blog: Chaidir Ali Assegaf" description="Notes on software development, the Microsoft Dynamics ecosystem and web technologies.">
+  <Strip />
+  <main id="main" class="mx-auto max-w-[85rem] px-4 pb-24 pt-5 sm:px-8 lg:pt-7">
+    <div data-dark class="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-2 border-b-0 border-form bg-form px-4 py-2 text-paper sm:px-5">
+      <p class="font-stencil text-[1.375rem] font-extrabold uppercase leading-none tracking-[0.08em]">Notices</p>
+      <p class="font-data text-xs">{loadFailed ? 'Not loaded' : `${publishedPosts.length} published`}</p>
     </div>
+    <div class="border-2 border-form px-4 py-6 sm:px-6 sm:py-8">
+      <h1 class="text-[clamp(2.5rem,6vw,4rem)] font-extrabold leading-none tracking-[-0.02em]">Blog</h1>
+      <p class="mt-4 max-w-[60ch] text-lg leading-relaxed">
+        Notes on software development, the Microsoft Dynamics ecosystem and web technologies.
+      </p>
 
-    {sortedTags.length > 0 && (
-      <div class="mb-8">
-        <div class="flex items-center gap-3 mb-3">
-          <h2 class="text-sm font-semibold text-slate-200 uppercase tracking-wider">Filter by tag:</h2>
+      {sortedTags.length > 0 && (
+        <div class="mt-7 flex flex-wrap items-center gap-x-3 gap-y-2">
+          <h2 class="text-[0.8125rem] font-semibold text-form">Filter by tag</h2>
+          <ul class="flex flex-wrap gap-2">
+            {sortedTags.map(([tag, count]) => (
+              <li>
+                <a
+                  href={`/blog?tag=${encodeURIComponent(tag)}`}
+                  aria-current={selectedTag === tag ? 'page' : undefined}
+                  class:list={[
+                    'inline-flex min-h-11 items-center gap-2 border-2 border-form px-3 text-sm font-semibold transition-colors duration-150',
+                    selectedTag === tag ? 'bg-form text-paper' : 'bg-paper text-form hover:bg-paper-deep',
+                  ]}
+                >
+                  {tag}
+                  <span class="font-data text-xs font-medium">{count}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
           {selectedTag && (
-            <a 
-              href="/blog" 
-              class="inline-flex items-center gap-1 px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-full text-xs transition-colors"
-            >
-              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
+            <a href="/blog" class="inline-block px-1 py-3 text-sm font-semibold underline decoration-form/40 underline-offset-4 hover:decoration-form">
               Clear filter
             </a>
           )}
         </div>
-        <div class="flex flex-wrap gap-2">
-          {sortedTags.map(([tag, count]) => (
-            <a 
-              href={`/blog?tag=${encodeURIComponent(tag)}`}
-              class={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                selectedTag === tag 
-                  ? 'bg-teal-500 text-slate-900 shadow-lg shadow-teal-500/20' 
-                  : 'bg-teal-400/10 text-teal-300 hover:bg-teal-400/20 hover:shadow-md'
-              }`}
-            >
-              <span class="text-slate-200 text-xs">
-                {tag}
-              </span>
-              <span class={`text-[10px] ${
-                selectedTag === tag ? 'text-slate-700' : 'text-teal-400'
-              }`}>({count})</span>
-            </a>
-          ))}
-        </div>
-      </div>
-    )}
-
-    {selectedTag && (
-      <div class="mb-6 p-3 bg-teal-400/10 border border-teal-400/20 rounded-lg">
-        <p class="text-teal-300 text-xs">
-          Showing <span class="font-semibold">{allPosts.length}</span> post{allPosts.length !== 1 ? 's' : ''} tagged with <span class="font-semibold">"{selectedTag}"</span>
-        </p>
-      </div>
-    )}
-
-    <div class="flex flex-col gap-6">
-      {allPosts.length > 0 ? (
-        allPosts.map((post) => (
-          <article class="group">
-            <div class="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-6 rounded-lg transition-all duration-300 hover:bg-slate-800/50 hover:shadow-[0_0_0_1px_rgba(148,163,184,0.1)]">
-              <a href={`/blog/${post.slug}`} class="block">
-                {post.imageUrl ? (
-                  <div class="w-full md:w-[200px] aspect-video md:aspect-[4/3] rounded overflow-hidden border border-slate-400/20 bg-slate-900/50 flex-shrink-0">
-                    <img 
-                      src={post.imageUrl} 
-                      alt={post.title}
-                      class="w-full h-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div class="w-full md:w-[200px] aspect-video md:aspect-[4/3] rounded overflow-hidden border border-slate-400/20 bg-gradient-to-br from-slate-800/80 to-slate-700/80 flex items-center justify-center text-slate-600 flex-shrink-0">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                      <polyline points="14 2 14 8 20 8"></polyline>
-                      <line x1="16" y1="13" x2="8" y2="13"></line>
-                      <line x1="16" y1="17" x2="8" y2="17"></line>
-                      <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                  </div>
-                )}
-              </a>
-              
-              <div class="flex flex-col gap-3">
-                <a href={`/blog/${post.slug}`}>
-                  <h2 class="text-xl font-semibold text-slate-200 m-0 group-hover:text-teal-300 transition-colors duration-200">
-                    {post.title}
-                  </h2>
-                </a>
-                <p class="text-slate-400 text-sm">
-                  {formatDate(post.publishedAt)} · {post.author}
-                </p>
-                <a href={`/blog/${post.slug}`}>
-                  <p class="text-slate-400 leading-relaxed">
-                    {post.excerpt}
-                  </p>
-                </a>
-                {post.tags.length > 0 && (
-                  <div class="flex flex-wrap gap-2 mt-2">
-                    {post.tags.map((tag) => (
-                      <a
-                        href={`/blog?tag=${encodeURIComponent(tag)}`}
-                        class="px-3 pb-1 bg-teal-400/10 hover:bg-teal-400/20 hover:shadow-md rounded-full font-medium transition-all duration-200"
-                      >
-                        <span class="text-teal-300 text-xs">{tag}</span>
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </article>
-        ))
-      ) : (
-        <div class="text-center py-16">
-          <p class="text-slate-400 text-lg">No blog posts available yet.</p>
-          <p class="text-slate-500 text-sm mt-2">Check back soon for new content!</p>
-        </div>
       )}
     </div>
-  </div>
+
+    {allPosts.length > 0 ? (
+      <section aria-labelledby="posts-title" class="mt-10">
+        <h2 id="posts-title" class="text-[0.8125rem] font-semibold text-form">
+          {selectedTag
+            ? `${allPosts.length} ${allPosts.length === 1 ? 'post' : 'posts'} tagged "${selectedTag}"`
+            : 'All posts, newest first'}
+        </h2>
+        <ol class="mt-3 grid gap-px border-2 border-form bg-form">
+          {allPosts.map((post, index) => (
+            <li class="grid gap-x-8 gap-y-2 bg-paper px-4 py-6 sm:grid-cols-[3rem_11rem_minmax(0,1fr)] sm:px-6">
+              <span class="font-data text-sm text-form">{String(index + 1).padStart(2, '0')}</span>
+              <span class="font-data text-[0.8125rem] sm:pt-1">{formatDay(post.publishedAt)}</span>
+              <div>
+                <h3 class="text-[1.375rem] font-extrabold leading-snug">
+                  <a href={`/blog/${post.slug}`} class="underline decoration-form/40 decoration-2 underline-offset-4 hover:decoration-form">
+                    {post.title}
+                  </a>
+                </h3>
+                {post.excerpt && <p class="mt-2 max-w-[68ch] leading-relaxed text-ink/85">{post.excerpt}</p>}
+                <p class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                  <span class="text-form">{post.author}</span>
+                  {post.tags.map((tag) => (
+                    <a href={`/blog?tag=${encodeURIComponent(tag)}`} class="inline-block py-2 font-semibold underline decoration-form/40 underline-offset-4 hover:decoration-form">
+                      {tag}
+                    </a>
+                  ))}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+    ) : (
+      <section class="mt-10 border-2 border-form bg-paper px-4 py-10 sm:px-6">
+        {loadFailed ? (
+          <>
+            <h2 class="text-2xl font-extrabold">Posts couldn't load</h2>
+            <p class="mt-2 max-w-[60ch] leading-relaxed">The blog's database didn't respond. Reload the page to try again.</p>
+            <a href={`${Astro.url.pathname}${Astro.url.search}`} class:list={[button, 'mt-6']}>Reload</a>
+          </>
+        ) : selectedTag ? (
+          <>
+            <h2 class="text-2xl font-extrabold">No posts are tagged "{selectedTag}"</h2>
+            <a href="/blog" class:list={[button, 'mt-6']}>Show all posts</a>
+          </>
+        ) : (
+          <>
+            <h2 class="text-2xl font-extrabold">No posts yet</h2>
+            <p class="mt-2 max-w-[60ch] leading-relaxed">Nothing has been published here yet.</p>
+          </>
+        )}
+      </section>
+    )}
+  </main>
 </Layout>

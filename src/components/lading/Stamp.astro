@@ -1,0 +1,26 @@
+---
+// A rubber stamp. Only ever used to carry a status and its date.
+interface Props {
+  word: string;
+  date: string;
+  class?: string;
+}
+
+const { word, date, class: className } = Astro.props;
+---
+
+<span
+  class:list={[
+    'stamp inline-flex -rotate-6 flex-col items-center border-[3px] border-double border-stamp px-3 pb-1 pt-1.5 text-stamp mix-blend-multiply',
+    className,
+  ]}
+>
+  <span class="font-stencil text-2xl font-extrabold uppercase leading-none tracking-[0.1em]">{word}</span>
+  <span class="mt-1 font-data text-xs font-semibold uppercase tracking-[0.08em]">{date}</span>
+</span>
+
+<style>
+  .stamp {
+    filter: url(#stamp-ink);
+  }
+</style>
