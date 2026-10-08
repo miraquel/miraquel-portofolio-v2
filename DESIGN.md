@@ -291,7 +291,7 @@ No public inputs. "Field" means a form box, above.
 The strip: sticky, paper ground, 2px form bottom rule. The name in stencil at left; section links in Overpass 600 at 0.875rem, form green, turning carbon and underlined on hover. On mobile only Blog and Contact remain. Every link is 44px tall. A skip link appears on focus on signal yellow.
 
 ### Container Bay (signature)
-A case study as a full-bleed band of steel: the large mark, title, client and period on the left; on the right the hold, a paper card framed 2px in carbon carrying the Route; below the head, Cargo, Evidence and Status as stencil-white labelled fields. Status always carries a "Delivered" stamp with its month, set on a paper slip. Focus outlines inside a bay turn signal yellow.
+A case study as a full-bleed band of steel: the large mark, title, client and period on the left; on the right the hold, a paper card framed 2px in carbon carrying the Route; below the head, Cargo, Evidence and Status as stencil-white labelled fields. The field is titled Evidence only when something in it can be opened (source, a write-up, a file to download); a bay holding only facts on file and cross-references titles it Record. Links to other sites open a new tab and say so to screen readers; links within the site and downloads stay in the tab. Status always carries a "Delivered" stamp with its month, set on a paper slip. Focus outlines inside a bay turn signal yellow.
 
 **Door-leaf material** (component-local, not palette): each leaf is painted in its bay's -deep steel (cobalt-deep or oxide-deep), corrugated by a repeating 90deg gradient of 14px plain, a 4px rib at rgb(0 0 0 / 0.16) and a 4px highlight at rgb(255 255 255 / 0.06); its edge is a 2px border at rgb(0 0 0 / 0.35); a 6px locking rod at rgb(0 0 0 / 0.4) runs from 6% to 94% of its height, 18% in from the meeting edge, ringed by the rod-ring shadow. These translucent values exist only on the leaves.
 
@@ -307,7 +307,7 @@ An ISO 6346 mark (owner code, serial, boxed check digit) with an accessible labe
 A rubber stamp in stamp red: stencil word over a mono date, 3px double border, rotated -6deg, multiply-blended and roughened by the stamp-ink displacement filter. It carries a status and a date and nothing else (Delivered on bays, Expired on a lapsed certificate).
 
 ### Manifest
-A form-framed table with a form-green header row; container lines carry their small mark and a standing paper-deep tint, and link to their bay. Stacks per row below 64rem, since its six columns need about 820px.
+A form-framed table with a form-green header row; container lines carry their small mark and a standing paper-deep tint, and link to their bay. A link that lands on a line (a bay's record cross-references one) stops 5rem below the top, clear of the strip, and tints that line paper-deep. Stacks per row below 64rem, since its six columns need about 820px.
 
 ## Do's and Don'ts
 

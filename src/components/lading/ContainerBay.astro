@@ -1,11 +1,11 @@
 ---
 // One case study as a container: the painted door end with its mark on the left, the
-// route inside, and the same cross-check order every time: route, cargo, evidence, status.
+// route inside, and the same cross-check order every time: route, cargo, evidence (or record), status.
 // The door leaves rest folded open; following a container mark plays them open on arrival.
 import Mark from './Mark.astro';
 import Route from './Route.astro';
 import Stamp from './Stamp.astro';
-import type { Container } from '../../data/work';
+import { evidenceLabel, type Container } from '../../data/work';
 import { formatMonth, formatPeriod } from '../../lib/format';
 
 interface Props {
@@ -14,6 +14,7 @@ interface Props {
 
 const { container } = Astro.props;
 const labelClass = 'text-[0.8125rem] font-semibold leading-tight text-stencil/85';
+const evidenceLink = 'inline-block py-3 underline decoration-stencil/50 decoration-2 underline-offset-4 hover:decoration-stencil';
 ---
 
 <article
@@ -50,13 +51,17 @@ const labelClass = 'text-[0.8125rem] font-semibold leading-tight text-stencil/85
         <dd class="mt-2 max-w-[58ch] text-[1.0625rem] leading-relaxed">{container.cargo}</dd>
       </div>
       <div>
-        <dt class={labelClass}>Evidence</dt>
+        <dt class={labelClass}>{evidenceLabel(container)}</dt>
         <dd class="mt-1">
           <ul>
             {container.evidence.map((item) => (
               <li class="text-[1.0625rem] font-semibold leading-snug">
-                {item.href ? (
-                  <a href={item.href} target="_blank" rel="noopener noreferrer" class="inline-block py-3 underline decoration-stencil/50 decoration-2 underline-offset-4 hover:decoration-stencil">
+                {item.href?.startsWith('http') ? (
+                  <a href={item.href} target="_blank" rel="noopener noreferrer" class={evidenceLink}>
+                    {item.label}<span class="sr-only"> (opens in a new tab)</span>
+                  </a>
+                ) : item.href ? (
+                  <a href={item.href} download={item.download || undefined} class={evidenceLink}>
                     {item.label}
                   </a>
                 ) : (
