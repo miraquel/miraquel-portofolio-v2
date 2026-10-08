@@ -50,18 +50,20 @@ import { containers } from '../data/work';
 		el.addEventListener('focusout', () => cross(id, false));
 	});
 
-	// Following a container link shuts that bay's doors while it is off screen, then swings
-	// them open once it arrives. Content never depends on it: at rest the doors stand open.
-	if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+	// Following a container link shuts that bay's doors while its route is off screen, then swings
+	// them open once the route comes into view: at once on a desktop, where the route sits beside
+	// the heading, and when a phone reader scrolls down to it. The doors only ever cover the route,
+	// so while they are shut nothing in view is hidden. At rest they stand open.
+	if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
 		document.querySelectorAll<HTMLAnchorElement>('a[data-container-link]').forEach((link) => {
 			link.addEventListener('click', () => {
 				const bay = document.getElementById(link.dataset.containerLink ?? '');
-				if (!bay) return;
+				const hold = bay?.querySelector('.bay-hold');
+				if (!bay || !hold) return;
 				bay.classList.add('is-shut');
 
 				const open = () => {
 					observer.disconnect();
-					clearTimeout(fallback);
 					requestAnimationFrame(() => requestAnimationFrame(() => bay.classList.remove('is-shut')));
 				};
 				const observer = new IntersectionObserver(
@@ -70,8 +72,7 @@ import { containers } from '../data/work';
 					},
 					{ threshold: 0.35 }
 				);
-				const fallback = setTimeout(open, 2500);
-				observer.observe(bay);
+				observer.observe(hold);
 			});
 		});
 	}

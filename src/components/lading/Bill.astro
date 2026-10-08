@@ -20,8 +20,12 @@ const [firstName, ...lastNames] = profile.name.split(' ');
       <p class="font-data text-xs">Revised {formatDay(profile.revised)}</p>
     </div>
 
+    {/* Below 1024px the boxes reflow in the order a skimming reader needs them: who ships, where
+        from and whether they will move, who they work for, how to reach them. The numbers stay with
+        their boxes, as on the printed form. None of the moved boxes holds a link, so focus order is
+        unchanged. */}
     <dl class="grid grid-cols-12 gap-px border-2 border-form bg-form">
-      <Field n={1} label="Shipper" class="col-span-12 overflow-hidden lg:col-span-7 lg:row-span-2 lg:pb-7">
+      <Field n={1} label="Shipper" class="order-1 lg:order-none col-span-12 overflow-hidden lg:col-span-7 lg:row-span-2 lg:pb-7">
         <Guilloche class="pointer-events-none absolute -right-44 -top-32 w-[34rem] text-form opacity-[0.16] max-lg:hidden" />
         <h1
           id="shipper-name"
@@ -33,12 +37,12 @@ const [firstName, ...lastNames] = profile.name.split(' ');
         <p class="relative mt-3 max-w-[50ch] text-[1.0625rem] leading-relaxed">{profile.summary}</p>
       </Field>
 
-      <Field n={2} label="Consignee" class="col-span-12 lg:col-span-5">
+      <Field n={2} label="Consignee" class="order-6 lg:order-none col-span-12 lg:col-span-5">
         <p class="text-[1.625rem] font-extrabold leading-tight">To the order of your hiring team</p>
         <p class="mt-2 text-[0.9375rem] leading-snug">{profile.roles}</p>
       </Field>
 
-      <Field n={3} label="Notify party" class="col-span-12 lg:col-span-5">
+      <Field n={3} label="Notify party" class="order-5 lg:order-none col-span-12 lg:col-span-5">
         <div data-email-group class="flex flex-wrap items-center gap-x-4 gap-y-2">
           <a
             href={`mailto:${profile.email}`}
@@ -56,21 +60,21 @@ const [firstName, ...lastNames] = profile.name.split(' ');
         </ul>
       </Field>
 
-      <Field n={4} label="Port of loading" class="col-span-12 sm:col-span-4 lg:col-span-3">
+      <Field n={4} label="Port of loading" class="order-2 lg:order-none col-span-12 sm:col-span-4 lg:col-span-3">
         <p class="text-[1.625rem] font-extrabold leading-tight">{profile.based}</p>
       </Field>
 
-      <Field n={5} label="Port of discharge" live class="col-span-12 sm:col-span-8 lg:col-span-4">
+      <Field n={5} label="Port of discharge" live class="order-3 lg:order-none col-span-12 sm:col-span-8 lg:col-span-4">
         <p class="text-[1.625rem] font-extrabold leading-tight">Open</p>
         <p class="mt-1 text-[0.9375rem] font-semibold leading-snug">{profile.relocation}</p>
       </Field>
 
-      <Field n={6} label="Current carrier" live class="col-span-12 lg:col-span-5">
+      <Field n={6} label="Current carrier" live class="order-4 lg:order-none col-span-12 lg:col-span-5">
         <p class="text-xl font-extrabold leading-tight">{current.company}</p>
         <p class="mt-1 text-[0.9375rem] leading-snug">{current.role}, since {formatMonth(current.period.start)}</p>
       </Field>
 
-      <Field n={7} label="Marks and numbers" class="col-span-12">
+      <Field n={7} label="Marks and numbers" class="order-7 lg:order-none col-span-12">
         <ul class="-mx-4 -mb-4 mt-1 grid gap-px border-t border-form bg-form sm:-mx-5 sm:-mb-5 sm:grid-cols-2 xl:grid-cols-4">
           {containers.map((container) => (
             <li class="bg-paper">
@@ -95,7 +99,7 @@ const [firstName, ...lastNames] = profile.name.split(' ');
         </ul>
       </Field>
 
-      <Field n={8} label="Description of goods" class="col-span-12" data-goods>
+      <Field n={8} label="Description of goods" class="order-8 lg:order-none col-span-12" data-goods>
         <table class="w-full text-left">
           <thead class="sr-only">
             <tr><th scope="col">Quantity</th><th scope="col">Goods</th></tr>
@@ -116,7 +120,7 @@ const [firstName, ...lastNames] = profile.name.split(' ');
         </table>
       </Field>
 
-      <Field n={9} label="Notices" class="col-span-12 lg:col-span-4" hidden data-notices>
+      <Field n={9} label="Notices" class="order-9 lg:order-none col-span-12 lg:col-span-4" hidden data-notices>
         <a data-notice-link class="text-lg font-extrabold leading-snug underline decoration-form/40 decoration-2 underline-offset-4 hover:decoration-form"></a>
         <p data-notice-date class="mt-1 font-data text-xs text-form"></p>
         <a href="/blog" class="mt-auto inline-block self-start py-3 text-[0.9375rem] font-semibold underline decoration-form/40 underline-offset-4 hover:decoration-form">All posts</a>
