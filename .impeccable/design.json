@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-08T12:00:00Z",
+  "generatedAt": "2026-10-08T13:20:00Z",
   "title": "Design System: Chaidir Ali Assegaf, Portfolio",
   "extensions": {
     "colorMeta": {
@@ -288,7 +288,8 @@
     ],
     "focus": {
       "default": "outline: 3px solid var(--color-ink); outline-offset: 3px",
-      "onSteel": "outline-color: var(--color-signal) inside [data-steel]",
+      "onDark": "outline-color: var(--color-signal) inside [data-dark] (steel bays and form-green bands)",
+      "scope": "Base focus, selection, scrollbar and smooth-scroll styles apply only under html[data-world='lading']",
       "selection": "background: var(--color-signal); color: var(--color-ink)"
     },
     "componentMaterials": {
@@ -362,7 +363,7 @@
       "name": "Container Bay",
       "kind": "custom",
       "refersTo": "steel-bay-cobalt",
-      "description": "A case study as a full-bleed steel band: large mark and title on stencil white, a carbon-framed paper hold carrying the route. Focus turns signal yellow on steel.",
+      "description": "A case study as a full-bleed steel band: large mark and title on stencil white, a carbon-framed paper hold carrying the route. Focus turns signal yellow on steel and on form-green bands.",
       "html": "<article class=\"ds-bay\"><div class=\"ds-bay-mark\">CAAU 202204 <span class=\"ds-check\">0</span></div><h3 class=\"ds-bay-title\">AX 2012 R3 to Dynamics 365 F&amp;O migration</h3><p class=\"ds-bay-label\">Evidence</p><a class=\"ds-bay-link\" href=\"#\">Migration notes</a><div class=\"ds-hold\"><p class=\"ds-hold-label\">Route</p><div class=\"ds-stop\"><b><span class=\"ds-stop-key\">A</span> AX 2012 R3</b><p class=\"ds-stop-tech\">X++ · SQL Server</p></div></div></article>",
       "css": ".ds-bay { padding: 56px 32px; background: var(--color-cobalt, #1d4a96); color: var(--color-stencil, #f5f7f2); } .ds-bay-mark { font-family: 'Big Shoulders Stencil Variable', 'Arial Narrow', sans-serif; font-size: 3rem; font-weight: 800; line-height: 1; letter-spacing: 0.04em; text-transform: uppercase; } .ds-check { border: 0.07em solid currentColor; padding: 0 0.14em; } .ds-bay-title { margin: 28px 0 0; max-width: 20ch; font-family: 'Overpass Variable', 'Segoe UI', sans-serif; font-size: 2.25rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.01em; } .ds-bay-label { margin: 24px 0 0; font-size: 0.8125rem; font-weight: 600; color: rgb(245 247 242 / 0.85); } .ds-bay-link { display: inline-block; padding: 12px 0; font-weight: 600; color: inherit; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; text-decoration-color: rgb(245 247 242 / 0.5); } .ds-bay-link:hover { text-decoration-color: var(--color-stencil, #f5f7f2); } .ds-bay-link:focus-visible { outline: 3px solid var(--color-signal, #f2c21b); outline-offset: 3px; } .ds-hold { margin-top: 24px; padding: 28px; background: var(--color-paper, #e3ede3); color: var(--color-ink, #17212b); border: 2px solid var(--color-ink, #17212b); } .ds-hold-label { margin: 0 0 20px; font-size: 0.8125rem; font-weight: 600; color: var(--color-form, #24543f); } .ds-stop { padding: 14px 20px; border: 2px solid var(--color-ink, #17212b); font-size: 1.125rem; } .ds-stop-key, .ds-stop-tech { font-family: 'Overpass Mono Variable', ui-monospace, monospace; font-size: 0.75rem; font-weight: 500; color: var(--color-form, #24543f); } .ds-stop-tech { margin: 8px 0 0; }"
     }
@@ -420,7 +421,7 @@
       "Do reserve signal yellow for live facts (the open port, the current carrier, the current employer's period) and for selection and focus.",
       "Do carry case studies as full-bleed cobalt or oxide bands with a stencilled ISO 6346 mark and a code-drawn route.",
       "Do keep every tap target at least 44px tall on mobile.",
-      "Do focus with a 3px carbon outline at a 3px offset, switching to signal yellow inside steel bands.",
+      "Do focus with a 3px carbon outline at a 3px offset, switching to signal yellow on dark grounds (steel bands and form-green bands, marked data-dark). These base styles apply only under html[data-world='lading']; the admin workspace keeps its own.",
       "Do keep smooth scrolling and the door swing behind `prefers-reduced-motion: no-preference`."
     ],
     "donts": [
