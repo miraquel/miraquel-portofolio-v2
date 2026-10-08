@@ -1,0 +1,662 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: DBT
+
+; Microsoft Dynamics AX Table : MobVendInvoiceTmp unloaded
+; --------------------------------------------------------------------------------
+  TABLEVERSION 1
+  
+  TABLE #MobVendInvoiceTmp
+    EnforceFKRelation 1
+    PROPERTIES
+      Name                #MobVendInvoiceTmp
+      TableType           #TempDB
+      CreateRecIdIndex    #Yes
+      PrimaryIndex        #SurrogateKey
+      ClusterIndex        #SurrogateKey
+    ENDPROPERTIES
+    
+    FIELDS
+      FIELD #AccountNum
+        STRING
+        PROPERTIES
+          Name                #AccountNum
+          Table               #MobVendInvoiceTmp
+          ExtendedDataType    #VendAccount
+          StringSize          #20
+        ENDPROPERTIES
+        
+      FIELD #Invoice
+        STRING
+        PROPERTIES
+          Name                #Invoice
+          Table               #MobVendInvoiceTmp
+          ExtendedDataType    #VendInvoiceId
+          StringSize          #20
+        ENDPROPERTIES
+        
+    ENDFIELDS
+    GROUPS
+    ENDGROUPS
+    
+    INDICES
+    ENDINDICES
+    FULLTEXTINDICES
+    ENDFULLTEXTINDICES
+    REFERENCES
+    ENDREFERENCES
+    
+    DELETEACTIONS
+    ENDDELETEACTIONS
+    
+    METHODS
+    ENDMETHODS
+  ENDTABLE
+  
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: MobVendInvoiceRef unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #MobVendInvoiceRef
+    PROPERTIES
+      Name                #MobVendInvoiceRef
+    ENDPROPERTIES
+    
+    METHODS
+      SOURCE #classDeclaration
+        #// One invoice the app wants to pay: the vendor and the invoice
+        #// number. No amount: AX works that out from the open balance.
+        #[DataContractAttribute]
+        #class MobVendInvoiceRef
+        #{
+        #    VendAccount     accountNum;
+        #    VendInvoiceId   invoiceId;
+        #}
+      ENDSOURCE
+      SOURCE #parmAccountNum
+        #[DataMemberAttribute('AccountNum')]
+        #public VendAccount parmAccountNum(VendAccount _accountNum = accountNum)
+        #{
+        #    accountNum = _accountNum;
+        #    return accountNum;
+        #}
+      ENDSOURCE
+      SOURCE #parmInvoiceId
+        #[DataMemberAttribute('InvoiceId')]
+        #public VendInvoiceId parmInvoiceId(VendInvoiceId _invoiceId = invoiceId)
+        #{
+        #    invoiceId = _invoiceId;
+        #    return invoiceId;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: MobVendSettlementRequest unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #MobVendSettlementRequest
+    PROPERTIES
+      Name                #MobVendSettlementRequest
+    ENDPROPERTIES
+    
+    METHODS
+      SOURCE #classDeclaration
+        #// What the app sends: which payment journal name to use, the
+        #// payment date, a description, and the invoices to pay.
+        #[DataContractAttribute]
+        #class MobVendSettlementRequest
+        #{
+        #    LedgerJournalNameId journalName;
+        #    TransDate           transDate;
+        #    Name                description;
+        #    List                invoices;
+        #}
+      ENDSOURCE
+      SOURCE #parmDescription
+        #[DataMemberAttribute('Description')]
+        #public Name parmDescription(Name _description = description)
+        #{
+        #    description = _description;
+        #    return description;
+        #}
+      ENDSOURCE
+      SOURCE #parmInvoices
+        #[DataMemberAttribute('Invoices'),
+        # AifCollectionTypeAttribute('_invoices', Types::Class,
+        #    classStr(MobVendInvoiceRef)),
+        # AifCollectionTypeAttribute('return', Types::Class,
+        #    classStr(MobVendInvoiceRef))]
+        #public List parmInvoices(List _invoices = invoices)
+        #{
+        #    invoices = _invoices;
+        #    return invoices;
+        #}
+      ENDSOURCE
+      SOURCE #parmJournalName
+        #[DataMemberAttribute('JournalName')]
+        #public LedgerJournalNameId parmJournalName(
+        #    LedgerJournalNameId _journalName = journalName)
+        #{
+        #    journalName = _journalName;
+        #    return journalName;
+        #}
+      ENDSOURCE
+      SOURCE #parmTransDate
+        #[DataMemberAttribute('TransDate')]
+        #public TransDate parmTransDate(TransDate _transDate = transDate)
+        #{
+        #    transDate = _transDate;
+        #    return transDate;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: MobVendPaymentResult unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #MobVendPaymentResult
+    PROPERTIES
+      Name                #MobVendPaymentResult
+    ENDPROPERTIES
+    
+    METHODS
+      SOURCE #classDeclaration
+        #// What AX sends back for each vendor: the journal it created,
+        #// the voucher, and the amount it worked out from the marks.
+        #[DataContractAttribute]
+        #class MobVendPaymentResult
+        #{
+        #    VendAccount     accountNum;
+        #    LedgerJournalId journalNum;
+        #    Voucher         voucher;
+        #    AmountCur       amountCur;
+        #}
+      ENDSOURCE
+      SOURCE #parmAccountNum
+        #[DataMemberAttribute('AccountNum')]
+        #public VendAccount parmAccountNum(VendAccount _accountNum = accountNum)
+        #{
+        #    accountNum = _accountNum;
+        #    return accountNum;
+        #}
+      ENDSOURCE
+      SOURCE #parmAmountCur
+        #[DataMemberAttribute('AmountCur')]
+        #public AmountCur parmAmountCur(AmountCur _amountCur = amountCur)
+        #{
+        #    amountCur = _amountCur;
+        #    return amountCur;
+        #}
+      ENDSOURCE
+      SOURCE #parmJournalNum
+        #[DataMemberAttribute('JournalNum')]
+        #public LedgerJournalId parmJournalNum(LedgerJournalId _journalNum = journalNum)
+        #{
+        #    journalNum = _journalNum;
+        #    return journalNum;
+        #}
+      ENDSOURCE
+      SOURCE #parmVoucher
+        #[DataMemberAttribute('Voucher')]
+        #public Voucher parmVoucher(Voucher _voucher = voucher)
+        #{
+        #    voucher = _voucher;
+        #    return voucher;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: MobOpenVendInvoice unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #MobOpenVendInvoice
+    PROPERTIES
+      Name                #MobOpenVendInvoice
+    ENDPROPERTIES
+    
+    METHODS
+      SOURCE #classDeclaration
+        #// One open vendor invoice, as the app lists it for picking.
+        #[DataContractAttribute]
+        #class MobOpenVendInvoice
+        #{
+        #    VendAccount     accountNum;
+        #    VendInvoiceId   invoiceId;
+        #    TransDate       transDate;
+        #    DueDate         dueDate;
+        #    AmountCur       amountCur;
+        #}
+      ENDSOURCE
+      SOURCE #parmAccountNum
+        #[DataMemberAttribute('AccountNum')]
+        #public VendAccount parmAccountNum(VendAccount _accountNum = accountNum)
+        #{
+        #    accountNum = _accountNum;
+        #    return accountNum;
+        #}
+      ENDSOURCE
+      SOURCE #parmAmountCur
+        #[DataMemberAttribute('AmountCur')]
+        #public AmountCur parmAmountCur(AmountCur _amountCur = amountCur)
+        #{
+        #    amountCur = _amountCur;
+        #    return amountCur;
+        #}
+      ENDSOURCE
+      SOURCE #parmDueDate
+        #[DataMemberAttribute('DueDate')]
+        #public DueDate parmDueDate(DueDate _dueDate = dueDate)
+        #{
+        #    dueDate = _dueDate;
+        #    return dueDate;
+        #}
+      ENDSOURCE
+      SOURCE #parmInvoiceId
+        #[DataMemberAttribute('InvoiceId')]
+        #public VendInvoiceId parmInvoiceId(VendInvoiceId _invoiceId = invoiceId)
+        #{
+        #    invoiceId = _invoiceId;
+        #    return invoiceId;
+        #}
+      ENDSOURCE
+      SOURCE #parmTransDate
+        #[DataMemberAttribute('TransDate')]
+        #public TransDate parmTransDate(TransDate _transDate = transDate)
+        #{
+        #    transDate = _transDate;
+        #    return transDate;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: MobVendPaymentService unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #MobVendPaymentService
+    PROPERTIES
+      Name                #MobVendPaymentService
+    ENDPROPERTIES
+    
+    METHODS
+      SOURCE #classDeclaration
+        #// Lets an outside app pay vendor invoices. The app sends invoice
+        #// numbers; AX marks the open transactions, works out the amounts
+        #// and leaves one unposted payment journal per vendor for finance
+        #// to review and post.
+        #class MobVendPaymentService
+        #{
+        #}
+      ENDSOURCE
+      SOURCE #buildResult
+        #private MobVendPaymentResult buildResult(
+        #    LedgerJournalTable  _journal,
+        #    LedgerJournalTrans  _payment,
+        #    VendAccount         _vendAccount)
+        #{
+        #    MobVendPaymentResult paymentResult = new MobVendPaymentResult();
+        #
+        #    paymentResult.parmAccountNum(_vendAccount);
+        #    paymentResult.parmJournalNum(_journal.JournalNum);
+        #    paymentResult.parmVoucher(_payment.Voucher);
+        #    paymentResult.parmAmountCur(_payment.amount());
+        #
+        #    return paymentResult;
+        #}
+      ENDSOURCE
+      SOURCE #createJournal
+        #private LedgerJournalTable createJournal(
+        #    LedgerJournalName   _journalName,
+        #    VendAccount         _vendAccount,
+        #    Name                _description)
+        #{
+        #    LedgerJournalTable journal;
+        #
+        #    journal.initValue();
+        #    journal.initFromLedgerJournalName(_journalName.JournalName);
+        #    journal.JournalNum =
+        #        JournalTableData::newTable(journal).nextJournalId();
+        #    journal.Name = strFmt("%1 - %2", _vendAccount, _description);
+        #    journal.insert();
+        #
+        #    return journal;
+        #}
+      ENDSOURCE
+      SOURCE #createPaymentLine
+        #private LedgerJournalTrans createPaymentLine(
+        #    LedgerJournalTable  _journal,
+        #    VendAccount         _vendAccount,
+        #    TransDate           _transDate)
+        #{
+        #    LedgerJournalTrans  payment;
+        #    LedgerJournalEngine engine;
+        #
+        #    engine = LedgerJournalEngine::construct(_journal.JournalType);
+        #    engine.newJournalActive(_journal);
+        #
+        #    // initValue sets Company and the company currency.
+        #    payment.initValue();
+        #    payment.JournalNum      = _journal.JournalNum;
+        #    payment.TransDate       = _transDate;
+        #    payment.TransactionType = LedgerTransType::Payment;
+        #    payment.Txt             = _journal.Name;
+        #
+        #    // The header's series: it switches to temporary numbers
+        #    // when the journal name allocates vouchers at posting.
+        #    payment.Voucher = NumberSeq::newGetVoucherFromId(
+        #        _journal.NumberSequenceTable).voucher();
+        #
+        #    payment.OffsetAccountType = _journal.OffsetAccountType;
+        #    payment.OffsetLedgerDimension =
+        #        _journal.OffsetLedgerDimension;
+        #
+        #    // The calls Microsoft's own AIF journal classes make after
+        #    // setting an account. They fill in what the journal form
+        #    // would: the vendor's currency, posting profile, method of
+        #    // payment, bank account and default dimensions.
+        #    payment.parmAccount(_vendAccount, LedgerJournalACType::Vend);
+        #    payment.modifiedField(
+        #        fieldNum(LedgerJournalTrans, LedgerDimension));
+        #    engine.accountModified(payment);
+        #    engine.currencyModified(payment);
+        #
+        #    payment.insert();
+        #
+        #    return payment;
+        #}
+      ENDSOURCE
+      SOURCE #findPaymentJournalName
+        #private LedgerJournalName findPaymentJournalName(
+        #    LedgerJournalNameId _journalName)
+        #{
+        #    LedgerJournalName journalName = LedgerJournalName::find(_journalName);
+        #
+        #    if (journalName.JournalType != LedgerJournalType::Payment)
+        #    {
+        #        throw error(strFmt(
+        #            "%1 is not a vendor payment journal name.", _journalName));
+        #    }
+        #
+        #    return journalName;
+        #}
+      ENDSOURCE
+      SOURCE #getOpenVendorInvoices
+        #[SysEntryPointAttribute(true),
+        # AifCollectionTypeAttribute('return', Types::Class,
+        #    classStr(MobOpenVendInvoice))]
+        #public List getOpenVendorInvoices(VendAccount _vendAccount)
+        #{
+        #    List                openInvoices = new List(Types::Class);
+        #    MobOpenVendInvoice  openInvoice;
+        #    VendTransOpen       vendTransOpen;
+        #    VendTrans           vendTrans;
+        #    SpecTrans           specTrans;
+        #
+        #    // The notExists join hides anything already marked on
+        #    // another journal, so two people can't pick the same invoice.
+        #    while select AmountCur, DueDate from vendTransOpen
+        #        where vendTransOpen.AccountNum == _vendAccount
+        #        join Invoice, TransDate from vendTrans
+        #            where vendTrans.RecId      == vendTransOpen.RefRecId
+        #               && vendTrans.Invoice    != ''
+        #               && vendTrans.Prepayment == NoYes::No
+        #        notExists join specTrans
+        #            where specTrans.RefCompany == vendTransOpen.DataAreaId
+        #               && specTrans.RefTableId == tableNum(VendTransOpen)
+        #               && specTrans.RefRecId   == vendTransOpen.RecId
+        #    {
+        #        openInvoice = new MobOpenVendInvoice();
+        #        openInvoice.parmAccountNum(_vendAccount);
+        #        openInvoice.parmInvoiceId(vendTrans.Invoice);
+        #        openInvoice.parmTransDate(vendTrans.TransDate);
+        #        openInvoice.parmDueDate(vendTransOpen.DueDate);
+        #        openInvoice.parmAmountCur(vendTransOpen.AmountCur);
+        #        openInvoices.addEnd(openInvoice);
+        #    }
+        #
+        #    return openInvoices;
+        #}
+      ENDSOURCE
+      SOURCE #loadInvoices
+        #private void loadInvoices(List _invoiceRefs, MobVendInvoiceTmp _invoices)
+        #{
+        #    ListEnumerator      enumerator;
+        #    MobVendInvoiceRef   invoiceRef;
+        #
+        #    if (!_invoiceRefs || !_invoiceRefs.elements())
+        #    {
+        #        throw error("The request has no invoices.");
+        #    }
+        #
+        #    enumerator = _invoiceRefs.getEnumerator();
+        #    while (enumerator.moveNext())
+        #    {
+        #        invoiceRef = enumerator.current();
+        #        _invoices.AccountNum = invoiceRef.parmAccountNum();
+        #        _invoices.Invoice    = invoiceRef.parmInvoiceId();
+        #        _invoices.insert();
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #markInvoices
+        #private void markInvoices(
+        #    LedgerJournalTrans  _payment,
+        #    MobVendInvoiceTmp   _invoices,
+        #    VendAccount         _vendAccount)
+        #{
+        #    CustVendOpenTransManager    manager;
+        #    VendTransOpen               vendTransOpen;
+        #    VendTrans                   vendTrans;
+        #    boolean                     found;
+        #
+        #    // The same manager the Settle transactions form uses. It
+        #    // writes the SpecTrans rows, takes cash discount into
+        #    // account, and throws if another journal already marked
+        #    // the transaction.
+        #    manager = CustVendOpenTransManager::construct(_payment);
+        #
+        #    while select Invoice from _invoices
+        #        where _invoices.AccountNum == _vendAccount
+        #    {
+        #        found = false;
+        #
+        #        // An invoice on a payment schedule has one open
+        #        // transaction per instalment, so mark them all.
+        #        // Prepayments stay out: updateTransMarked asks the user
+        #        // to confirm those in a dialog box.
+        #        while select vendTransOpen
+        #            where vendTransOpen.AccountNum == _vendAccount
+        #            join RecId from vendTrans
+        #            where vendTrans.RecId == vendTransOpen.RefRecId
+        #               && vendTrans.Invoice == _invoices.Invoice
+        #               && vendTrans.Prepayment == NoYes::No
+        #        {
+        #            manager.updateTransMarked(vendTransOpen, NoYes::Yes);
+        #            found = true;
+        #        }
+        #
+        #        if (!found)
+        #        {
+        #            throw error(strFmt(
+        #                "Vendor %1 has no open balance on invoice %2.",
+        #                _vendAccount, _invoices.Invoice));
+        #        }
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #setAmountFromMarks
+        #private void setAmountFromMarks(LedgerJournalTrans _payment)
+        #{
+        #    AmountCur marked;
+        #
+        #    marked =
+        #        SpecTransManager::getTotalSettleAmountForSpecReference(
+        #            _payment.DataAreaId,
+        #            _payment.TableId,
+        #            _payment.RecId,
+        #            _payment.CurrencyCode,
+        #            _payment.Company,
+        #            _payment.TransDate);
+        #
+        #    // Open vendor invoices carry negative amounts, so paying
+        #    // them debits the vendor by the same amount.
+        #    _payment.selectForUpdate(true);
+        #    _payment.amountCur2DebCred(-marked);
+        #    _payment.SettleVoucher = SettlementType::SelectedTransact;
+        #    _payment.update();
+        #}
+      ENDSOURCE
+      SOURCE #settleVendorInvoices
+        #[SysEntryPointAttribute(true),
+        # AifCollectionTypeAttribute('return', Types::Class,
+        #    classStr(MobVendPaymentResult))]
+        #public List settleVendorInvoices(
+        #    MobVendSettlementRequest _request)
+        #{
+        #    LedgerJournalName   journalName;
+        #    LedgerJournalTable  journal;
+        #    LedgerJournalTrans  payment;
+        #    MobVendInvoiceTmp   invoices;
+        #    MobVendInvoiceTmp   vendors;
+        #    VendAccount         vendAccount;
+        #    List                results = new List(Types::Class);
+        #
+        #    journalName = this.findPaymentJournalName(
+        #        _request.parmJournalName());
+        #
+        #    // One TempDB table, two buffers on the same rows: one walks
+        #    // the vendors, the other finds each vendor's invoices.
+        #    this.loadInvoices(_request.parmInvoices(), invoices);
+        #    vendors.linkPhysicalTableInstance(invoices);
+        #
+        #    ttsBegin;
+        #
+        #    while select AccountNum from vendors
+        #        group by AccountNum
+        #    {
+        #        vendAccount = vendors.AccountNum;
+        #
+        #        journal = this.createJournal(
+        #            journalName, vendAccount, _request.parmDescription());
+        #        payment = this.createPaymentLine(
+        #            journal, vendAccount, _request.parmTransDate());
+        #
+        #        this.markInvoices(payment, invoices, vendAccount);
+        #        this.setAmountFromMarks(payment);
+        #
+        #        results.addEnd(
+        #            this.buildResult(journal, payment, vendAccount));
+        #    }
+        #
+        #    ttsCommit;
+        #
+        #    return results;
+        #}
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: SVC
+
+; Microsoft Dynamics AX SERVICE : MobVendPaymentService unloaded
+; --------------------------------------------------------------------------------
+  VERSION 1
+  
+  SERVICE #MobVendPaymentService
+    PROPERTIES
+      Name                #MobVendPaymentService
+      ExternalName        #MobVendPaymentService
+      Class               #MobVendPaymentService
+    ENDPROPERTIES
+    
+    OPERATIONS
+      OPERATION #getOpenVendorInvoices
+        PROPERTIES
+          Name                #getOpenVendorInvoices
+          Method              #getOpenVendorInvoices
+        ENDPROPERTIES
+        
+        PERMISSIONSET #Permissions
+          PROPERTIES
+          ENDPROPERTIES
+          
+          TABLES #Tables
+          ENDTABLES
+          
+          SERVERMETHODS #Server Methods
+          ENDSERVERMETHODS
+          
+          ASSOCIATEDCODEPERMISSIONS #Associated Code Permissions
+          ENDASSOCIATEDCODEPERMISSIONS
+        ENDPERMISSIONSET
+        
+      ENDOPERATION
+      
+      OPERATION #settleVendorInvoices
+        PROPERTIES
+          Name                #settleVendorInvoices
+          Method              #settleVendorInvoices
+        ENDPROPERTIES
+        
+        PERMISSIONSET #Permissions
+          PROPERTIES
+          ENDPROPERTIES
+          
+          TABLES #Tables
+          ENDTABLES
+          
+          SERVERMETHODS #Server Methods
+          ENDSERVERMETHODS
+          
+          ASSOCIATEDCODEPERMISSIONS #Associated Code Permissions
+          ENDASSOCIATEDCODEPERMISSIONS
+        ENDPERMISSIONSET
+        
+      ENDOPERATION
+      
+    ENDOPERATIONS
+    
+  ENDSERVICE
+
+***Element: SVG
+
+; Microsoft Dynamics AX SERVICEGROUP : MobVendPaymentServiceGroup unloaded
+; --------------------------------------------------------------------------------
+  VERSION 1
+  
+  SERVICEGROUP #MobVendPaymentServiceGroup
+    PROPERTIES
+      Name                #MobVendPaymentServiceGroup
+      AutoDeploy          #No
+    ENDPROPERTIES
+    
+    SERVICENODEREFERENCE #MobVendPaymentService
+      PROPERTIES
+        Name                #MobVendPaymentService
+        Service             #MobVendPaymentService
+      ENDPROPERTIES
+      
+    ENDSERVICENODEREFERENCE
+    
+  ENDSERVICEGROUP
+
+***Element: END
