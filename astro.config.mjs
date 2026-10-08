@@ -7,6 +7,9 @@ import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
+  // The production address, so canonical and Open Graph URLs are absolute and never localhost
+  site: 'https://chaidiraliassegaf.vercel.app',
+
   vite: {
     plugins: [tailwindcss()],
     build: {

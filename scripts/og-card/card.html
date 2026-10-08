@@ -1,0 +1,206 @@
+<!doctype html>
+<!--
+  The 1200x630 social preview card (public/og.png), set in the site's own tokens and
+  self-hosted fonts. Render it with scripts/og-card/render.py; the facts must match src/data.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face {
+    font-family: 'Big Shoulders Stencil Variable';
+    src: url('../../node_modules/@fontsource-variable/big-shoulders-stencil/files/big-shoulders-stencil-latin-opsz-normal.woff2') format('woff2-variations');
+    font-weight: 100 900;
+  }
+  @font-face {
+    font-family: 'Overpass Variable';
+    src: url('../../node_modules/@fontsource-variable/overpass/files/overpass-latin-wght-normal.woff2') format('woff2-variations');
+    font-weight: 100 900;
+  }
+  @font-face {
+    font-family: 'Overpass Mono Variable';
+    src: url('../../node_modules/@fontsource-variable/overpass-mono/files/overpass-mono-latin-wght-normal.woff2') format('woff2-variations');
+    font-weight: 300 700;
+  }
+
+  :root {
+    --paper: #e3ede3;
+    --form: #24543f;
+    --ink: #17212b;
+    --cobalt: #1d4a96;
+    --oxide: #9a3a25;
+    --signal: #f2c21b;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+
+  html, body { width: 1200px; height: 630px; }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: 40px 48px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Overpass Variable', sans-serif;
+    overflow: hidden;
+  }
+
+  .band {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 22px;
+    background: var(--form);
+    color: var(--paper);
+  }
+
+  .band-title {
+    font-family: 'Big Shoulders Stencil Variable', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .band-url { font-family: 'Overpass Mono Variable', monospace; font-size: 18px; }
+
+  .form {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr 1fr auto;
+    flex: 1;
+    gap: 2px;
+    background: var(--form);
+    border: 2px solid var(--form);
+    border-top: 0;
+  }
+
+  .field {
+    position: relative;
+    padding: 18px 22px;
+    background: var(--paper);
+    overflow: hidden;
+  }
+
+  .label {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    color: var(--form);
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .label span { font-family: 'Overpass Mono Variable', monospace; font-size: 15px; font-weight: 500; }
+
+  .shipper { grid-row: span 2; }
+
+  .rosette { position: absolute; right: -150px; top: -140px; width: 520px; color: var(--form); opacity: 0.16; }
+
+  .name {
+    position: relative;
+    margin-top: 10px;
+    font-family: 'Big Shoulders Stencil Variable', sans-serif;
+    font-size: 120px;
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+  }
+
+  .title { position: relative; margin-top: 22px; font-size: 36px; font-weight: 800; }
+
+  .live { background: var(--signal); }
+
+  .big { margin-top: 6px; font-size: 40px; font-weight: 800; line-height: 1.05; }
+
+  .small { margin-top: 4px; font-size: 20px; font-weight: 600; line-height: 1.25; }
+
+  .marks {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    padding: 0;
+    background: var(--form);
+  }
+
+  .mark { padding: 20px 22px 22px; background: var(--paper); }
+
+  .code {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Big Shoulders Stencil Variable', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .chip { width: 14px; height: 14px; }
+  .check { padding: 0 4px; border: 2px solid currentColor; line-height: 0.95; }
+  .project { margin-top: 8px; font-size: 19px; font-weight: 800; }
+</style>
+</head>
+<body>
+  <div class="band">
+    <p class="band-title">Bill of lading</p>
+    <p class="band-url">chaidiraliassegaf.vercel.app</p>
+  </div>
+  <div class="form">
+    <div class="field shipper">
+      <svg class="rosette" viewBox="-210 -210 420 420" aria-hidden="true"><defs><path id="r" /></defs><g id="turns" fill="none" stroke="currentColor" stroke-width="0.6"></g></svg>
+      <p class="label"><span>01</span>Shipper</p>
+      <p class="name">Chaidir Ali<br />Assegaf</p>
+      <p class="title">Dynamics 365 F&amp;O &amp; .NET Developer</p>
+    </div>
+    <div class="field live">
+      <p class="label"><span>05</span>Port of discharge</p>
+      <p class="big">Open</p>
+      <p class="small">Relocating with employer visa sponsorship</p>
+    </div>
+    <div class="field">
+      <p class="label"><span>04</span>Port of loading</p>
+      <p class="big">Indonesia</p>
+    </div>
+    <div class="field marks" id="marks"></div>
+  </div>
+
+  <script>
+    // The same rosette the site draws (src/lib/guilloche.ts): one curve, rotated 36 times
+    const points = [];
+    for (let i = 0; i <= 720; i++) {
+      const t = (i / 720) * Math.PI * 2;
+      const r = 150 + 34 * Math.sin(9 * t) + 12 * Math.sin(23 * t);
+      points.push(`${(r * Math.cos(t)).toFixed(1)},${(r * Math.sin(t)).toFixed(1)}`);
+    }
+    document.getElementById('r').setAttribute('d', `M${points.join('L')}Z`);
+    const turns = document.getElementById('turns');
+    for (let i = 0; i < 36; i++) {
+      const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      use.setAttribute('href', '#r');
+      use.setAttribute('transform', `rotate(${((i * 360) / 36 / 9).toFixed(2)})`);
+      turns.appendChild(use);
+    }
+
+    // ISO 6346 check digit, as in src/lib/container-mark.ts
+    const values = { A: 10, B: 12, C: 13, D: 14, E: 15, F: 16, G: 17, H: 18, I: 19, J: 20, K: 21, L: 23, M: 24,
+      N: 25, O: 26, P: 27, Q: 28, R: 29, S: 30, T: 31, U: 32, V: 34, W: 35, X: 36, Y: 37, Z: 38 };
+    const check = (code) => ([...code].reduce((s, c, i) => s + (/\d/.test(c) ? +c : values[c]) * 2 ** i, 0) % 11) % 10;
+
+    const containers = [
+      ['202204', 'cobalt', 'F&O migration'],
+      ['202311', 'oxide', 'AXFinMobile'],
+      ['202402', 'cobalt', 'Sparepart Management'],
+      ['202501', 'oxide', 'Futurist'],
+    ];
+    document.getElementById('marks').innerHTML = containers.map(([serial, steel, project]) => `
+      <div class="mark">
+        <p class="code"><span class="chip" style="background: var(--${steel})"></span>CAAU ${serial} <span class="check">${check('CAAU' + serial)}</span></p>
+        <p class="project">${project}</p>
+      </div>`).join('');
+  </script>
+</body>
+</html>

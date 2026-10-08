@@ -20,6 +20,9 @@ const {
 	noindex = false,
 	chrome = 'lading',
 } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const socialImage = new URL('/og.png', Astro.site);
 ---
 
 <!doctype html>
@@ -33,10 +36,20 @@ const {
 		<meta name="theme-color" content="#24543f" />
 		<title>{title}</title>
 		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
 		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content={profile.name} />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
-		<meta property="og:url" content={Astro.url.href} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={socialImage} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta
+			property="og:image:alt"
+			content={`Bill of lading for ${profile.name}, ${profile.title}: port of loading ${profile.based}, port of discharge open. Four container marks list the case studies.`}
+		/>
+		<meta name="twitter:card" content="summary_large_image" />
 	</head>
 	<body
 		class={chrome === 'lading'
