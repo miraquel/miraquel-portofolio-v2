@@ -1,0 +1,3 @@
+# AX 2012 XPO exports must keep CRLF line endings and the BOM, or the AOT import
+# fails with "Unknown export code". Never let git normalise them.
+*.xpo -text
