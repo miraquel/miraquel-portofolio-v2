@@ -22,11 +22,13 @@ export interface GoodsLine {
   quantity?: string;
   goods: string;
   detail: string;
+  /** The goods as the Shipper field's screening line names them */
+  short?: string;
 }
 
 export const goods: GoodsLine[] = [
   { quantity: '8 years', goods: '.NET', detail: 'C#, ASP.NET Core, Web API, Blazor, Entity Framework Core' },
-  { quantity: '5 years', goods: 'Dynamics 365 Finance & Operations', detail: 'X++, LCS, Azure DevOps' },
+  { quantity: '5 years', goods: 'Dynamics 365 Finance & Operations', short: 'Dynamics 365 F&O', detail: 'X++, LCS, Azure DevOps' },
   { goods: 'Dynamics AX 2012', detail: 'X++, custom AIF services, reports' },
   { goods: 'Dynamics 365 Business Central', detail: 'AL, Power Apps, Power Automate' },
   { goods: 'Mobile and data', detail: 'Flutter and Dart, SQL Server, SSIS, MySQL' },

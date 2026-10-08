@@ -74,7 +74,7 @@ const caseStudies: CaseStudy[] = [
     slug: 'axfinmobile',
     steel: 'oxide',
     title: 'AXFinMobile',
-    line: 'Invoice settlement from a phone, posted as AX 2012 R2 payment journals',
+    line: 'Invoice settlement from a phone, posted as AX 2012 R2 payment journals: about 60% less manual entry',
     client: 'PT Gandum Mas Kencana',
     period: { start: '2023-11', end: '2024-02' },
     cargo:
