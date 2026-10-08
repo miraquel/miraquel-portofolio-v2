@@ -1,0 +1,24 @@
+---
+// Decorative security pattern for the bill of lading: one rosette curve, repeated under
+// rotation, so the markup stays small.
+import { rosetteCurve } from '../../lib/guilloche';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const rosette = rosetteCurve(150, 34, 9, 12, 23);
+const rosetteTurns = Array.from({ length: 36 }, (_, i) => (i * 360) / 36 / 9);
+
+---
+
+<svg class={className} viewBox="-210 -210 420 420" aria-hidden="true" focusable="false">
+  <defs>
+    <path id="guilloche-rosette" d={rosette} />
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="0.6">
+    {rosetteTurns.map((turn) => <use href="#guilloche-rosette" transform={`rotate(${turn.toFixed(2)})`} />)}
+  </g>
+</svg>

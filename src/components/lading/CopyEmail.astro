@@ -1,0 +1,60 @@
+---
+// Copy-to-clipboard for the email address. mailto: does nothing on a machine with no mail
+// app, so the address can be copied too. The button stays hidden until the script runs.
+// Place it inside an element marked [data-email-group] that also holds the
+// [data-contact-email] link, so a refused clipboard can fall back to selecting that link.
+interface Props {
+  email: string;
+}
+
+const { email } = Astro.props;
+---
+
+<button
+  type="button"
+  data-copy-email={email}
+  hidden
+  class="inline-flex min-h-11 items-center gap-2 border-2 border-form bg-paper px-3 text-sm font-semibold text-form transition-colors duration-150 hover:bg-form hover:text-paper"
+>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <rect x="9" y="9" width="13" height="13"></rect>
+    <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"></path>
+  </svg>
+  <span data-copy-label>Copy address</span>
+</button>
+<span data-copy-status class="sr-only" aria-live="polite"></span>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-email]').forEach((copyButton) => {
+    const copyLabel = copyButton.querySelector('[data-copy-label]');
+    const copyStatus = copyButton.nextElementSibling;
+    const emailLink = copyButton.closest('[data-email-group]')?.querySelector('[data-contact-email]');
+    let resetTimer: ReturnType<typeof setTimeout> | undefined;
+    if (!copyLabel || !copyStatus) return;
+
+    copyButton.hidden = false;
+    copyButton.addEventListener('click', async () => {
+      clearTimeout(resetTimer);
+      try {
+        await navigator.clipboard.writeText(copyButton.dataset.copyEmail ?? '');
+        copyLabel.textContent = 'Copied';
+        copyStatus.textContent = 'Email address copied.';
+      } catch {
+        // Clipboard access can be refused; select the address so it can be copied by hand
+        if (emailLink) {
+          const range = document.createRange();
+          range.selectNodeContents(emailLink);
+          const selection = window.getSelection();
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+        }
+        copyLabel.textContent = 'Address selected';
+        copyStatus.textContent = "Couldn't copy automatically. The address is selected, so copy it with your keyboard.";
+      }
+      resetTimer = setTimeout(() => {
+        copyLabel.textContent = 'Copy address';
+        copyStatus.textContent = '';
+      }, 2500);
+    });
+  });
+</script>

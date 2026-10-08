@@ -1,0 +1,27 @@
+---
+// An ISO 6346 container mark: owner code, serial, and the check digit in its box.
+import type { ContainerMark } from '../../lib/container-mark';
+
+interface Props {
+  mark: ContainerMark;
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+}
+
+const { mark, size = 'sm', class: className } = Astro.props;
+---
+
+<span
+  class:list={[
+    'inline-flex items-center whitespace-nowrap font-stencil font-extrabold uppercase leading-none tracking-[0.04em]',
+    size === 'lg' && 'gap-[0.28em] text-[clamp(2.75rem,6vw,4.75rem)]',
+    size === 'md' && 'gap-[0.3em] text-[1.875rem]',
+    size === 'sm' && 'gap-[0.3em] text-[1.25rem]',
+    className,
+  ]}
+  aria-label={`Container ${mark.owner} ${mark.serial} check digit ${mark.check}`}
+>
+  <span aria-hidden="true">{mark.owner}</span>
+  <span aria-hidden="true">{mark.serial}</span>
+  <span aria-hidden="true" class="border-[0.07em] border-current px-[0.14em] leading-[0.95]">{mark.check}</span>
+</span>

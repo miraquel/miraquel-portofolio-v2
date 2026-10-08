@@ -1,157 +1,195 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getBlogPostBySlug } from '../../lib/blog';
+import Strip from '../../components/lading/Strip.astro';
+import { findPublishedPostBySlug } from '../../lib/blog';
+import { formatDay } from '../../lib/format';
 import { sanitizePostContent } from '../../lib/sanitize';
 
 export const prerender = false;
 
 const { slug } = Astro.params;
-const post = await getBlogPostBySlug(slug!);
+
+// A missing post answers 404 and a failed read answers 503, instead of quietly redirecting to /blog
+const { post, loadFailed } = await findPublishedPostBySlug(slug!).then(
+  (post) => ({ post, loadFailed: false }),
+  (error) => {
+    console.error('Error fetching blog post:', error);
+    return { post: null, loadFailed: true };
+  }
+);
 
 if (!post) {
-  return Astro.redirect('/blog');
+  Astro.response.status = loadFailed ? 503 : 404;
 }
 
-const safeContent = sanitizePostContent(post.content);
-
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  }).format(date);
-}
+const safeContent = post ? sanitizePostContent(post.content) : '';
+const field = 'bg-paper px-4 py-4 sm:px-5';
+const label = 'text-[0.8125rem] font-semibold text-form';
+const button = 'inline-flex min-h-11 items-center border-2 border-form bg-form px-5 text-sm font-semibold text-paper transition-colors duration-150 hover:border-ink hover:bg-ink';
 ---
 
-<Layout>
-  <article class="min-h-screen px-6 max-w-4xl mx-auto py-24">
-    <a 
-      href="/blog" 
-      class="inline-flex items-center gap-2 text-slate-400 hover:text-teal-300 transition-colors duration-200 mb-8"
-    >
-      <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="19" y1="12" x2="5" y2="12"></line>
-        <polyline points="12 19 5 12 12 5"></polyline>
-      </svg>
-      Back to Blog
-    </a>
-
-    <header class="mb-12">
-      {post.imageUrl && (
-        <div class="w-full aspect-video rounded-lg overflow-hidden border border-slate-400/20 bg-slate-900/50 mb-8">
-          <img 
-            src={post.imageUrl} 
-            alt={post.title}
-            class="w-full h-full object-cover"
-          />
-        </div>
-      )}
-      
-      <h1 class="text-5xl font-bold text-slate-200 leading-tight mb-4">{post.title}</h1>
-      
-      <div class="flex items-center gap-4 text-slate-400 text-sm mb-6">
-        <span>{formatDate(post.publishedAt)}</span>
-        <span>·</span>
-        <span>{post.author}</span>
-      </div>
-      
-      {post.tags.length > 0 && (
-        <div class="flex flex-wrap gap-2">
-          {post.tags.map((tag) => (
-            <a
-              href={`/blog?tag=${encodeURIComponent(tag)}`}
-              class="px-3 pb-1 bg-teal-400/10 hover:bg-teal-400/20 hover:shadow-md rounded-full font-medium transition-all duration-200"
-            >
-              <span class="text-teal-300 text-sm inline-flex items-center">{tag}</span>
-            </a>
-          ))}
-        </div>
-      )}
-    </header>
-
-    <div class="prose prose-invert prose-slate max-w-none">
-      <div class="text-slate-300 leading-relaxed space-y-4" set:html={safeContent} />
+<Layout
+  title={post ? `${post.title}: Chaidir Ali Assegaf` : loadFailed ? "Post couldn't load" : 'Post not found'}
+  description={post?.excerpt || undefined}
+>
+  <Strip />
+  <main id="main" class="mx-auto max-w-[85rem] px-4 pb-24 pt-5 sm:px-8 lg:pt-7">
+    <div data-dark class="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-2 border-b-0 border-form bg-form px-4 py-2 text-paper sm:px-5">
+      <a href="/blog" class="py-1 font-stencil text-[1.375rem] font-extrabold uppercase leading-none tracking-[0.08em] hover:underline">Notices</a>
+      <a href="/blog" class="py-1 text-sm font-semibold underline decoration-paper/50 underline-offset-4 hover:decoration-paper">All posts</a>
     </div>
-  </article>
+
+    {post ? (
+      <article>
+        <header>
+          <div class="border-2 border-b-0 border-form bg-paper px-4 py-6 sm:px-5 sm:py-8">
+            <h1 class="max-w-[24ch] text-[clamp(2.25rem,5.5vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.02em]">{post.title}</h1>
+            {post.excerpt && <p class="mt-4 max-w-[60ch] text-lg leading-relaxed">{post.excerpt}</p>}
+          </div>
+          <dl class="grid grid-cols-12 gap-px border-2 border-form bg-form">
+            <div class:list={[field, 'col-span-12 sm:col-span-4']}>
+              <dt class={label}>Published</dt>
+              <dd class="mt-1.5 font-data text-sm font-semibold">{formatDay(post.publishedAt)}</dd>
+            </div>
+            <div class:list={[field, 'col-span-12 sm:col-span-4']}>
+              <dt class={label}>Written by</dt>
+              <dd class="mt-1.5 font-extrabold">{post.author}</dd>
+            </div>
+            <div class:list={[field, 'col-span-12 sm:col-span-4']}>
+              <dt class={label}>Tags</dt>
+              <dd class="mt-0.5 flex flex-wrap gap-x-4">
+                {post.tags.length > 0
+                  ? post.tags.map((tag) => (
+                      <a href={`/blog?tag=${encodeURIComponent(tag)}`} class="inline-block py-1.5 font-semibold underline decoration-form/40 underline-offset-4 hover:decoration-form">
+                        {tag}
+                      </a>
+                    ))
+                  : <span class="py-1.5">None</span>}
+              </dd>
+            </div>
+          </dl>
+
+          {post.imageUrl && (
+            <div class="border-2 border-t-0 border-form bg-paper-deep">
+              <img src={post.imageUrl} alt="" class="aspect-[21/9] w-full object-cover" />
+            </div>
+          )}
+        </header>
+
+        <div class="post-body mx-auto mt-12 max-w-[68ch] text-[1.125rem] leading-[1.75]" set:html={safeContent} />
+      </article>
+    ) : (
+      <section class="border-2 border-form bg-paper px-4 py-10 sm:px-6">
+        <h1 class="text-[clamp(2.25rem,5vw,3.5rem)] font-extrabold leading-tight tracking-[-0.02em]">
+          {loadFailed ? "This post couldn't load" : 'Post not found'}
+        </h1>
+        <p class="mt-3 max-w-[60ch] text-lg leading-relaxed">
+          {loadFailed
+            ? "The blog's database didn't respond. Reload the page to try again."
+            : "This post doesn't exist or is no longer published."}
+        </p>
+        <a href={loadFailed ? Astro.url.pathname : '/blog'} class:list={[button, 'mt-8']}>
+          {loadFailed ? 'Reload' : 'See all posts'}
+        </a>
+      </section>
+    )}
+  </main>
 </Layout>
 
 <style>
-  .prose {
-    color: #cbd5e1;
+  .post-body :global(h2) {
+    margin: 3rem 0 1rem;
+    font-size: 1.625rem;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
   }
 
-  .prose :global(h2) {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #e2e8f0;
-    margin-top: 3rem;
-    margin-bottom: 1.5rem;
+  .post-body :global(h3) {
+    margin: 2.25rem 0 0.75rem;
+    font-size: 1.375rem;
+    font-weight: 800;
+    line-height: 1.25;
   }
 
-  .prose :global(h3) {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #e2e8f0;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
+  .post-body :global(p),
+  .post-body :global(ul),
+  .post-body :global(ol) {
+    margin-bottom: 1.25rem;
   }
 
-  .prose :global(p) {
-    margin-bottom: 1.5rem;
-    line-height: 1.8;
-  }
-
-  .prose :global(a) {
-    color: #5eead4;
-    text-decoration: underline;
-    transition: color 0.2s ease;
-  }
-
-  .prose :global(a:hover) {
-    color: #2dd4bf;
-  }
-
-  .prose :global(code) {
-    background-color: rgba(30, 41, 59, 0.5);
-    padding: 0.2rem 0.4rem;
-    border-radius: 0.25rem;
-    font-size: 0.875em;
-    color: #5eead4;
-  }
-
-  .prose :global(pre) {
-    background-color: rgba(30, 41, 59, 0.5);
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    overflow-x: auto;
-    margin: 2rem 0;
-  }
-
-  .prose :global(pre code) {
-    background-color: transparent;
-    padding: 0;
-  }
-
-  .prose :global(ul),
-  .prose :global(ol) {
-    margin: 1.5rem 0;
+  .post-body :global(ul),
+  .post-body :global(ol) {
     padding-left: 1.5rem;
   }
 
-  .prose :global(li) {
+  .post-body :global(ul) {
+    list-style: square;
+  }
+
+  .post-body :global(ol) {
+    list-style: decimal;
+  }
+
+  .post-body :global(li) {
     margin-bottom: 0.5rem;
   }
 
-  .prose :global(blockquote) {
-    border-left: 4px solid #5eead4;
-    padding-left: 1.5rem;
-    margin: 2rem 0;
-    font-style: italic;
-    color: #94a3b8;
+  .post-body :global(li::marker) {
+    color: var(--color-form);
   }
 
-  .prose :global(img) {
-    border-radius: 0.5rem;
+  .post-body :global(a) {
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--color-form) 45%, transparent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+
+  .post-body :global(a:hover) {
+    text-decoration-color: var(--color-form);
+  }
+
+  .post-body :global(code) {
+    padding: 0.1em 0.35em;
+    background-color: var(--color-paper-deep);
+    font-family: var(--font-data);
+    font-size: 0.875em;
+  }
+
+  .post-body :global(pre) {
     margin: 2rem 0;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .post-body :global(pre code) {
+    padding: 0;
+    background-color: transparent;
+    font-size: inherit;
+  }
+
+  /* A quoted clause: set off on the deeper paper, never with a side stripe */
+  .post-body :global(blockquote) {
+    margin: 2rem 0;
+    padding: 1.25rem 1.5rem;
+    background-color: var(--color-paper-deep);
+    color: var(--color-form);
+    font-weight: 600;
+  }
+
+  .post-body :global(img) {
+    margin: 2rem 0;
+    border: 2px solid var(--color-form);
+  }
+
+  .post-body :global(hr) {
+    margin: 2.5rem 0;
+    border-top: 2px solid var(--color-form);
   }
 </style>
