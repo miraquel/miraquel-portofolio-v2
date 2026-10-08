@@ -1,0 +1,436 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-08T12:00:00Z",
+  "title": "Design System: Chaidir Ali Assegaf, Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Security Paper",
+        "canonical": "#e3ede3",
+        "tonalRamp": [
+          "oklch(15% 0.016 150)",
+          "oklch(27% 0.016 150)",
+          "oklch(39% 0.016 150)",
+          "oklch(51% 0.016 150)",
+          "oklch(63% 0.016 150)",
+          "oklch(75% 0.016 150)",
+          "oklch(87% 0.016 150)",
+          "oklch(95% 0.016 150)"
+        ]
+      },
+      "paper-deep": {
+        "role": "neutral",
+        "displayName": "Deep Tint Paper",
+        "canonical": "#d2e2d5",
+        "tonalRamp": [
+          "oklch(15% 0.022 152)",
+          "oklch(27% 0.022 152)",
+          "oklch(39% 0.022 152)",
+          "oklch(51% 0.022 152)",
+          "oklch(63% 0.022 152)",
+          "oklch(75% 0.022 152)",
+          "oklch(87% 0.022 152)",
+          "oklch(95% 0.022 152)"
+        ]
+      },
+      "form": {
+        "role": "primary",
+        "displayName": "Form Green Ink",
+        "canonical": "#24543f",
+        "tonalRamp": [
+          "oklch(15% 0.06 160)",
+          "oklch(27% 0.07 160)",
+          "oklch(41% 0.07 160)",
+          "oklch(51% 0.07 160)",
+          "oklch(63% 0.06 160)",
+          "oklch(75% 0.05 160)",
+          "oklch(87% 0.03 160)",
+          "oklch(95% 0.015 160)"
+        ]
+      },
+      "form-soft": {
+        "role": "neutral",
+        "displayName": "Faded Ink",
+        "canonical": "#5d8571",
+        "tonalRamp": [
+          "oklch(15% 0.04 160)",
+          "oklch(27% 0.05 160)",
+          "oklch(39% 0.05 160)",
+          "oklch(51% 0.05 160)",
+          "oklch(58% 0.05 160)",
+          "oklch(72% 0.04 160)",
+          "oklch(86% 0.025 160)",
+          "oklch(95% 0.012 160)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Carbon",
+        "canonical": "#17212b",
+        "tonalRamp": [
+          "oklch(15% 0.025 250)",
+          "oklch(24% 0.025 250)",
+          "oklch(35% 0.025 250)",
+          "oklch(47% 0.025 250)",
+          "oklch(59% 0.02 250)",
+          "oklch(71% 0.015 250)",
+          "oklch(84% 0.01 250)",
+          "oklch(95% 0.005 250)"
+        ]
+      },
+      "cobalt": {
+        "role": "secondary",
+        "displayName": "Container Cobalt",
+        "canonical": "#1d4a96",
+        "tonalRamp": [
+          "oklch(15% 0.06 262)",
+          "oklch(27% 0.1 262)",
+          "oklch(37% 0.12 262)",
+          "oklch(42% 0.14 262)",
+          "oklch(55% 0.13 262)",
+          "oklch(68% 0.1 262)",
+          "oklch(83% 0.06 262)",
+          "oklch(95% 0.02 262)"
+        ]
+      },
+      "cobalt-deep": {
+        "role": "secondary",
+        "displayName": "Cobalt Door Steel",
+        "canonical": "#173c7a",
+        "tonalRamp": [
+          "oklch(15% 0.06 262)",
+          "oklch(27% 0.1 262)",
+          "oklch(37% 0.12 262)",
+          "oklch(47% 0.12 262)",
+          "oklch(59% 0.11 262)",
+          "oklch(71% 0.09 262)",
+          "oklch(84% 0.05 262)",
+          "oklch(95% 0.02 262)"
+        ]
+      },
+      "oxide": {
+        "role": "secondary",
+        "displayName": "Oxide Red",
+        "canonical": "#9a3a25",
+        "tonalRamp": [
+          "oklch(15% 0.05 35)",
+          "oklch(27% 0.09 35)",
+          "oklch(41% 0.11 35)",
+          "oklch(47% 0.13 35)",
+          "oklch(59% 0.13 35)",
+          "oklch(71% 0.1 35)",
+          "oklch(84% 0.05 35)",
+          "oklch(95% 0.02 35)"
+        ]
+      },
+      "oxide-deep": {
+        "role": "secondary",
+        "displayName": "Oxide Door Steel",
+        "canonical": "#7d2f1e",
+        "tonalRamp": [
+          "oklch(15% 0.05 35)",
+          "oklch(27% 0.09 35)",
+          "oklch(41% 0.11 35)",
+          "oklch(51% 0.12 35)",
+          "oklch(62% 0.11 35)",
+          "oklch(73% 0.09 35)",
+          "oklch(85% 0.05 35)",
+          "oklch(95% 0.02 35)"
+        ]
+      },
+      "stencil": {
+        "role": "neutral",
+        "displayName": "Stencil White",
+        "canonical": "#f5f7f2",
+        "tonalRamp": [
+          "oklch(15% 0.005 125)",
+          "oklch(27% 0.005 125)",
+          "oklch(39% 0.005 125)",
+          "oklch(51% 0.005 125)",
+          "oklch(63% 0.005 125)",
+          "oklch(75% 0.005 125)",
+          "oklch(87% 0.005 125)",
+          "oklch(97.5% 0.005 125)"
+        ]
+      },
+      "signal": {
+        "role": "tertiary",
+        "displayName": "Signal Yellow",
+        "canonical": "#f2c21b",
+        "tonalRamp": [
+          "oklch(25% 0.05 90)",
+          "oklch(35% 0.08 90)",
+          "oklch(45% 0.1 90)",
+          "oklch(57% 0.12 90)",
+          "oklch(69% 0.15 90)",
+          "oklch(83% 0.17 90)",
+          "oklch(90% 0.12 90)",
+          "oklch(96% 0.05 90)"
+        ]
+      },
+      "stamp": {
+        "role": "tertiary",
+        "displayName": "Stamp Red",
+        "canonical": "#b3261e",
+        "tonalRamp": [
+          "oklch(15% 0.06 28)",
+          "oklch(27% 0.11 28)",
+          "oklch(39% 0.15 28)",
+          "oklch(51% 0.18 28)",
+          "oklch(62% 0.17 28)",
+          "oklch(73% 0.12 28)",
+          "oklch(85% 0.06 28)",
+          "oklch(95% 0.02 28)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display (stencil)",
+        "purpose": "The name in the Shipper field only; uppercase, 6rem ceiling."
+      },
+      "mark-lg": {
+        "displayName": "Container mark, large",
+        "purpose": "ISO 6346 mark in a container bay header."
+      },
+      "mark-md": {
+        "displayName": "Container mark, medium",
+        "purpose": "Marks in the bill's Marks and numbers field."
+      },
+      "mark-sm": {
+        "displayName": "Container mark, small",
+        "purpose": "Marks on container lines in the manifest."
+      },
+      "band-title": {
+        "displayName": "Band title",
+        "purpose": "Printed band titles (Bill of lading, Notices), the strip name, and the word of a stamp; uppercase."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section heads after a mono section number; blog and post titles share weight and tracking."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "A container's project title on steel."
+      },
+      "field-value": {
+        "displayName": "Field value",
+        "purpose": "The typed answer in a primary form field."
+      },
+      "secondary": {
+        "displayName": "Secondary",
+        "purpose": "Supporting lines, section notes, route stop descriptions and leg labels, credential details, employer roles, manifest platform column."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading text, 50 to 62ch."
+      },
+      "body-post": {
+        "displayName": "Post body",
+        "purpose": "Blog post reading column, 68ch."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Field labels, column headers and section notes, in form green, sentence case."
+      },
+      "data": {
+        "displayName": "Data (mono)",
+        "purpose": "Field numbers, dates, periods, line numbers and tech lists only; tabular lining figures."
+      }
+    },
+    "shadows": [
+      {
+        "name": "rod-ring",
+        "value": "0 0 0 2px rgb(255 255 255 / 0.12)",
+        "purpose": "Light ring on a door leaf's locking rod. The only box-shadow; nothing on paper casts one."
+      }
+    ],
+    "motion": [
+      {
+        "name": "door-swing",
+        "value": "transform 1100ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Door leaves swing from shut to rotateY(±92deg) on arrival at a followed container, under perspective 4000px."
+      },
+      {
+        "name": "door-fade",
+        "value": "opacity 350ms ease-out 700ms; visibility 0s linear 1100ms",
+        "purpose": "Leaves fade during the swing and are hidden at rest, so they never cover content. display: none under reduced motion."
+      },
+      {
+        "name": "state-fast",
+        "value": "150ms",
+        "purpose": "Color, background and underline-thickness changes on hover and cross-highlight."
+      },
+      {
+        "name": "smooth-scroll",
+        "value": "scroll-behavior: smooth",
+        "purpose": "Only under prefers-reduced-motion: no-preference."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "40rem"
+      },
+      {
+        "name": "md",
+        "value": "48rem"
+      },
+      {
+        "name": "lg",
+        "value": "64rem"
+      },
+      {
+        "name": "xl",
+        "value": "80rem"
+      }
+    ],
+    "focus": {
+      "default": "outline: 3px solid var(--color-ink); outline-offset: 3px",
+      "onSteel": "outline-color: var(--color-signal) inside [data-steel]",
+      "selection": "background: var(--color-signal); color: var(--color-ink)"
+    },
+    "componentMaterials": {
+      "container-bay-door-leaf": {
+        "scope": "Container Bay door leaves only; not palette colours.",
+        "fill": "var(--color-cobalt-deep) or var(--color-oxide-deep), by bay steel",
+        "corrugation": "repeating-linear-gradient(90deg, transparent 0 14px, rgb(0 0 0 / 0.16) 14px 18px, rgb(255 255 255 / 0.06) 18px 22px)",
+        "edge": "2px solid rgb(0 0 0 / 0.35)",
+        "lockingRod": "6px wide, rgb(0 0 0 / 0.4), top 6% to bottom 6%, 18% from the meeting edge, box-shadow rod-ring"
+      }
+    }
+  },
+  "components": [
+    {
+      "name": "Form Field Grid",
+      "kind": "card",
+      "refersTo": "field",
+      "description": "Numbered dt/dd boxes on a 12-column grid; 1px hairlines are a grid gap over the form-green ground, framed at 2px. Live facts print on signal yellow.",
+      "html": "<div class=\"ds-band\"><span class=\"ds-band-title\">Bill of lading</span><span class=\"ds-band-meta\">Revised 8 October 2026</span></div><dl class=\"ds-fields\"><div class=\"ds-field\"><dt class=\"ds-label\"><span class=\"ds-num\">04</span>Port of loading</dt><dd class=\"ds-value\">Indonesia</dd></div><div class=\"ds-field ds-field-live\"><dt class=\"ds-label\"><span class=\"ds-num\">05</span>Port of discharge</dt><dd class=\"ds-value\">Open</dd></div></dl>",
+      "css": ".ds-band { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 8px 20px; background: var(--color-form, #24543f); color: var(--color-paper, #e3ede3); border: 2px solid var(--color-form, #24543f); border-bottom: 0; } .ds-band-title { font-family: 'Big Shoulders Stencil Variable', 'Arial Narrow', sans-serif; font-weight: 800; font-size: 1.375rem; line-height: 1; letter-spacing: 0.08em; text-transform: uppercase; } .ds-band-meta { font-family: 'Overpass Mono Variable', ui-monospace, monospace; font-size: 0.75rem; } .ds-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin: 0; background: var(--color-form, #24543f); border: 2px solid var(--color-form, #24543f); } .ds-field { display: flex; flex-direction: column; gap: 10px; padding: 20px; background: var(--color-paper, #e3ede3); color: var(--color-ink, #17212b); } .ds-field-live { background: var(--color-signal, #f2c21b); } .ds-label { display: flex; align-items: baseline; gap: 8px; font-family: 'Overpass Variable', 'Segoe UI', sans-serif; font-size: 0.8125rem; font-weight: 600; line-height: 1.25; color: var(--color-form, #24543f); } .ds-num { font-family: 'Overpass Mono Variable', ui-monospace, monospace; font-size: 0.75rem; font-weight: 500; } .ds-value { margin: 0; font-family: 'Overpass Variable', 'Segoe UI', sans-serif; font-size: 1.625rem; font-weight: 800; line-height: 1.25; }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Square, 44px, form-green ground; darkens to carbon on hover.",
+      "html": "<button class=\"ds-btn-primary\">See all posts</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px; border: 2px solid var(--color-form, #24543f); border-radius: 0; background: var(--color-form, #24543f); color: var(--color-paper, #e3ede3); font-family: 'Overpass Variable', 'Segoe UI', sans-serif; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: background-color 150ms, border-color 150ms; } .ds-btn-primary:hover { background: var(--color-ink, #17212b); border-color: var(--color-ink, #17212b); } .ds-btn-primary:focus-visible { outline: 3px solid var(--color-ink, #17212b); outline-offset: 3px; }"
+    },
+    {
+      "name": "Outline Button (Copy address)",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Paper ground, form border and text, inline stroke icon; inverts to form green on hover.",
+      "html": "<button class=\"ds-btn-outline\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\"></rect><path d=\"M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1\"></path></svg><span>Copy address</span></button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 2px solid var(--color-form, #24543f); border-radius: 0; background: var(--color-paper, #e3ede3); color: var(--color-form, #24543f); font-family: 'Overpass Variable', 'Segoe UI', sans-serif; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: background-color 150ms, color 150ms; } .ds-btn-outline:hover { background: var(--color-form, #24543f); color: var(--color-paper, #e3ede3); } .ds-btn-outline:focus-visible { outline: 3px solid var(--color-ink, #17212b); outline-offset: 3px; }"
+    },
+    {
+      "name": "Tag Chip",
+      "kind": "chip",
+      "refersTo": "tag-chip",
+      "description": "Blog tag filter; square 44px chip with a mono count. Selected inverts to form green.",
+      "html": "<a class=\"ds-chip\" href=\"#\">dynamics <span class=\"ds-chip-count\">4</span></a> <a class=\"ds-chip ds-chip-selected\" href=\"#\" aria-current=\"page\">dotnet <span class=\"ds-chip-count\">2</span></a>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 2px solid var(--color-form, #24543f); background: var(--color-paper, #e3ede3); color: var(--color-form, #24543f); font-family: 'Overpass Variable', 'Segoe UI', sans-serif; font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: background-color 150ms; } .ds-chip:hover { background: var(--color-paper-deep, #d2e2d5); } .ds-chip-selected, .ds-chip-selected:hover { background: var(--color-form, #24543f); color: var(--color-paper, #e3ede3); } .ds-chip-count { font-family: 'Overpass Mono Variable', ui-monospace, monospace; font-size: 0.75rem; font-weight: 500; } .ds-chip:focus-visible { outline: 3px solid var(--color-ink, #17212b); outline-offset: 3px; }"
+    },
+    {
+      "name": "Strip",
+      "kind": "nav",
+      "refersTo": "strip",
+      "description": "Sticky printed strip: stencil name, form-green section links that turn carbon and underline on hover; 44px targets.",
+      "html": "<header class=\"ds-strip\"><a class=\"ds-strip-name\" href=\"#\">Chaidir Ali Assegaf</a><nav><a class=\"ds-strip-link\" href=\"#\">Case studies</a><a class=\"ds-strip-link\" href=\"#\">Blog</a><a class=\"ds-strip-link\" href=\"#\">Contact</a></nav></header>",
+      "css": ".ds-strip { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 0 32px; background: var(--color-paper, #e3ede3); border-bottom: 2px solid var(--color-form, #24543f); } .ds-strip-name { padding: 11px 0; font-family: 'Big Shoulders Stencil Variable', 'Arial Narrow', sans-serif; font-size: 1.375rem; font-weight: 800; line-height: 1; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-ink, #17212b); text-decoration: none; } .ds-strip-link { display: inline-block; padding: 15px 10px; font-family: 'Overpass Variable', 'Segoe UI', sans-serif; font-size: 0.875rem; font-weight: 600; line-height: 1; color: var(--color-form, #24543f); text-decoration: none; text-underline-offset: 4px; transition: color 150ms; } .ds-strip-link:hover { color: var(--color-ink, #17212b); text-decoration: underline; } .ds-strip-link:focus-visible { outline: 3px solid var(--color-ink, #17212b); outline-offset: 3px; }"
+    },
+    {
+      "name": "Container Mark",
+      "kind": "custom",
+      "refersTo": "mark-md",
+      "description": "ISO 6346 mark: owner code, serial and a boxed check digit in stencil, beside a square steel swatch. Sizes: lg in bay headers, md in Marks and numbers (shown), sm in the manifest.",
+      "html": "<a class=\"ds-mark-link\" href=\"#\"><span class=\"ds-swatch\"></span><span class=\"ds-mark\" aria-label=\"Container CAAU 202204 check digit 0\"><span aria-hidden=\"true\">CAAU</span><span aria-hidden=\"true\">202204</span><span aria-hidden=\"true\" class=\"ds-check\">0</span></span></a>",
+      "css": ".ds-mark-link { display: inline-flex; align-items: center; gap: 10px; padding: 20px; background: var(--color-paper, #e3ede3); color: var(--color-ink, #17212b); text-decoration: none; transition: background-color 150ms; } .ds-mark-link:hover { background: var(--color-paper-deep, #d2e2d5); } .ds-mark-link:focus-visible { outline: 3px solid var(--color-ink, #17212b); outline-offset: 3px; } .ds-swatch { width: 14px; height: 14px; background: var(--color-cobalt, #1d4a96); } .ds-mark { display: inline-flex; align-items: center; gap: 0.3em; font-family: 'Big Shoulders Stencil Variable', 'Arial Narrow', sans-serif; font-size: 1.875rem; font-weight: 800; line-height: 1; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; } .ds-check { border: 0.07em solid currentColor; padding: 0 0.14em; line-height: 0.95; }"
+    },
+    {
+      "name": "Rubber Stamp",
+      "kind": "custom",
+      "refersTo": "stamp",
+      "description": "Status word over its date, stamp red, double 3px border, rotated -6deg, multiply-blended. Only ever a status plus a date.",
+      "html": "<span class=\"ds-stamp-slip\"><span class=\"ds-stamp\"><span class=\"ds-stamp-word\">Delivered</span><span class=\"ds-stamp-date\">Apr 2023</span></span></span>",
+      "css": ".ds-stamp-slip { display: inline-block; padding: 16px 20px; background: var(--color-paper, #e3ede3); border: 2px solid var(--color-ink, #17212b); } .ds-stamp { display: inline-flex; flex-direction: column; align-items: center; padding: 6px 12px 4px; border: 3px double var(--color-stamp, #b3261e); color: var(--color-stamp, #b3261e); transform: rotate(-6deg); mix-blend-mode: multiply; } .ds-stamp-word { font-family: 'Big Shoulders Stencil Variable', 'Arial Narrow', sans-serif; font-size: 1.5rem; font-weight: 800; line-height: 1; letter-spacing: 0.1em; text-transform: uppercase; } .ds-stamp-date { margin-top: 4px; font-family: 'Overpass Mono Variable', ui-monospace, monospace; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }"
+    },
+    {
+      "name": "Container Bay",
+      "kind": "custom",
+      "refersTo": "steel-bay-cobalt",
+      "description": "A case study as a full-bleed steel band: large mark and title on stencil white, a carbon-framed paper hold carrying the route. Focus turns signal yellow on steel.",
+      "html": "<article class=\"ds-bay\"><div class=\"ds-bay-mark\">CAAU 202204 <span class=\"ds-check\">0</span></div><h3 class=\"ds-bay-title\">AX 2012 R3 to Dynamics 365 F&amp;O migration</h3><p class=\"ds-bay-label\">Evidence</p><a class=\"ds-bay-link\" href=\"#\">Migration notes</a><div class=\"ds-hold\"><p class=\"ds-hold-label\">Route</p><div class=\"ds-stop\"><b><span class=\"ds-stop-key\">A</span> AX 2012 R3</b><p class=\"ds-stop-tech\">X++ · SQL Server</p></div></div></article>",
+      "css": ".ds-bay { padding: 56px 32px; background: var(--color-cobalt, #1d4a96); color: var(--color-stencil, #f5f7f2); } .ds-bay-mark { font-family: 'Big Shoulders Stencil Variable', 'Arial Narrow', sans-serif; font-size: 3rem; font-weight: 800; line-height: 1; letter-spacing: 0.04em; text-transform: uppercase; } .ds-check { border: 0.07em solid currentColor; padding: 0 0.14em; } .ds-bay-title { margin: 28px 0 0; max-width: 20ch; font-family: 'Overpass Variable', 'Segoe UI', sans-serif; font-size: 2.25rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.01em; } .ds-bay-label { margin: 24px 0 0; font-size: 0.8125rem; font-weight: 600; color: rgb(245 247 242 / 0.85); } .ds-bay-link { display: inline-block; padding: 12px 0; font-weight: 600; color: inherit; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; text-decoration-color: rgb(245 247 242 / 0.5); } .ds-bay-link:hover { text-decoration-color: var(--color-stencil, #f5f7f2); } .ds-bay-link:focus-visible { outline: 3px solid var(--color-signal, #f2c21b); outline-offset: 3px; } .ds-hold { margin-top: 24px; padding: 28px; background: var(--color-paper, #e3ede3); color: var(--color-ink, #17212b); border: 2px solid var(--color-ink, #17212b); } .ds-hold-label { margin: 0 0 20px; font-size: 0.8125rem; font-weight: 600; color: var(--color-form, #24543f); } .ds-stop { padding: 14px 20px; border: 2px solid var(--color-ink, #17212b); font-size: 1.125rem; } .ds-stop-key, .ds-stop-tech { font-family: 'Overpass Mono Variable', ui-monospace, monospace; font-size: 0.75rem; font-weight: 500; color: var(--color-form, #24543f); } .ds-stop-tech { margin: 8px 0 0; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Bill of Lading",
+    "overview": "The site is an original ocean bill of lading issued for one developer. The ground is pale green security-tinted form paper; every rule, label and field number is printed in a single deep green ink, and every fact is typed over it in carbon. Claims live in numbered fields, never in free-floating copy. Where the document needs to carry weight, it hands off to cargo: each case study is a full-bleed band of painted container steel, cobalt or oxide red, with its ISO 6346 mark stencilled in off-white.\n\nDensity is that of a working form: tight hairline grids of boxes, small semibold labels, heavy data. Decoration is limited to what a real shipping document or container carries: a generated guilloche rosette as the security print, rubber stamps that certify a status and a date, a check-digit box on every mark. One signal yellow marks what is live right now, and nothing else competes with it.\n\nThe world rejects the developer-portfolio template (sticky sidebar, project card grids) and its minimal-editorial opposite, and it rejects cream paper. There are no rounded corners and no soft shadows anywhere on the public surfaces.",
+    "keyCharacteristics": [
+      "One green ink for structure, carbon for data, signal yellow for live facts only.",
+      "Numbered dt/dd fields on a 12-column form grid, separated by 1px hairlines and framed by 2px rules.",
+      "Full-bleed steel container bands carrying stencilled ISO 6346 marks.",
+      "A condensed stencil face for marks, the name and printed band titles; a highway-signage grotesk for everything read; its mono for codes and dates.",
+      "One authored motion: container door leaves swinging open on arrival."
+    ],
+    "rules": [
+      {
+        "name": "The One Ink Rule",
+        "body": "Every printed element of the form (rules, labels, numbers, band grounds) is Form Green. Data is Carbon. A third text color on paper is a defect.",
+        "section": "colors"
+      },
+      {
+        "name": "The Live Fact Rule",
+        "body": "Signal Yellow marks only what is current: an open port of discharge, the current carrier, the current employer's period, plus selection and focus. A static fact on yellow is a lie about the document.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Paints Rule",
+        "body": "Cobalt and oxide appear only as container steel (a bay ground or the small swatch beside its mark). They are never text accents, buttons or borders on paper.",
+        "section": "colors"
+      },
+      {
+        "name": "The Stencil Is Paint Rule",
+        "body": "The stencil face is for what would be painted or printed large: container marks, the name, band titles, and the word of a rubber stamp. Never for headings, buttons or reading.",
+        "section": "typography"
+      },
+      {
+        "name": "The Mono Is A Code Rule",
+        "body": "Overpass Mono carries only codes, dates, numbers and tech lists. A sentence in mono is a defect.",
+        "section": "typography"
+      },
+      {
+        "name": "The Printed Depth Rule",
+        "body": "No box-shadows on paper. Separation comes from a 2px rule, a 1px hairline, or the paper-deep tone. The one box-shadow in the system is the 2px light ring on a door leaf's locking rod.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Two Rules Rule",
+        "body": "Two weights only: 2px for frames and section rules, 1px for the hairlines between fields, drawn as a 1px grid gap over the form-green ground rather than as borders. In-field row dividers inside tables may use form green at 25 to 40%.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do put every claim in a numbered field: a form-green label with its two-digit mono number over carbon data.",
+      "Do draw grids of fields as a 1px gap over the form-green ground inside a 2px form frame.",
+      "Do reserve signal yellow for live facts (the open port, the current carrier, the current employer's period) and for selection and focus.",
+      "Do carry case studies as full-bleed cobalt or oxide bands with a stencilled ISO 6346 mark and a code-drawn route.",
+      "Do keep every tap target at least 44px tall on mobile.",
+      "Do focus with a 3px carbon outline at a 3px offset, switching to signal yellow inside steel bands.",
+      "Do keep smooth scrolling and the door swing behind `prefers-reduced-motion: no-preference`."
+    ],
+    "donts": [
+      "Don't round a corner or cast a shadow on paper.",
+      "Don't use a stamp without a status and a date.",
+      "Don't set headings, buttons or reading text in the stencil face, or sentences in mono.",
+      "Don't use cobalt or oxide as accent colors on paper.",
+      "Don't lay work out as a card grid or add a sticky sidebar.",
+      "Don't add a field without a real fact in it.",
+      "Don't let anything animated cover content at rest."
+    ]
+  }
+}
