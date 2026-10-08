@@ -11,7 +11,8 @@ const { n, id, title, note } = Astro.props;
 
 <div class="flex flex-wrap items-end justify-between gap-x-10 gap-y-3 border-b-2 border-form pb-4">
   <h2 id={id} class="flex items-baseline gap-3 text-[clamp(2rem,4vw,3.25rem)] font-extrabold leading-none tracking-[-0.02em] text-ink">
-    <span class="font-data text-sm font-medium tracking-normal text-form">{n}</span>
+    {/* The form's section number is for the eye; a screen reader hears the plain heading */}
+    <span class="font-data text-sm font-medium tracking-normal text-form" aria-hidden="true">{n}</span>
     {title}
   </h2>
   {note && <p class="max-w-[44ch] text-[0.9375rem] leading-snug text-form">{note}</p>}

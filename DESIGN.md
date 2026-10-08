@@ -223,7 +223,7 @@ A single-ink form palette (paper, green ink, carbon) with two container-steel pa
 - **Contact address** (Overpass, 800, clamp 1.75rem to 3.5rem, line-height 1.05, -0.02em): the email in the closing Notify party, the page's primary action. The one reading-face size above the headline ceiling, and used nowhere else.
 - **Mark** (stencil, 800, uppercase, 0.04em tracking, line-height 1): ISO 6346 container marks in two named sizes: medium in a bay header, after the title, client and period and keyed below by "Serial is the start month" in the label role (small on phones, so the title stays the largest thing in the head); small at the foot of each Marks and numbers card, beside its swatch and above the period, and in the manifest. No other mark sizes. A mark never leads: the project title does. The check digit sits in a box bordered at 0.07em.
 - **Band title** (stencil, 800, 1.375rem, 0.08em tracking, uppercase): printed band titles ("Bill of lading", "Notices") reversed out of the form band, and the name in the strip.
-- **Headline** (Overpass, 800, clamp 2rem to 3.25rem, line-height 1, -0.02em): section heads, preceded by their mono section number in form green. Blog and post titles use the same weight and tracking up to 4rem.
+- **Headline** (Overpass, 800, clamp 2rem to 3.25rem, line-height 1, -0.02em): section heads, preceded by their mono section number in form green. Blog and post titles use the same weight and tracking up to 4rem. Section heads use the words a recruiter expects and the strip names (Case studies, All projects, Employers, Contact); the mono number before them is hidden from screen readers.
 - **Title** (Overpass, 800, clamp 1.875rem to 2.5rem, line-height 1.1, balanced): a container's project title; it leads its bay. In a Marks and numbers card the same role runs at 1.25rem.
 - **Field value** (Overpass, 800, 1.625rem): the typed answer in a primary field; 1.25rem and 1.125rem for denser fields and list entries.
 - **Secondary** (Overpass, 400 or 600, 0.9375rem, line-height 1.375): supporting lines under a field value, section notes, route stop descriptions and leg labels, return flows, credential details, employer roles, the manifest's platform column.
@@ -235,6 +235,8 @@ A single-ink form palette (paper, green ink, carbon) with two container-steel pa
 **The Stencil Is Paint Rule.** The stencil face is for what would be painted or printed large: container marks, the name, band titles, and the word of a rubber stamp. Never for headings, buttons or reading.
 
 **The Mono Is A Code Rule.** Overpass Mono carries only codes, dates, numbers and tech lists. A sentence in mono is a defect.
+
+**The Plain Heading Rule.** The shipping vocabulary lives in field labels, band titles, stamps and section notes ("Four projects, carried as containers"), never in a section heading. A heading says what the section holds in the reader's own words, so a skim never has to translate it.
 
 ## Layout
 
