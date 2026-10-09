@@ -1,5 +1,8 @@
 ---
 // The thin printed strip above the document: who it belongs to, and the way around it.
+import DarkSwitch from './DarkSwitch.astro';
+import { menuRow, stripChip as chip, stripLink as linkClass } from '../../lib/strip-ui';
+
 interface Props {
   /** On the homepage section links stay in-page; elsewhere they lead back to it */
   onHome?: boolean;
@@ -27,11 +30,6 @@ const index = [
   { n: 14, href: `${base}#contact`, label: 'Contact' },
   { href: '/blog', label: 'Blog' },
 ];
-
-const linkClass =
-  'inline-block px-2 py-[15px] text-sm font-semibold leading-none text-form underline-offset-4 transition-colors duration-150 hover:text-ink hover:underline md:px-2.5';
-// A framed chip that fills with the ink when on: an open menu, a pressed Dark switch
-const chip = 'border-2 border-form px-2 py-[5px] text-sm font-semibold leading-none text-form transition-colors duration-150';
 ---
 
 <a
@@ -53,16 +51,7 @@ const chip = 'border-2 border-form px-2 py-[5px] text-sm font-semibold leading-n
           </li>
         ))}
         {/* The Dark switch needs its script, so it shows once that runs; a phone finds it in the menu */}
-        <li class="hidden md:block" hidden data-theme-switch-item>
-          <button
-            type="button"
-            aria-pressed="false"
-            data-theme-switch
-            class="group flex min-h-11 cursor-pointer items-center pl-2.5 focus-visible:outline-offset-[-3px]"
-          >
-            <span class={`${chip} group-aria-pressed:bg-form group-aria-pressed:text-paper`}>Dark<span class="sr-only"> mode</span></span>
-          </button>
-        </li>
+        <DarkSwitch variant="chip" class="hidden md:block" />
         <li class="md:hidden">
           <a href={`${base}#contact`} class={linkClass}>Contact</a>
         </li>
@@ -79,7 +68,7 @@ const chip = 'border-2 border-form px-2 py-[5px] text-sm font-semibold leading-n
                   <li>
                     <a
                       href={item.href}
-                      class="-mx-4 flex min-h-12 items-baseline gap-3 px-4 py-3.5 text-[1.125rem] font-extrabold leading-tight text-ink transition-colors duration-150 hover:bg-paper-deep focus-visible:outline-offset-[-3px] sm:-mx-8 sm:px-8"
+                      class={menuRow}
                     >
                       <span aria-hidden="true" class="w-6 shrink-0 font-mono text-xs font-medium text-form tabular-nums">
                         {item.n}
@@ -88,20 +77,7 @@ const chip = 'border-2 border-form px-2 py-[5px] text-sm font-semibold leading-n
                     </a>
                   </li>
                 ))}
-                <li hidden data-theme-switch-item>
-                  <button
-                    type="button"
-                    aria-pressed="false"
-                    data-theme-switch
-                    class="group -mx-4 flex min-h-12 w-[calc(100%+2rem)] cursor-pointer items-center gap-3 px-4 py-3 text-left text-[1.125rem] font-extrabold leading-tight text-ink transition-colors duration-150 hover:bg-paper-deep focus-visible:outline-offset-[-3px] sm:-mx-8 sm:w-[calc(100%+4rem)] sm:px-8"
-                  >
-                    <span aria-hidden="true" class="w-6 shrink-0"></span>
-                    Dark mode
-                    <span aria-hidden="true" class={`ml-auto ${chip} group-aria-pressed:bg-form group-aria-pressed:text-paper`}>
-                      <span class="group-aria-pressed:hidden">Off</span><span class="hidden group-aria-pressed:inline">On</span>
-                    </span>
-                  </button>
-                </li>
+                <DarkSwitch variant="row" />
               </ul>
             </div>
           </details>
@@ -112,59 +88,9 @@ const chip = 'border-2 border-form px-2 py-[5px] text-sm font-semibold leading-n
 </header>
 
 <script>
-  import { choiceAfterSwitch, isTheme, themeKey, type Theme } from '../../lib/theme';
+  import { wireStripMenus } from '../../lib/strip-menu';
+  import { wireThemeSwitches } from '../../lib/theme-switch';
 
-  // The phone menu is a <details>, so it opens and closes without script; this shuts it once a
-  // link is chosen, on Escape, and on a tap anywhere else, as a menu is expected to.
-  document.querySelectorAll<HTMLDetailsElement>('details[data-strip-menu]').forEach((menu) => {
-    const summary = menu.querySelector('summary');
-    menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => (menu.open = false)));
-    document.addEventListener('keydown', (event) => {
-      if (event.key !== 'Escape' || !menu.open) return;
-      menu.open = false;
-      summary?.focus();
-    });
-    document.addEventListener('click', (event) => {
-      if (menu.open && !menu.contains(event.target as Node)) menu.open = false;
-    });
-  });
-
-  // The Dark switch. The page follows the device's setting until a visitor flips it, and flipping
-  // back to the device's own look forgets the choice. Layout.astro applies a stored choice before
-  // the first paint; global.css holds the night print itself.
-  const root = document.documentElement;
-  const darkDevice = matchMedia('(prefers-color-scheme: dark)');
-  const device = (): Theme => (darkDevice.matches ? 'dark' : 'light');
-  const shown = (): Theme => {
-    const chosen = root.dataset.theme;
-    return isTheme(chosen) ? chosen : device();
-  };
-  const switches = document.querySelectorAll<HTMLButtonElement>('[data-theme-switch]');
-  const sync = () => switches.forEach((button) => button.setAttribute('aria-pressed', String(shown() === 'dark')));
-  const show = (choice: Theme | null) => {
-    root.classList.add('is-reprinting');
-    if (choice) root.dataset.theme = choice;
-    else delete root.dataset.theme;
-    sync();
-    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('is-reprinting')));
-  };
-
-  switches.forEach((button) =>
-    button.addEventListener('click', () => {
-      const choice = choiceAfterSwitch(shown(), device());
-      // Private windows can refuse storage; the choice then lasts for this page only
-      try {
-        if (choice) localStorage.setItem(themeKey, choice);
-        else localStorage.removeItem(themeKey);
-      } catch {}
-      show(choice);
-    })
-  );
-  darkDevice.addEventListener('change', sync);
-  // A choice made in another tab
-  addEventListener('storage', (event) => {
-    if (event.key === themeKey) show(isTheme(event.newValue) ? event.newValue : null);
-  });
-  sync();
-  document.querySelectorAll<HTMLElement>('[data-theme-switch-item]').forEach((item) => (item.hidden = false));
+  wireStripMenus();
+  wireThemeSwitches();
 </script>

@@ -1,118 +1,127 @@
 ---
-import '../styles/global.css';
-import '../styles/admin.css';
+// The admin workspace: the site's own page and strip, carrying the admin's places instead of the
+// site's sections. Every admin page is private (noindex) and leaves page views out of analytics.
+import Layout from './Layout.astro';
+import DarkSwitch from '../components/lading/DarkSwitch.astro';
+import { menuRow, stripChip, stripLink } from '../lib/strip-ui';
 
 interface Props {
-  title?: string;
+  title: string;
 }
 
-const { title = 'Admin Panel' } = Astro.props;
-const currentPath = Astro.url.pathname;
+const { title } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, '');
 
-const isActive = (path: string) => {
-  if (path === '/admin') return currentPath === '/admin';
-  if (path === '/admin/posts/new') return currentPath.startsWith('/admin/posts/new');
-  if (path === '/admin/posts') return currentPath.startsWith('/admin/posts') && !currentPath.startsWith('/admin/posts/new');
-  return false;
-};
-
-const navItems = [
-  { href: '/admin', label: 'Dashboard', icon: 'home' },
-  { href: '/admin/posts', label: 'Blog Posts', icon: 'document' },
-  { href: '/admin/posts/new', label: 'New Post', icon: 'plus' }
+const places = [
+  { href: '/admin', label: 'Dashboard', current: path === '/admin' },
+  { href: '/admin/posts', label: 'Posts', current: path === '/admin/posts' || path.startsWith('/admin/posts/edit') },
+  { href: '/admin/posts/new', label: 'New post', current: path === '/admin/posts/new' },
 ];
+
+// The current place is underlined, as a tab is
+const current = 'aria-[current=page]:text-ink aria-[current=page]:underline aria-[current=page]:decoration-2';
+const menuButton =
+  '-mx-4 flex min-h-12 w-[calc(100%+2rem)] cursor-pointer items-baseline gap-3 px-4 py-3.5 text-left text-[1.125rem] font-extrabold leading-tight text-ink transition-colors duration-150 hover:bg-paper-deep focus-visible:outline-offset-[-3px] sm:-mx-8 sm:w-[calc(100%+4rem)] sm:px-8';
 ---
 
-<!doctype html>
-<html lang="en" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-    <meta name="generator" content={Astro.generator} />
-    <title>{title} - Chaidir Ali Assegaf</title>
-  </head>
-  <body class="admin-shell">
-    <div class="admin-frame">
-      <aside class="admin-sidebar">
-        <a href="/admin" class="admin-brand">
-          <span class="admin-brand-mark">CA</span>
-          <span class="admin-brand-copy">
-            <strong>Content Studio</strong>
-            <span>Portfolio admin</span>
-          </span>
-        </a>
-
-        <nav class="admin-nav" aria-label="Admin navigation">
-          <div class="admin-nav-label">Workspace</div>
-          {navItems.map(item => (
-            <a href={item.href} class={`admin-nav-link ${isActive(item.href) ? 'is-active' : ''}`}>
-              {item.icon === 'home' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/></svg>}
-              {item.icon === 'document' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l3 3v15H6z"/><path d="M9 11h6M9 15h6"/></svg>}
-              {item.icon === 'plus' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>}
-              <span>{item.label}</span>
-            </a>
+<Layout title={`${title}: Admin`} noindex analytics={false}>
+  <a
+    href="#main"
+    class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-2 focus:z-50 focus:signal-stock focus:px-4 focus:py-2.5 focus:font-semibold"
+  >
+    Skip to content
+  </a>
+  <header class="sticky top-0 z-40 border-b-2 border-form bg-paper">
+    <div class="mx-auto flex max-w-[85rem] items-center justify-between gap-3 px-4 sm:px-8 md:gap-6">
+      <a href="/admin" class="inline-flex min-h-11 shrink-0 items-center">
+        <span class="flex items-baseline gap-2.5">
+          <span class="font-stencil text-base font-extrabold uppercase leading-none tracking-[0.05em] text-ink min-[380px]:text-[1.125rem] lg:text-[1.375rem]">
+            Chaidir Ali Assegaf
+          </span>{' '}
+          <span class="text-sm font-semibold leading-none text-form">Admin</span>
+        </span>
+      </a>
+      <nav aria-label="Admin">
+        <ul class="flex items-center">
+          {places.map((place) => (
+            <li class="hidden lg:block">
+              <a href={place.href} aria-current={place.current ? 'page' : undefined} class={`${stripLink} ${current}`}>
+                {place.label}
+              </a>
+            </li>
           ))}
-        </nav>
-
-        <div class="admin-sidebar-footer">
-          <a href="/" target="_blank" rel="noopener noreferrer" class="admin-sidebar-action">
-            <span>View live site</span><span>↗</span>
-          </a>
-          <button class="admin-sidebar-action js-logout">
-            <span>Sign out</span><span>→</span>
-          </button>
-        </div>
-      </aside>
-
-      <div class="admin-workspace">
-        <header class="admin-mobile-header">
-          <span class="admin-mobile-brand">Content Studio</span>
-          <span class="admin-mobile-actions">
-            <a href="/" target="_blank" rel="noopener noreferrer">View site ↗</a>
-            <button class="admin-mobile-logout js-logout">Sign out</button>
-          </span>
-        </header>
-
-        <main class="admin-main">
-          <slot />
-        </main>
-
-        <nav class="admin-mobile-nav" aria-label="Mobile admin navigation">
-          {navItems.map(item => (
-            <a href={item.href} class={`admin-nav-link ${isActive(item.href) ? 'is-active' : ''}`}>
-              {item.icon === 'home' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/></svg>}
-              {item.icon === 'document' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l3 3v15H6z"/><path d="M9 11h6M9 15h6"/></svg>}
-              {item.icon === 'plus' && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>}
-              <span>{item.label}</span>
+          <li class="hidden lg:block lg:border-l lg:border-form/35 lg:pl-2.5">
+            <a href="/" target="_blank" rel="noopener noreferrer" class={stripLink}>
+              View site<span class="sr-only"> (opens in a new tab)</span>
             </a>
-          ))}
-        </nav>
-      </div>
+          </li>
+          <li class="hidden lg:block">
+            <button type="button" data-sign-out class={`${stripLink} cursor-pointer`}>Sign out</button>
+          </li>
+          <DarkSwitch variant="chip" class="hidden lg:block" />
+          <li class="lg:hidden">
+            <details class="group" data-strip-menu>
+              <summary class="flex min-h-11 cursor-pointer list-none items-center px-1.5 focus-visible:outline-offset-[-3px] [&::-webkit-details-marker]:hidden">
+                <span class={`${stripChip} group-open:bg-form group-open:text-paper`}>Menu</span>
+              </summary>
+              <div class="absolute inset-x-0 top-[calc(100%+2px)] max-h-[calc(100dvh-3rem)] overflow-y-auto border-b-2 border-form bg-paper">
+                <ul class="mx-auto max-w-[85rem] divide-y divide-form/30 px-4 sm:px-8">
+                  {places.map((place) => (
+                    <li>
+                      <a href={place.href} aria-current={place.current ? 'page' : undefined} class={`${menuRow} ${current} underline-offset-[6px]`}>
+                        {place.label}
+                      </a>
+                    </li>
+                  ))}
+                  <li>
+                    <a href="/" target="_blank" rel="noopener noreferrer" class={menuRow}>
+                      View site<span class="sr-only"> (opens in a new tab)</span>
+                    </a>
+                  </li>
+                  <li>
+                    <button type="button" data-sign-out class={menuButton}>Sign out</button>
+                  </li>
+                  <DarkSwitch variant="row" numbered={false} />
+                </ul>
+              </div>
+            </details>
+          </li>
+        </ul>
+      </nav>
     </div>
+  </header>
 
-    <script>
-      import { auth } from '../lib/firebase';
-      import { signOut, onAuthStateChanged } from 'firebase/auth';
-      import { isAdmin } from '../lib/admin';
+  <main id="main" class="mx-auto max-w-[85rem] px-4 pb-24 pt-8 sm:px-8 lg:pt-10">
+    <slot />
+  </main>
+</Layout>
 
-      onAuthStateChanged(auth, async user => {
-        if (!(await isAdmin(user)) && !window.location.pathname.includes('/admin/login')) {
-          await signOut(auth);
-          window.location.replace('/admin/login');
-        }
-      });
+<script>
+  import { onAuthStateChanged, signOut } from 'firebase/auth';
+  import { auth } from '../lib/firebase';
+  import { isAdmin } from '../lib/admin';
+  import { wireStripMenus } from '../lib/strip-menu';
+  import { wireThemeSwitches } from '../lib/theme-switch';
 
-      document.querySelectorAll('.js-logout').forEach(button => {
-        button.addEventListener('click', async () => {
-          try {
-            await signOut(auth);
-            window.location.href = '/admin/login';
-          } catch (error) {
-            console.error('Logout failed:', error);
-          }
-        });
-      });
-    </script>
-  </body>
-</html>
+  wireStripMenus();
+  wireThemeSwitches();
+
+  // Only an administrator stays; anyone else is signed out and sent to the sign-in page
+  onAuthStateChanged(auth, async (user) => {
+    if (!(await isAdmin(user))) {
+      await signOut(auth);
+      window.location.replace('/admin/login');
+    }
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-sign-out]').forEach((button) =>
+    button.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        window.location.href = '/admin/login';
+      } catch (error) {
+        console.error('Sign-out failed:', error);
+      }
+    })
+  );
+</script>

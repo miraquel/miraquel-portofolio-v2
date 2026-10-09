@@ -1,0 +1,99 @@
+---
+// A post's form, for writing a new post and editing one: the writing on the left, publishing at the
+// right (below the writing on a phone). The page's script reads and saves it (src/lib/post-editor.ts).
+import Stamp from '../lading/Stamp.astro';
+import type { Status } from '../../lib/blog';
+import { fieldHint, fieldInput, fieldLabel, notice, primaryButton, secondaryButton } from '../../lib/admin-ui';
+
+interface Props {
+  statuses: Status[];
+  /** The post being edited; a new post has none */
+  postId?: string;
+  submitLabel: string;
+}
+
+const { statuses, postId, submitLabel } = Astro.props;
+const optional = '<span class="font-normal"> (optional)</span>';
+---
+
+<form id="postForm" class="mt-8 grid items-start gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_20rem]" hidden={Boolean(postId)}>
+  {postId && <input type="hidden" id="postId" value={postId} />}
+
+  <div class="min-w-0 space-y-6">
+    <div>
+      <label for="title" class={fieldLabel}>Title</label>
+      <input type="text" id="title" required class={`${fieldInput} text-[1.25rem] font-bold`} />
+    </div>
+    <div>
+      <label for="slug" class={fieldLabel}>Slug</label>
+      <input type="text" id="slug" required spellcheck="false" aria-describedby="slug-hint" class={`${fieldInput} font-data text-[0.9375rem]`} />
+      <span id="slug-hint" class={fieldHint}>
+        The post's address, /blog/<em class="not-italic font-semibold">slug</em>.{!postId && ' It follows the title until you change it.'}
+      </span>
+    </div>
+    <div>
+      <label for="excerpt" class={fieldLabel}>Excerpt</label>
+      <textarea id="excerpt" required rows="3" aria-describedby="excerpt-hint" class={`${fieldInput} leading-relaxed`}></textarea>
+      <span id="excerpt-hint" class={fieldHint}>Shown under the title, in the blog's list and on the post, and in link previews.</span>
+    </div>
+    <div class="admin-editor">
+      <span id="content-label" class={fieldLabel}>Content</span>
+      <div class="mt-2">
+        <div id="editor"></div>
+      </div>
+      <input type="hidden" id="content" />
+    </div>
+  </div>
+
+  <aside aria-labelledby="publishing-title" class="lg:sticky lg:top-[4.5rem] short-desktop:static">
+    <div data-band class="border-2 border-b-0 border-form bg-form px-4 py-2.5 text-paper">
+      <h2 id="publishing-title" class="text-[0.8125rem] font-semibold leading-tight">Publishing</h2>
+    </div>
+    <div class="space-y-5 border-2 border-form bg-paper px-4 py-5">
+      {/* The chosen status and date, stamped as the site stamps a delivery; the fields below say it in words */}
+      <div id="statusStamp" aria-hidden="true" class="flex justify-end pr-1 pt-1">
+        <Stamp word="Status" date="Date" />
+      </div>
+
+      <div>
+        <label for="status" class={fieldLabel}>Status</label>
+        <select id="status" required class={fieldInput}>
+          {statuses.map((status) => (
+            <option value={status.name} selected={!postId && status.name === 'published'} data-status-id={status.id}>
+              {status.displayName}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label for="publishedAt" class={fieldLabel}>Published</label>
+        <input type="datetime-local" id="publishedAt" required class={fieldInput} />
+      </div>
+      <div>
+        <label for="author" class={fieldLabel}>Author</label>
+        <input type="text" id="author" required value={postId ? undefined : 'Chaidir Ali Assegaf'} class={fieldInput} />
+      </div>
+      <div>
+        <label for="tags" class={fieldLabel}>Tags<Fragment set:html={optional} /></label>
+        <input type="text" id="tags" aria-describedby="tags-hint" class={fieldInput} />
+        <span id="tags-hint" class={fieldHint}>Separate tags with commas.</span>
+      </div>
+      <div>
+        <label for="readingTime" class={fieldLabel}>Reading time in minutes<Fragment set:html={optional} /></label>
+        <input type="number" id="readingTime" min="1" inputmode="numeric" class={`${fieldInput} tabular-nums`} />
+      </div>
+      <div>
+        <label for="imageUrl" class={fieldLabel}>Image address<Fragment set:html={optional} /></label>
+        <input type="url" id="imageUrl" aria-describedby="image-hint" class={fieldInput} />
+        <span id="image-hint" class={fieldHint}>A wide picture shown above the post's text.</span>
+      </div>
+
+      <p id="errorMessage" role="alert" class={notice} hidden></p>
+
+      <div class="flex flex-wrap gap-3 pt-1">
+        <button type="submit" id="submitButton" class={primaryButton}>{submitLabel}</button>
+        <a href="/admin/posts" class={secondaryButton}>Cancel</a>
+      </div>
+    </div>
+  </aside>
+</form>
