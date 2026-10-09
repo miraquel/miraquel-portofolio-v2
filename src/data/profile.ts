@@ -10,9 +10,7 @@ export const profile = {
   /** The Consignee value: the roles this is addressed to, stated plainly */
   roles: 'Dynamics 365 F&O, AX or .NET backend roles',
   based: 'Indonesia',
-  /** The meta description's wording */
-  relocation: 'Relocating with employer visa sponsorship',
-  /** Port of discharge, in words a recruiter reads without decoding the label */
+  /** Port of discharge, in words a recruiter reads without decoding the label; also the meta description's last sentence */
   discharge: { value: 'Open to relocating abroad', detail: 'With employer visa sponsorship' },
   email: 'ading.assegaf@gmail.com',
   linkedin: 'https://www.linkedin.com/in/chaidirassegaf/',

@@ -1,7 +1,9 @@
 """Render the 1200x630 social preview cards.
 
     python scripts/og-card/render.py
-        card.html -> public/og.png, the site card.
+        card.html -> public/og.png, the site card. It prints the card's version; set it in
+        src/layouts/Layout.astro (path: '/og.png?v=...') so link previews fetch the new card,
+        since LinkedIn and others cache an image by its URL.
 
     python scripts/og-card/render.py post --slug <slug> --title "..." --date 2026-10-08 --tags "X++, AIF"
         post-card.html -> public/blog/<slug>/og.png, one post's card. Then set the post's
@@ -12,6 +14,7 @@ and npm dependencies installed, since the cards load the self-hosted fonts from 
 Run from the project root.
 """
 import argparse
+import hashlib
 import re
 from pathlib import Path
 
@@ -51,7 +54,10 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.kind != "post":
-        render(cards / "card.html", root / "public" / "og.png")
+        out = root / "public" / "og.png"
+        render(cards / "card.html", out)
+        version = hashlib.sha256(out.read_bytes()).hexdigest()[:8]
+        print(f"Set the site card path in src/layouts/Layout.astro to /og.png?v={version}")
         return
 
     if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", args.slug):
