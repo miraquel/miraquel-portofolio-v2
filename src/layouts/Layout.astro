@@ -31,7 +31,7 @@ const {
 	type = 'website',
 	image = {
 		path: '/og.png',
-		alt: `Bill of lading for ${profile.name}, ${profile.title}: port of loading ${profile.based}, port of discharge open. Four container marks list the case studies.`,
+		alt: `Bill of lading for ${profile.name}, ${profile.title}: port of loading ${profile.based}; port of discharge, ${profile.discharge.value.toLowerCase()} ${profile.discharge.detail.toLowerCase()}. Four container marks list the case studies.`,
 	},
 	publishedTime,
 	author = profile.name,
