@@ -186,6 +186,7 @@ The world rejects the developer-portfolio template (sticky sidebar, project card
 - Full-bleed steel container bands carrying stencilled ISO 6346 marks.
 - A condensed stencil face for marks, the name and printed band titles; a highway-signage grotesk for everything read; its mono for codes and dates.
 - One authored motion: container door leaves swinging open on arrival.
+- A night print of the same form for dark devices and for the strip's Dark switch.
 
 ## Colors
 
@@ -199,8 +200,8 @@ A single-ink form palette (paper, green ink, carbon) with two container-steel pa
 - **Oxide Red** (oxide) and **Oxide Door Steel** (oxide-deep): the second steel paint, used exactly like cobalt. Bays alternate between the two by data, not by decoration.
 
 ### Tertiary
-- **Signal Yellow** (signal): reserved for live facts. Port of discharge and Current carrier print on it as whole fields, and the current employer's period sits on a yellow slip. It also serves as the interaction mark: text selection, the focus outline on dark grounds (steel bands and form-green bands), and the focused skip link.
-- **Stamp Red** (stamp): rubber-stamp ink only, used at full strength with multiply blending and the stamp-ink displacement filter.
+- **Signal Yellow** (signal): reserved for live facts. Port of discharge and Current carrier print on it as whole fields, and the current employer's period sits on a yellow slip. It also serves as the interaction mark: text selection, the focus outline on steel and, by day, on form-green bands, and the focused skip link. Whatever prints on it keeps the day inks in either look (the `signal-stock` utility).
+- **Stamp Red** (stamp): rubber-stamp ink only, used at full strength with the stamp-ink displacement filter, multiply-blended into light paper by day.
 
 ### Neutral
 - **Security Paper** (paper): the page ground and the ground of every field.
@@ -215,6 +216,17 @@ A single-ink form palette (paper, green ink, carbon) with two container-steel pa
 **The Live Fact Rule.** Signal Yellow marks only what is current: an open port of discharge, the current carrier, the current employer's period, plus selection and focus. A static fact on yellow is a lie about the document.
 
 **The Two Paints Rule.** Cobalt and oxide appear only as container steel (a bay ground or the small swatch beside its mark). They are never text accents, buttons or borders on paper.
+
+**The Same Stock Rule.** Signal yellow is the same stock by day and by night, so a live field, the current employer's slip, the focused skip link and a text selection always print carbon data and form-green labels on it.
+
+### Night Print
+The same form printed on green-black paper, for a device set to dark or a visitor who turns on the strip's Dark switch. Paper and ink swap their lightness and keep their roles, so a form-green band, the primary button and a table header, printed solid in the ink, turn light at night with dark paper text on them. The values live once in `src/styles/global.css` (a `prefers-color-scheme: dark` block and an identical `html[data-theme='dark']` block; `tests/night-print.test.ts` holds them equal and checks contrast).
+- **Night Paper** (paper): #0f1a15. **Night Deep Tint** (paper-deep): #1a2a22.
+- **Night Form Ink** (form): #86b89b, 7.9:1 on night paper (form green is 7.2:1 by day). **Night Faded Ink** (form-soft): #557d69.
+- **Night Carbon** (ink): #e3ede3, the day paper, 14.8:1.
+- **Night Stamp** (stamp): #ef7a6b, 6.5:1, set on top of the paper (no multiply, which would sink it into the dark).
+- Unchanged: cobalt, oxide and their door steel, stencil white, signal yellow. A route card on steel turns to night paper with a light frame.
+- A code block in a post sits on the deeper paper with carbon-night text instead of a carbon ground.
 
 ## Typography
 
@@ -293,7 +305,9 @@ There are no cards. Content sits in fields.
 No public inputs. "Field" means a form box, above.
 
 ### Navigation
-The strip: sticky, paper ground, 2px form bottom rule. The name in stencil at left; section links in Overpass 600 at 0.875rem, form green, turning carbon and underlined on hover. Below 768px only Contact and a Menu control fit beside the name (a fourth link would need about 84px; a phone leaves 27 to 64). Menu is a 2px form-framed word that inverts to form ground while open, and it opens the index: a paper panel under the strip, ruled 2px at its foot, listing every section in page order as 1.125rem carbon rows with their mono section numbers (10 to 14, hidden from screen readers), then Blog, at least 48px tall and parted by form hairlines at 30%. It is a `<details>`, so it works without script; script closes it when a row is chosen, on Escape (focus returns to Menu) and on a tap elsewhere. It opens without motion, and its focus rings sit inside their boxes so the scrolling panel never clips them. The strip's name steps down to 1rem, and 1.125rem from 380px, so the links fit without crowding the 16px gutters. Every link is 44px tall. A skip link appears on focus on signal yellow. In-page links scroll smoothly only once the page has loaded, so arriving on a /#section address lands exactly, 56px below the top.
+The strip: sticky, paper ground, 2px form bottom rule. The name in stencil at left; section links in Overpass 600 at 0.875rem, form green, turning carbon and underlined on hover. Below 768px only Contact and a Menu control fit beside the name (a fourth link would need about 84px; a phone leaves 27 to 64). Menu is a 2px form-framed word that inverts to form ground while open, and it opens the index: a paper panel under the strip, ruled 2px at its foot, listing every section in page order as 1.125rem carbon rows with their mono section numbers (10 to 14, hidden from screen readers), then Blog, at least 48px tall and parted by form hairlines at 30%. It is a `<details>`, so it works without script; script closes it when a row is chosen, on Escape (focus returns to Menu) and on a tap elsewhere. It opens without motion, and its focus rings sit inside their boxes so the scrolling panel never clips them. The strip's name steps down to 1rem, and 1.125rem from 380px, so the links fit without crowding the 16px gutters. Every link is 44px tall. A skip link appears on focus on signal yellow.
+
+The Dark switch: the page follows the device's light or dark setting until a visitor flips the switch, which overrides it and is remembered (localStorage `theme`, applied by a head script before the first paint). Flipping back to the device's own look forgets the choice, so the page follows the device again; a choice made in another tab applies too. From 768px it is the last item in the strip, a 2px form-framed "Dark" chip built like Menu, filling with the ink while pressed (`aria-pressed`, named "Dark mode"). On a phone there is no room beside Menu, so it is the last row of the index: "Dark mode" with an Off/On chip. Both need script, so both stay hidden without it; a dark device still gets the night print from CSS alone. Flipping reprints the page at once, with colour transitions held for that frame. In-page links scroll smoothly only once the page has loaded, so arriving on a /#section address lands exactly, 56px below the top.
 
 ### Container Bay (signature)
 A case study as a full-bleed band of steel: the title, client and period on the left, then the medium mark; on the right the hold, a paper card framed 2px in carbon carrying the Route; below the head, Cargo and Evidence as stencil-white labelled fields. The field is titled Evidence only when something in it can be opened (source, a write-up, a file to download); a bay holding only facts on file and cross-references titles it Record. Links to other sites open a new tab and say so to screen readers; links within the site and downloads stay in the tab. The route card carries the status: a "Delivered" stamp with its end month, pressed at its top right beside the Route label (spoken as "Status: Delivered Apr 2023"). The card is the paper the stamp needs, so a bay has no Status field or separate slip. Below 1024px a bay stacks head, then its fields (cargo first), then the route, so the one-sentence explanation leads and the diagram follows as the detail. Focus outlines inside a bay turn signal yellow.
@@ -309,7 +323,7 @@ A data-flow diagram drawn in code: lettered stops (A, B, C) as 2px carbon-framed
 An ISO 6346 mark (owner code, serial, boxed check digit). Standalone (bay header, manifest) it is an image named "Container CAAU 202204, check digit 0"; inside a link it is hidden, so the link is named by its project title first. Hovering or focusing a Marks and numbers card lights the Description of goods lines its route uses (`carries` in `src/data/work.ts`), and hovering a goods line lights the cards that prove it: AXFinMobile lights .NET, Dynamics AX 2012 and Mobile and data together, and Mobile and data lights three cards. Both ends sit in adjacent fields, so they share a screen once the cards are in view. A lit card or line takes paper-deep with a 2px form frame drawn inside the box (an outline at -2px, not a shadow); from 640px the goods table reaches 12px into the field padding, with its cells padded to match, so the frame clears the text while the text keeps its column. A line no container carries (Business Central) stays unlit, and touch is left out, where a tap would only flash. Each card also prints the manifest line that carries it ("Manifest line 06": the words in Overpass, the number in mono) as a plain cross-reference.
 
 ### Stamp
-A rubber stamp in stamp red: stencil word over a mono date, 3px double border, rotated -6deg, multiply-blended and roughened by the stamp-ink displacement filter. It carries a status and a date and nothing else (Delivered on a bay's route card, Expired on a lapsed certificate).
+A rubber stamp in stamp red: stencil word over a mono date, 3px double border, rotated -6deg, roughened by the stamp-ink displacement filter; multiply-blended into the paper by day and set on top of it at night (`--stamp-blend`). It carries a status and a date and nothing else (Delivered on a bay's route card, Expired on a lapsed certificate).
 
 ### Manifest
 A form-framed table with a form-green header row; container lines carry their small mark and a standing paper-deep tint, and link to their bay. A link that lands on a line (a bay's record cross-references one) stops 5rem below the top, clear of the strip, and tints that line paper-deep. Stacks per row below 64rem, since its six columns need about 820px.
@@ -322,7 +336,7 @@ A form-framed table with a form-green header row; container lines carry their sm
 - **Do** reserve signal yellow for live facts (the open port, the current carrier, the current employer's period) and for selection and focus.
 - **Do** carry case studies as full-bleed cobalt or oxide bands with a stencilled ISO 6346 mark and a code-drawn route.
 - **Do** keep every tap target at least 44px tall on mobile.
-- **Do** focus with a 3px carbon outline at a 3px offset, switching to signal yellow on dark grounds (steel bands and form-green bands, marked `data-dark`). These base styles apply only under `html[data-world='lading']`; the admin workspace keeps its own.
+- **Do** focus with a 3px carbon outline at a 3px offset (night carbon at night), switching to signal yellow on steel (marked `data-dark`). Inside a form-green band (marked `data-band`) it is signal yellow by day and night paper at night, since the band turns light. These base styles apply only under `html[data-world='lading']`; the admin workspace keeps its own.
 - **Do** keep smooth scrolling and the door swing behind `prefers-reduced-motion: no-preference`.
 
 ### Don't:

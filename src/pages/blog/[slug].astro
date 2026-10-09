@@ -42,7 +42,7 @@ const button = 'inline-flex min-h-11 items-center border-2 border-form bg-form p
 >
   <Strip />
   <main id="main" class="mx-auto max-w-[85rem] px-4 pb-24 pt-5 sm:px-8 lg:pt-7">
-    <div data-dark class="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-2 border-b-0 border-form bg-form px-4 py-2 text-paper sm:px-5">
+    <div data-band class="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-2 border-b-0 border-form bg-form px-4 py-2 text-paper sm:px-5">
       <a href="/blog" class="py-1 font-stencil text-[1.375rem] font-extrabold uppercase leading-none tracking-[0.08em] hover:underline">Notices</a>
       <a href="/blog" class="py-1 text-sm font-semibold underline decoration-paper/50 underline-offset-4 hover:decoration-paper">All posts</a>
     </div>
@@ -181,8 +181,9 @@ const button = 'inline-flex min-h-11 items-center border-2 border-form bg-form p
     margin: 2rem 0;
     padding: 1.25rem 1.5rem;
     overflow-x: auto;
-    background-color: var(--color-ink);
-    color: var(--color-paper);
+    /* Carbon by day, the deeper paper by night (global.css) */
+    background-color: var(--code-ground);
+    color: var(--code-text);
     font-size: 0.9375rem;
     line-height: 1.6;
   }
