@@ -42,7 +42,10 @@ test('edit page waits for authenticated admin state before reading a post', asyn
 test('clearing optional edit fields removes their stored Firestore values', async () => {
   const editPage = await readFile(new URL('../src/pages/admin/posts/edit/[id].astro', import.meta.url), 'utf8');
   assert.match(editPage, /imageUrl \|\| deleteField\(\)/);
-  assert.match(editPage, /readingTimeInput \? parseInt\(readingTimeInput\) : deleteField\(\)/);
+  assert.match(editPage, /readingTime \?\? deleteField\(\)/);
+  // The shared form reader gives an emptied reading time as null, which the edit page deletes
+  const editor = await readFile(new URL('../src/lib/post-editor.ts', import.meta.url), 'utf8');
+  assert.match(editor, /readingTime \? parseInt\(readingTime\) : null/);
 });
 
 test('sanitize-html and its whole dependency tree are bundled into the server build', async () => {

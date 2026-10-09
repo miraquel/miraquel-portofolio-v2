@@ -1,132 +1,213 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
+import AdminHead from '../../components/admin/AdminHead.astro';
+import { notice, pending, primaryButton, table, tableHead, textAction } from '../../lib/admin-ui';
+import '../../styles/admin.css';
 
 export const prerender = false;
 ---
 
-<AdminLayout title="Blog Posts">
-  <header class="admin-page-header">
-    <div>
-      <div class="admin-eyebrow">Content library</div>
-      <h1 class="admin-page-title">Blog posts</h1>
-      <p class="admin-page-description">Find, review, and manage everything you have written.</p>
-    </div>
-    <a href="/admin/posts/new" class="admin-primary-button">New post <span aria-hidden="true">＋</span></a>
-  </header>
+<AdminLayout title="Posts">
+  <AdminHead title="Posts" note="Every post, newest first. Open a title to edit it.">
+    <a href="/admin/posts/new" class={primaryButton}>New post</a>
+  </AdminHead>
 
-  <div id="postFilters" class="admin-filterbar hidden"></div>
-  <div id="loadingPosts" class="admin-page-description">Loading your library…</div>
-  <div id="postsError" class="hidden p-4 rounded-lg bg-red-500/10 text-red-400"></div>
-  <div id="posts" class="admin-post-list hidden"></div>
+  <div id="postFilters" class="mt-8 space-y-3" hidden>
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+      <h2 class="w-14 text-[0.8125rem] font-semibold text-form">Status</h2>
+      <ul id="statusFilters" class="flex flex-wrap gap-2"></ul>
+    </div>
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+      <h2 class="w-14 text-[0.8125rem] font-semibold text-form">Tag</h2>
+      <ul id="tagFilters" class="flex flex-wrap gap-2"></ul>
+    </div>
+  </div>
+
+  <p id="postsPending" role="status" class={`mt-8 ${pending}`}>Loading your posts…</p>
+  <p id="postsError" role="alert" class={`mt-8 ${notice}`} hidden></p>
+
+  <table id="postTable" role="table" class={`mt-8 ${table}`} aria-label="Posts" hidden>
+    <thead role="rowgroup" class={tableHead}>
+      <tr role="row">
+        <th role="columnheader" scope="col">Title</th>
+        <th role="columnheader" scope="col" class="w-36">Status</th>
+        <th role="columnheader" scope="col" class="w-48">Published</th>
+        <th role="columnheader" scope="col" class="w-[18%]">Tags</th>
+        <th role="columnheader" scope="col" class="w-40"><span class="sr-only">Actions</span></th>
+      </tr>
+    </thead>
+    <tbody role="rowgroup" id="postRows"></tbody>
+  </table>
+
+  <p id="postsEmpty" class="mt-8 text-[0.9375rem]" hidden></p>
+
+  <template id="clearFilters">
+    <a href="/admin/posts" class={textAction}>Clear filters</a>
+  </template>
 </AdminLayout>
 
 <script>
   import { onAuthStateChanged } from 'firebase/auth';
-  import { collection, getDocs } from 'firebase/firestore';
+  import { collection, getDocs, orderBy, query } from 'firebase/firestore';
   import { auth, db } from '../../lib/firebase';
   import { isAdmin } from '../../lib/admin';
   import { deletePost } from '../../lib/post-writes';
+  import { filterChip, tableRow, textAction } from '../../lib/admin-ui';
+  import { newestFirst, publishedOn, statusOf, type AdminPost } from '../../lib/admin-posts';
 
-  const loading = document.getElementById('loadingPosts')!;
-  const posts = document.getElementById('posts')!;
-  const filters = document.getElementById('postFilters')!;
+  const pendingLine = document.getElementById('postsPending')!;
   const errorBox = document.getElementById('postsError')!;
-  const searchParams = new URLSearchParams(window.location.search);
-  const selectedStatus = searchParams.get('status');
-  const selectedTag = searchParams.get('tag');
+  const filters = document.getElementById('postFilters')!;
+  const statusFilters = document.getElementById('statusFilters')!;
+  const tagFilters = document.getElementById('tagFilters')!;
+  const postTable = document.getElementById('postTable')!;
+  const postRows = document.getElementById('postRows')!;
+  const emptyLine = document.getElementById('postsEmpty')!;
+  const clearFilters = document.getElementById('clearFilters') as HTMLTemplateElement;
 
-  function textElement(tag: string, value: unknown, className: string): HTMLElement {
+  const params = new URLSearchParams(window.location.search);
+  const selectedStatus = params.get('status');
+  const selectedTag = params.get('tag');
+  // A status's display name ("Published") by its stored name ("published"), in the statuses' order
+  const statusNames = new Map<string, string>();
+  const statusLabel = (status: string) => statusNames.get(status) ?? status;
+
+  function showError(message: string) {
+    errorBox.textContent = message;
+    errorBox.hidden = false;
+  }
+
+  function filterItem(label: string, count: number, param: 'status' | 'tag', value: string | null, selected: boolean): HTMLLIElement {
+    const next = new URLSearchParams(window.location.search);
+    if (value) next.set(param, value);
+    else next.delete(param);
+    const link = document.createElement('a');
+    link.href = next.size ? `/admin/posts?${next}` : '/admin/posts';
+    link.className = filterChip(selected);
+    if (selected) link.setAttribute('aria-current', 'page');
+    const number = document.createElement('span');
+    number.className = 'font-data text-xs font-medium';
+    number.textContent = String(count);
+    link.append(label, number);
+    const item = document.createElement('li');
+    item.append(link);
+    return item;
+  }
+
+  function cell(...children: (Node | string)[]): HTMLTableCellElement {
+    const td = document.createElement('td');
+    td.setAttribute('role', 'cell');
+    td.append(...children);
+    return td;
+  }
+
+  function textElement(tag: string, text: string, className: string): HTMLElement {
     const element = document.createElement(tag);
     element.className = className;
-    element.textContent = String(value ?? '');
+    element.textContent = text;
     return element;
   }
 
-  function filterLink(label: string, param: 'status' | 'tag', value: string | null, active: boolean): HTMLAnchorElement {
-    const link = document.createElement('a');
-    const params = new URLSearchParams(window.location.search);
-    value ? params.set(param, value) : params.delete(param);
-    link.href = params.size ? `/admin/posts?${params}` : '/admin/posts';
-    link.className = `admin-filter-chip ${active ? 'is-active' : ''}`;
-    link.textContent = label;
-    return link;
+  function showEmpty(message: string, withClear: boolean) {
+    emptyLine.replaceChildren(message, ' ');
+    if (withClear) emptyLine.append(clearFilters.content.cloneNode(true));
+    emptyLine.hidden = false;
+    postTable.hidden = true;
   }
 
-  onAuthStateChanged(auth, async user => {
+  function row(post: AdminPost): HTMLTableRowElement {
+    const tr = document.createElement('tr');
+    tr.setAttribute('role', 'row');
+    tr.className = tableRow;
+
+    const title = document.createElement('a');
+    title.href = `/admin/posts/edit/${encodeURIComponent(post.id)}`;
+    title.className =
+      'inline-block py-3 -my-3 font-bold leading-snug underline decoration-form/40 decoration-2 underline-offset-4 hover:decoration-form';
+    title.textContent = post.title;
+    const titleCell = cell(title);
+    if (post.excerpt) titleCell.append(textElement('p', post.excerpt, 'mt-1.5 max-w-[60ch] text-[0.9375rem] leading-snug text-ink/80'));
+
+    const view = document.createElement('a');
+    view.href = `/blog/${encodeURIComponent(post.slug)}`;
+    view.target = '_blank';
+    view.rel = 'noopener noreferrer';
+    view.className = textAction;
+    view.append('View', textElement('span', ' (opens in a new tab)', 'sr-only'));
+
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = textAction;
+    remove.append('Delete', textElement('span', ` ${post.title}`, 'sr-only'));
+    remove.addEventListener('click', async () => {
+      if (!confirm(`Delete "${post.title}"? This cannot be undone.`)) return;
+      errorBox.hidden = true;
+      remove.disabled = true;
+      try {
+        await deletePost(post.id, post.slug);
+        tr.remove();
+        if (!postRows.children.length) showEmpty('No posts left here.', Boolean(selectedStatus || selectedTag));
+      } catch (error) {
+        remove.disabled = false;
+        showError(`Couldn't delete "${post.title}": ${error instanceof Error ? error.message : 'unknown error'}.`);
+      }
+    });
+
+    const actions = document.createElement('div');
+    actions.className = 'flex gap-x-5';
+    actions.append(view, remove);
+
+    tr.append(
+      titleCell,
+      cell(statusLabel(statusOf(post))),
+      cell(textElement('span', publishedOn(post), 'font-data text-[0.8125rem]')),
+      cell(textElement('span', (post.tags ?? []).join(', '), 'font-data text-[0.8125rem] leading-relaxed')),
+      cell(actions)
+    );
+    return tr;
+  }
+
+  onAuthStateChanged(auth, async (user) => {
     if (!(await isAdmin(user))) return;
 
     try {
-      const snapshot = await getDocs(collection(db, 'posts'));
-      const allPostData = snapshot.docs
-        .map(post => ({ id: post.id, ...post.data() }))
-        .sort((a: any, b: any) => (b.publishedAt?.toMillis?.() || 0) - (a.publishedAt?.toMillis?.() || 0));
+      const [statusesSnapshot, snapshot] = await Promise.all([
+        getDocs(query(collection(db, 'statuses'), orderBy('order', 'asc'))),
+        getDocs(collection(db, 'posts')),
+      ]);
+      for (const status of statusesSnapshot.docs.map((doc) => doc.data())) statusNames.set(status.name, status.displayName);
+      const statusOrder = [...statusNames.keys()];
+      const all = snapshot.docs.map((post) => ({ id: post.id, ...post.data() }) as AdminPost).sort(newestFirst);
 
-      const statuses = [...new Set((allPostData as any[]).map(post => post.status || 'draft'))].sort();
-      const tags = [...new Set((allPostData as any[]).flatMap(post => post.tags || []))].sort();
-      const statusRow = document.createElement('div');
-      statusRow.className = 'admin-filter-row';
-      statusRow.append(filterLink('All statuses', 'status', null, !selectedStatus));
-      for (const status of statuses) statusRow.append(filterLink(status, 'status', status, selectedStatus === status));
-      const tagRow = document.createElement('div');
-      tagRow.className = 'admin-filter-row';
-      tagRow.append(filterLink('All tags', 'tag', null, !selectedTag));
-      for (const tag of tags) tagRow.append(filterLink(tag, 'tag', tag, selectedTag === tag));
-      filters.append(statusRow, tagRow);
-      filters.classList.remove('hidden');
-
-      const postData = (allPostData as any[]).filter(post =>
-        (!selectedStatus || (post.status || 'draft') === selectedStatus)
-        && (!selectedTag || (post.tags || []).includes(selectedTag))
-      );
-
-      for (const post of postData) {
-        const card = document.createElement('article');
-        card.className = 'admin-post-row';
-        const details = document.createElement('div');
-        details.append(
-          textElement('h2', post.title, 'admin-post-title'),
-          textElement('p', post.excerpt, 'admin-post-excerpt'),
-          textElement('span', post.status || 'draft', 'admin-post-status')
-        );
-
-        const actions = document.createElement('div');
-        actions.className = 'admin-post-actions';
-        const view = document.createElement('a');
-        view.href = `/blog/${encodeURIComponent(post.slug)}`;
-        view.target = '_blank';
-        view.rel = 'noopener noreferrer';
-        view.className = 'admin-action-button';
-        view.textContent = 'View';
-        const edit = document.createElement('a');
-        edit.href = `/admin/posts/edit/${encodeURIComponent(post.id)}`;
-        edit.className = 'admin-action-button';
-        edit.textContent = 'Edit';
-        const remove = document.createElement('button');
-        remove.className = 'admin-action-button is-danger';
-        remove.textContent = 'Delete';
-        remove.addEventListener('click', async () => {
-          if (!confirm(`Delete "${post.title}"? This cannot be undone.`)) return;
-          try {
-            remove.setAttribute('disabled', 'true');
-            await deletePost(post.id, post.slug);
-            card.remove();
-          } catch (error) {
-            remove.removeAttribute('disabled');
-            alert(error instanceof Error ? error.message : 'Failed to delete post.');
-          }
-        });
-        actions.append(view, edit, remove);
-        card.append(details, actions);
-        posts.append(card);
+      const statusCounts = new Map<string, number>();
+      const tagCounts = new Map<string, number>();
+      for (const post of all) {
+        statusCounts.set(statusOf(post), (statusCounts.get(statusOf(post)) ?? 0) + 1);
+        for (const tag of post.tags ?? []) tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
       }
+      statusFilters.append(
+        filterItem('All', all.length, 'status', null, !selectedStatus),
+        ...[...statusCounts]
+          .sort(([a], [b]) => (statusOrder.indexOf(a) >>> 0) - (statusOrder.indexOf(b) >>> 0) || a.localeCompare(b))
+          .map(([status, count]) => filterItem(statusLabel(status), count, 'status', status, selectedStatus === status))
+      );
+      tagFilters.append(
+        filterItem('All', all.length, 'tag', null, !selectedTag),
+        ...[...tagCounts].sort(([a], [b]) => a.localeCompare(b)).map(([tag, count]) => filterItem(tag, count, 'tag', tag, selectedTag === tag))
+      );
+      filters.hidden = all.length === 0;
 
-      if (postData.length === 0) posts.append(textElement('p', 'No posts match these filters.', 'admin-page-description'));
-      loading.classList.add('hidden');
-      posts.classList.remove('hidden');
+      const shown = all.filter(
+        (post) => (!selectedStatus || statusOf(post) === selectedStatus) && (!selectedTag || (post.tags ?? []).includes(selectedTag))
+      );
+      postRows.append(...shown.map(row));
+      postTable.hidden = shown.length === 0;
+      if (all.length === 0) showEmpty('No posts yet. Use New post to write the first one.', false);
+      else if (shown.length === 0) showEmpty('No posts match these filters.', true);
+      pendingLine.hidden = true;
     } catch (error) {
-      loading.classList.add('hidden');
-      errorBox.textContent = error instanceof Error ? error.message : 'Failed to load posts.';
-      errorBox.classList.remove('hidden');
+      pendingLine.hidden = true;
+      showError(`Couldn't load your posts: ${error instanceof Error ? error.message : 'unknown error'}. Reload the page to try again.`);
     }
   });
 </script>

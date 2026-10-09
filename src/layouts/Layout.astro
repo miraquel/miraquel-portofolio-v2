@@ -3,6 +3,7 @@ import '@fontsource-variable/big-shoulders-stencil/opsz.css';
 import '@fontsource-variable/overpass/wght.css';
 import '@fontsource-variable/overpass-mono/wght.css';
 import '../styles/global.css';
+import Analytics from '../components/Analytics.astro';
 import { profile } from '../data/profile';
 import type { SocialImage } from '../lib/social-meta';
 
@@ -11,8 +12,8 @@ interface Props {
 	description?: string;
 	/** Keep the page out of search results (the admin sign-in) */
 	noindex?: boolean;
-	/** 'plain' is for the admin sign-in, which brings its own dark styles and fonts */
-	chrome?: 'lading' | 'plain';
+	/** Page views go to Firebase Analytics; the admin workspace leaves them out */
+	analytics?: boolean;
 	/** Link-preview title, when it should differ from the tab title */
 	ogTitle?: string;
 	type?: 'website' | 'article';
@@ -26,7 +27,7 @@ const {
 	title = `${profile.name}: ${profile.title}`,
 	description = `${profile.title} based in ${profile.based}: Dynamics AX 2012 and Finance & Operations customisation, and the ASP.NET services and Flutter apps that connect to them. ${profile.discharge.value} ${profile.discharge.detail.toLowerCase()}.`,
 	noindex = false,
-	chrome = 'lading',
+	analytics = true,
 	ogTitle = title,
 	type = 'website',
 	image = {
@@ -44,7 +45,7 @@ const socialImage = new URL(image.path, Astro.site);
 ---
 
 <!doctype html>
-<html lang="en" data-world={chrome === 'lading' ? 'lading' : undefined}>
+<html lang="en" data-world="lading">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -52,19 +53,15 @@ const socialImage = new URL(image.path, Astro.site);
 		<meta name="generator" content={Astro.generator} />
 		{noindex && <meta name="robots" content="noindex" />}
 		<meta name="theme-color" content="#24543f" />
-		{chrome === 'lading' && (
-			<>
-				<meta name="color-scheme" content="light dark" />
-				{/* A visitor's Dark switch choice (Strip.astro, src/lib/theme.ts) applies before the
-				    first paint, so the page never flashes the other look */}
-				<script is:inline>
-					try {
-						const theme = localStorage.getItem('theme');
-						if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
-					} catch {}
-				</script>
-			</>
-		)}
+		<meta name="color-scheme" content="light dark" />
+		{/* A visitor's Dark switch choice (src/lib/theme-switch.ts, src/lib/theme.ts) applies before
+		    the first paint, so the page never flashes the other look */}
+		<script is:inline>
+			try {
+				const theme = localStorage.getItem('theme');
+				if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+			} catch {}
+		</script>
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<meta name="author" content={author} />
@@ -81,11 +78,7 @@ const socialImage = new URL(image.path, Astro.site);
 		{publishedTime && <meta property="article:published_time" content={publishedTime} />}
 		<meta name="twitter:card" content="summary_large_image" />
 	</head>
-	<body
-		class={chrome === 'lading'
-			? 'min-h-screen bg-paper font-body text-base leading-normal text-ink antialiased'
-			: 'm-0 min-h-screen w-full bg-slate-900 font-sans leading-normal text-slate-400'}
-	>
+	<body class="min-h-screen bg-paper font-body text-base leading-normal text-ink antialiased">
 		<slot />
 
 		<!-- Rubber-stamp ink: a slight displacement so stamp edges read as pressed ink, not vector -->
@@ -105,26 +98,6 @@ const socialImage = new URL(image.path, Astro.site);
 			else addEventListener('load', settle, { once: true });
 		</script>
 
-		<!-- Firebase Analytics -->
-		<script>
-			import { app } from '../lib/firebase-app';
-			import { getAnalytics, isSupported, logEvent } from 'firebase/analytics';
-
-			// Analytics needs IndexedDB and cookies; private windows and blockers can refuse
-			// either, and a tracking failure must never surface as a page error
-			isSupported()
-				.then((supported) => {
-					if (!supported) return;
-					const analytics = getAnalytics(app);
-
-					// Log page view
-					logEvent(analytics, 'page_view', {
-						page_title: document.title,
-						page_location: window.location.href,
-						page_path: window.location.pathname
-					});
-				})
-				.catch(() => {});
-		</script>
+		{analytics && <Analytics />}
 	</body>
 </html>

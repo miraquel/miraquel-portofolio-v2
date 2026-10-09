@@ -1,22 +1,10 @@
 @import "tailwindcss";
-@plugin "@tailwindcss/typography";
 
 /* A desktop too short to show the work under the bill (720-800px laptop viewports): the
    first screen tightens so the case-study cards reach the fold. 1440x900 is untouched. */
 @custom-variant short-desktop (@media (min-width: 64rem) and (max-height: 51.25rem));
 
 @theme {
-  /* Legacy palette, still used by the admin workspace */
-  --color-slate-900: #0f172a;
-  --color-slate-800: #1e293b;
-  --color-slate-700: #334155;
-  --color-slate-600: #475569;
-  --color-slate-400: #94a3b8;
-  --color-slate-300: #cbd5e1;
-  --color-slate-200: #e2e8f0;
-  --color-teal-400: #2dd4bf;
-  --color-teal-300: #5eead4;
-
   /* Bill of lading: security-tinted form paper printed in one green ink, data typed in carbon.
      These are the day values; the night print (below) reprints the form on dark paper. */
   --color-paper: #e3ede3;
@@ -47,8 +35,8 @@
 /* No global `a` rule here: Tailwind's preflight already makes links inherit color inside
    @layer base, and an unlayered rule would override every text-* utility on links. */
 
-/* Scoped to pages in the bill-of-lading world. The admin workspace also loads this file and
-   keeps its own dark look, where a carbon focus ring would vanish. */
+/* Scoped to pages in the bill-of-lading world, which Layout.astro marks on every page, the admin
+   workspace included. */
 @layer base {
   html[data-world='lading'] {
     color-scheme: light;

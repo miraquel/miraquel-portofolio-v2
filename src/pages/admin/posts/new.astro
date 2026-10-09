@@ -1,318 +1,74 @@
 ---
 import AdminLayout from '../../../layouts/AdminLayout.astro';
+import AdminHead from '../../../components/admin/AdminHead.astro';
+import PostForm from '../../../components/admin/PostForm.astro';
 import { getAllStatuses } from '../../../lib/blog';
+import '../../../styles/post-body.css';
+import '../../../styles/admin.css';
 
 export const prerender = false;
 
 const statuses = await getAllStatuses();
 ---
 
-<AdminLayout title="New Blog Post">
-  <div class="max-w-5xl">
-    <header class="admin-page-header">
-      <div>
-        <div class="admin-eyebrow">Editor</div>
-        <h1 class="admin-page-title">Create a new post</h1>
-        <p class="admin-page-description">Shape the story first. Publishing controls stay close at hand.</p>
-      </div>
-    </header>
-
-    <form id="postForm" class="admin-form space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="md:col-span-2">
-          <label for="title" class="block text-sm font-medium text-slate-300 mb-2">
-            Title *
-          </label>
-          <input
-            type="text"
-            id="title"
-            required
-            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-            placeholder="Enter post title"
-          />
-        </div>
-
-        <div class="md:col-span-2">
-          <label for="slug" class="block text-sm font-medium text-slate-300 mb-2">
-            Slug *
-          </label>
-          <input
-            type="text"
-            id="slug"
-            required
-            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-            placeholder="post-url-slug"
-          />
-          <p class="mt-1 text-xs text-slate-500">URL-friendly version of the title</p>
-        </div>
-
-        <div class="md:col-span-2">
-          <label for="excerpt" class="block text-sm font-medium text-slate-300 mb-2">
-            Excerpt *
-          </label>
-          <textarea
-            id="excerpt"
-            required
-            rows="3"
-            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-            placeholder="Brief summary of the post"
-          ></textarea>
-        </div>
-
-        <div class="md:col-span-2">
-          <label for="content" class="block text-sm font-medium text-slate-300 mb-2">
-            Content *
-          </label>
-          <div class="bg-white rounded-lg prose max-w-none">
-            <div id="editor"></div>
-          </div>
-          <input type="hidden" id="content" required />
-        </div>
-
-        <div>
-          <label for="author" class="block text-sm font-medium text-slate-300 mb-2">
-            Author *
-          </label>
-          <input
-            type="text"
-            id="author"
-            required
-            value="Chaidir Ali Assegaf"
-            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-          />
-        </div>
-
-        <div>
-          <label for="publishedAt" class="block text-sm font-medium text-slate-300 mb-2">
-            Published Date *
-          </label>
-          <input
-            type="datetime-local"
-            id="publishedAt"
-            required
-            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-          />
-        </div>
-
-        <div>
-          <label for="imageUrl" class="block text-sm font-medium text-slate-300 mb-2">
-            Image URL
-          </label>
-          <input
-            type="url"
-            id="imageUrl"
-            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-            placeholder="https://example.com/image.jpg"
-          />
-        </div>
-
-        <div>
-          <label for="tags" class="block text-sm font-medium text-slate-300 mb-2">
-            Tags
-          </label>
-          <input
-            type="text"
-            id="tags"
-            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-            placeholder="javascript, web-dev, tutorial"
-          />
-          <p class="mt-1 text-xs text-slate-500">Comma-separated tags</p>
-        </div>
-
-        <div>
-          <label for="status" class="block text-sm font-medium text-slate-300 mb-2">
-            Status *
-          </label>
-          <select
-            id="status"
-            required
-            class="w-full px-4 py-2 pr-10 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2394a3b8%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
-          >
-            {statuses.map(status => (
-              <option 
-                value={status.name} 
-                selected={status.name === 'published'}
-                data-status-id={status.id}
-              >
-                {status.displayName}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label for="readingTime" class="block text-sm font-medium text-slate-300 mb-2">
-            Reading Time (minutes)
-          </label>
-          <input
-            type="number"
-            id="readingTime"
-            min="1"
-            class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-            placeholder="5"
-          />
-        </div>
-      </div>
-
-      <div id="errorMessage" class="hidden p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
-      </div>
-
-      <div class="flex gap-4">
-        <button
-          type="submit"
-          id="submitButton"
-          class="admin-primary-button"
-        >
-          Create Post
-        </button>
-        <a
-          href="/admin/posts"
-          class="admin-action-button inline-flex items-center justify-center px-4"
-        >
-          <span class="text-slate-200 font-medium">
-            Cancel
-          </span>
-        </a>
-      </div>
-    </form>
-  </div>
+<AdminLayout title="New post">
+  <AdminHead title="New post" note="Write the post, then set how and when it is published." />
+  <PostForm statuses={statuses} submitLabel="Create post" />
 </AdminLayout>
 
 <script>
-  import { ClassicEditor, Bold, Essentials, Italic, Paragraph, Undo, Heading, Link, List, BlockQuote, CodeBlock, Image, ImageUpload, MediaEmbed, Table, Indent, Underline, Strikethrough, Code } from 'ckeditor5';
-  import 'ckeditor5/ckeditor5.css';
-
   import { Timestamp } from 'firebase/firestore';
   import { createPost } from '../../../lib/post-writes';
+  import { readPostFields, startEditor, toLocalInput, wireStatusStamp } from '../../../lib/post-editor';
 
   const form = document.getElementById('postForm') as HTMLFormElement;
   const titleInput = document.getElementById('title') as HTMLInputElement;
   const slugInput = document.getElementById('slug') as HTMLInputElement;
-  const errorMessage = document.getElementById('errorMessage') as HTMLDivElement;
+  const errorMessage = document.getElementById('errorMessage') as HTMLParagraphElement;
   const submitButton = document.getElementById('submitButton') as HTMLButtonElement;
-  const contentInput = document.getElementById('content') as HTMLInputElement;
-  // Initialize CKEditor
-  ClassicEditor
-    .create({
-      attachTo: document.querySelector('#editor') as HTMLElement,
-      licenseKey: 'GPL',
-      plugins: [Essentials, Bold, Italic, Underline, Strikethrough, Code, Paragraph, Heading, Link, List, BlockQuote, CodeBlock, Image, ImageUpload, MediaEmbed, Table, Indent, Undo],
-      toolbar: {
-        items: [
-          'undo', 'redo', '|',
-          'heading', '|',
-          'bold', 'italic', 'underline', 'strikethrough', 'code', '|',
-          'link', 'blockQuote', 'codeBlock', '|',
-          'bulletedList', 'numberedList', 'outdent', 'indent', '|',
-          'insertTable', 'mediaEmbed'
-        ]
-      },
-      heading: {
-        options: [
-          { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
-          { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
-          { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
-          { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
-        ]
-      }
-    })
-    .then((editor: any) => {
-      // Add prose class to editor content area
-      const editableElement = editor.ui.view.editable.element;
-      if (editableElement) {
-        editableElement.classList.add('prose', 'prose-slate', 'max-w-none');
-      }
-      
-      // Sync editor content to hidden input
-      editor.model.document.on('change:data', () => {
-        contentInput.value = editor.getData();
-      });
-    })
-    .catch((error: any) => {
-      console.error('Error initializing editor:', error);
-    });
 
-  // Auto-generate slug from title
-  titleInput?.addEventListener('input', () => {
-    const slug = titleInput.value
+  startEditor().catch((error) => console.error('Error initializing editor:', error));
+
+  // The slug follows the title until it is edited by hand
+  let slugEdited = false;
+  slugInput.addEventListener('input', () => (slugEdited = slugInput.value.length > 0));
+  titleInput.addEventListener('input', () => {
+    if (slugEdited) return;
+    slugInput.value = titleInput.value
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
-    slugInput.value = slug;
   });
 
-  // Set default publish date to now
-  const publishedAtInput = document.getElementById('publishedAt') as HTMLInputElement;
-  const now = new Date();
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-  publishedAtInput.value = now.toISOString().slice(0, 16);
+  // A new post is dated now
+  (document.getElementById('publishedAt') as HTMLInputElement).value = toLocalInput(new Date());
+  wireStatusStamp();
 
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    // Hide previous error
-    errorMessage.classList.add('hidden');
-
-    // Disable button during submission
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    errorMessage.hidden = true;
     submitButton.disabled = true;
-    submitButton.textContent = 'Creating...';
+    submitButton.textContent = 'Creating…';
 
     try {
-      const title = (document.getElementById('title') as HTMLInputElement).value;
-      const slug = (document.getElementById('slug') as HTMLInputElement).value;
-      const excerpt = (document.getElementById('excerpt') as HTMLTextAreaElement).value;
-      const content = (document.getElementById('content') as HTMLTextAreaElement).value;
-      const author = (document.getElementById('author') as HTMLInputElement).value;
-      const publishedAt = (document.getElementById('publishedAt') as HTMLInputElement).value;
-      const imageUrl = (document.getElementById('imageUrl') as HTMLInputElement).value;
-      const tagsInput = (document.getElementById('tags') as HTMLInputElement).value;
-      const status = (document.getElementById('status') as HTMLSelectElement).value;
-      const readingTimeInput = (document.getElementById('readingTime') as HTMLInputElement).value;
-
-      const tags = tagsInput
-        .split(',')
-        .map(tag => tag.trim())
-        .filter(tag => tag.length > 0);
-
-      // Get statusId from selected option
-      const statusSelect = document.getElementById('status') as HTMLSelectElement;
-      const selectedOption = statusSelect.options[statusSelect.selectedIndex];
-      const statusId = selectedOption.getAttribute('data-status-id');
-
-      const postData: any = {
-        title,
-        slug,
-        excerpt,
-        content,
-        author,
-        publishedAt: Timestamp.fromDate(new Date(publishedAt)),
-        tags,
-        status,
-        statusId,
+      const { publishedAt, imageUrl, readingTime, ...fields } = readPostFields();
+      const postData: Record<string, unknown> = {
+        ...fields,
+        publishedAt: Timestamp.fromDate(publishedAt),
         createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
+        updatedAt: Timestamp.now(),
       };
-
-      if (imageUrl) {
-        postData.imageUrl = imageUrl;
-      }
-
-      if (readingTimeInput) {
-        postData.readingTime = parseInt(readingTimeInput);
-      }
+      if (imageUrl) postData.imageUrl = imageUrl;
+      if (readingTime) postData.readingTime = readingTime;
 
       await createPost(postData);
-
-      // Redirect to posts list
       window.location.href = '/admin/posts';
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating post:', error);
-      errorMessage.classList.remove('hidden');
-      errorMessage.textContent = error.message || 'Failed to create post. Please try again.';
-
-      // Re-enable button
+      errorMessage.textContent = `Couldn't create the post: ${error instanceof Error && error.message ? error.message : 'unknown error'}. Your writing is still here; try again.`;
+      errorMessage.hidden = false;
       submitButton.disabled = false;
-      submitButton.textContent = 'Create Post';
+      submitButton.textContent = 'Create post';
     }
   });
 </script>

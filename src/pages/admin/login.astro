@@ -1,94 +1,87 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import '../../styles/admin.css';
+import { fieldInput, fieldLabel, notice, primaryButton, textAction } from '../../lib/admin-ui';
 ---
 
-<Layout title="Sign in: Content Studio" chrome="plain" noindex>
-  <div class="admin-login-page">
-    <section class="admin-login-intro">
-      <div class="admin-login-wordmark">Chaidir Ali Assegaf · Content Studio</div>
-      <div class="admin-login-intro-copy">
-        <div class="admin-eyebrow">Private workspace</div>
-        <h1>Write with focus.<br />Publish with intent.</h1>
-        <p>A quiet workspace for shaping articles, managing drafts, and keeping your portfolio current.</p>
-      </div>
-      <div class="admin-login-footnote">Portfolio publishing system</div>
+<Layout title="Sign in: Admin" noindex analytics={false}>
+  <main id="main" class="mx-auto flex min-h-screen max-w-[28rem] flex-col justify-center px-4 py-12">
+    <a href="/" class="self-start font-stencil text-[1.375rem] font-extrabold uppercase leading-none tracking-[0.05em] text-ink">
+      Chaidir Ali Assegaf
+    </a>
+
+    <div data-band class="mt-6 flex items-center justify-between gap-x-6 border-2 border-b-0 border-form bg-form px-4 py-2 text-paper sm:px-5">
+      <p class="font-stencil text-[1.375rem] font-extrabold uppercase leading-none tracking-[0.08em]">Admin</p>
+      <p class="font-data text-xs">Private</p>
+    </div>
+    <section aria-labelledby="sign-in-title" class="border-2 border-form bg-paper px-4 py-6 sm:px-5">
+      <h1 id="sign-in-title" class="text-[2rem] font-extrabold leading-none tracking-[-0.02em]">Sign in</h1>
+      <p class="mt-3 text-[0.9375rem] leading-snug text-form">To write, edit and publish the blog's posts.</p>
+
+      <form id="loginForm" class="mt-6 space-y-5">
+        <label class={fieldLabel}>
+          Email address
+          <input type="email" id="email" required autocomplete="email" class={fieldInput} />
+        </label>
+        <label class={fieldLabel}>
+          Password
+          <input type="password" id="password" required autocomplete="current-password" class={fieldInput} />
+        </label>
+
+        <p id="errorMessage" role="alert" class={notice} hidden></p>
+
+        <button type="submit" id="loginButton" class={`${primaryButton} w-full`}>Sign in</button>
+      </form>
     </section>
 
-    <section class="admin-login-panel">
-      <div class="admin-login-form-wrap">
-        <h2>Welcome back</h2>
-        <p>Sign in to continue to your workspace.</p>
-
-        <form id="loginForm" class="space-y-5">
-          <div>
-            <label for="email">Email address</label>
-            <input type="email" id="email" required autocomplete="email" placeholder="admin@example.com" />
-          </div>
-
-          <div>
-            <label for="password">Password</label>
-            <input type="password" id="password" required autocomplete="current-password" placeholder="••••••••" />
-          </div>
-
-          <div id="errorMessage" class="hidden p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-xs"></div>
-
-          <button type="submit" id="loginButton" class="admin-login-submit">Sign in</button>
-        </form>
-
-        <a href="/" class="admin-login-back">← Return to portfolio</a>
-      </div>
-    </section>
-  </div>
+    <a href="/" class={`${textAction} mt-4 self-start`}>Back to the site</a>
+  </main>
 </Layout>
 
 <script>
-  import { auth } from '../../lib/firebase';
   import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+  import { auth } from '../../lib/firebase';
   import { isAdmin } from '../../lib/admin';
+
+  // Firebase names a failure by its code; the visitor gets the problem and what to do about it
+  const problems: Record<string, string> = {
+    'auth/invalid-credential': 'The email address or password is wrong. Check both and try again.',
+    'auth/invalid-email': "That doesn't look like an email address. Check it and try again.",
+    'auth/user-disabled': 'This account has been turned off.',
+    'auth/too-many-requests': 'Too many attempts. Wait a few minutes, then try again.',
+    'auth/network-request-failed': "Couldn't reach the sign-in service. Check your connection and try again.",
+  };
 
   const form = document.getElementById('loginForm') as HTMLFormElement;
   const emailInput = document.getElementById('email') as HTMLInputElement;
   const passwordInput = document.getElementById('password') as HTMLInputElement;
-  const errorMessage = document.getElementById('errorMessage') as HTMLDivElement;
+  const errorMessage = document.getElementById('errorMessage') as HTMLParagraphElement;
   const loginButton = document.getElementById('loginButton') as HTMLButtonElement;
 
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const email = emailInput.value;
-    const password = passwordInput.value;
-
-    // Hide previous error
-    errorMessage.classList.add('hidden');
-    
-    // Disable button during login
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    errorMessage.hidden = true;
     loginButton.disabled = true;
-    loginButton.textContent = 'Signing in...';
+    loginButton.textContent = 'Signing in…';
 
     try {
-      const credential = await signInWithEmailAndPassword(auth, email, password);
+      const credential = await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
       if (!(await isAdmin(credential.user))) {
         await signOut(auth);
         throw new Error('This account does not have administrator access.');
       }
-      // Redirect to admin dashboard
       window.location.href = '/admin';
-    } catch (error: any) {
-      // Show error message
-      errorMessage.classList.remove('hidden');
-      errorMessage.textContent = error.message || 'Failed to sign in. Please check your credentials.';
-      
-      // Re-enable button
+    } catch (error) {
+      const code = (error as { code?: string }).code ?? '';
+      errorMessage.textContent =
+        problems[code] ?? (error instanceof Error && error.message ? error.message : "Couldn't sign in. Check the email address and password.");
+      errorMessage.hidden = false;
       loginButton.disabled = false;
       loginButton.textContent = 'Sign in';
     }
   });
 
-  // Check if already logged in
+  // An administrator who is already signed in goes straight to the dashboard
   auth.onAuthStateChanged(async (user) => {
-    if (await isAdmin(user)) {
-      window.location.href = '/admin';
-    }
+    if (await isAdmin(user)) window.location.href = '/admin';
   });
 </script>

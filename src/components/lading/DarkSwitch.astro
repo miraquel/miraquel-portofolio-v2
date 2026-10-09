@@ -1,0 +1,43 @@
+---
+// The Dark switch, wired by src/lib/theme-switch.ts. It needs that script, so it stays hidden until
+// the script runs. A 'chip' sits in a strip; a 'row' closes a strip's phone menu.
+import { stripChip } from '../../lib/strip-ui';
+
+interface Props {
+  variant: 'chip' | 'row';
+  /** The list item's classes: where the chip shows (the site strip shows it from 768px) */
+  class?: string;
+  /** A row keeps the empty number column of a menu whose rows are numbered */
+  numbered?: boolean;
+}
+
+const { variant, class: className, numbered = true } = Astro.props;
+---
+
+{variant === 'chip' ? (
+  <li class={className} hidden data-theme-switch-item>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-theme-switch
+      class="group flex min-h-11 cursor-pointer items-center pl-2.5 focus-visible:outline-offset-[-3px]"
+    >
+      <span class={`${stripChip} group-aria-pressed:bg-form group-aria-pressed:text-paper`}>Dark<span class="sr-only"> mode</span></span>
+    </button>
+  </li>
+) : (
+  <li class={className} hidden data-theme-switch-item>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-theme-switch
+      class="group -mx-4 flex min-h-12 w-[calc(100%+2rem)] cursor-pointer items-center gap-3 px-4 py-3 text-left text-[1.125rem] font-extrabold leading-tight text-ink transition-colors duration-150 hover:bg-paper-deep focus-visible:outline-offset-[-3px] sm:-mx-8 sm:w-[calc(100%+4rem)] sm:px-8"
+    >
+      {numbered && <span aria-hidden="true" class="w-6 shrink-0"></span>}
+      Dark mode
+      <span aria-hidden="true" class={`ml-auto ${stripChip} group-aria-pressed:bg-form group-aria-pressed:text-paper`}>
+        <span class="group-aria-pressed:hidden">Off</span><span class="hidden group-aria-pressed:inline">On</span>
+      </span>
+    </button>
+  </li>
+)}

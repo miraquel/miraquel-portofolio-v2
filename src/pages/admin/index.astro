@@ -1,38 +1,45 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
+import AdminHead from '../../components/admin/AdminHead.astro';
+import { fieldLabel, notice, pending, primaryButton, table, tableHead, textAction } from '../../lib/admin-ui';
+import '../../styles/admin.css';
 
 export const prerender = false;
 ---
 
 <AdminLayout title="Dashboard">
-  <header class="admin-page-header">
-    <div>
-      <div class="admin-eyebrow">Workspace</div>
-      <h1 class="admin-page-title">Dashboard</h1>
-      <p class="admin-page-description">A focused view of your publishing activity.</p>
-    </div>
-    <a href="/admin/posts/new" class="admin-primary-button">Create post <span aria-hidden="true">＋</span></a>
-  </header>
+  <AdminHead title="Dashboard" note="How many posts sit in each status, and the posts dated latest.">
+    <a href="/admin/posts/new" class={primaryButton}>New post</a>
+  </AdminHead>
 
-  <div id="loadingStats" class="admin-page-description">Loading publishing data…</div>
-  <div id="stats" class="admin-metric-rail hidden"></div>
-  <div id="statsError" class="hidden p-4 rounded-lg bg-red-500/10 text-red-400"></div>
+  <p id="dashboardPending" role="status" class={`mt-8 ${pending}`}>Loading your posts…</p>
+  <p id="dashboardError" role="alert" class={`mt-8 ${notice}`} hidden></p>
 
-  <section class="admin-command-section">
-    <div>
-      <h2 class="admin-section-title">Continue working</h2>
-      <p class="admin-section-copy">Jump back into the two tasks you use most.</p>
+  <section id="countsSection" aria-labelledby="counts-title" class="mt-8" hidden>
+    <h2 id="counts-title" class={fieldLabel}>Posts by status</h2>
+    {/* Each count opens the post list filtered to it */}
+    <ul id="countList" class="mt-3 flex flex-wrap gap-px border-2 border-form bg-form"></ul>
+  </section>
+
+  <section id="latestSection" aria-labelledby="latest-title" class="mt-12" hidden>
+    <div class="flex flex-wrap items-baseline justify-between gap-x-6">
+      <h2 id="latest-title" class="text-[1.375rem] font-extrabold leading-tight">Latest posts</h2>
+      <a href="/admin/posts" class={textAction}>All posts</a>
     </div>
-    <div class="admin-command-list">
-      <a href="/admin/posts/new" class="admin-command">
-        <span><strong>Write a new post</strong><span>Start in the editor with a clean draft.</span></span>
-        <span aria-hidden="true">→</span>
-      </a>
-      <a href="/admin/posts" class="admin-command">
-        <span><strong>Review your library</strong><span>Edit, filter, publish, or archive existing work.</span></span>
-        <span aria-hidden="true">→</span>
-      </a>
-    </div>
+    <table role="table" class={`mt-3 ${table}`} aria-labelledby="latest-title">
+      <thead role="rowgroup" class={tableHead}>
+        <tr role="row">
+          <th role="columnheader" scope="col">Title</th>
+          <th role="columnheader" scope="col" class="w-40">Status</th>
+          <th role="columnheader" scope="col" class="w-52">Published</th>
+          <th role="columnheader" scope="col" class="w-24"><span class="sr-only">On the blog</span></th>
+        </tr>
+      </thead>
+      <tbody role="rowgroup" id="latestRows"></tbody>
+    </table>
+    <p id="latestEmpty" class="mt-3 text-[0.9375rem]" hidden>
+      No posts yet. <a href="/admin/posts/new" class={textAction}>Write the first one</a>
+    </p>
   </section>
 </AdminLayout>
 
@@ -41,52 +48,109 @@ export const prerender = false;
   import { collection, getDocs, orderBy, query } from 'firebase/firestore';
   import { auth, db } from '../../lib/firebase';
   import { isAdmin } from '../../lib/admin';
+  import { tableRow, textAction } from '../../lib/admin-ui';
+  import { newestFirst, publishedOn, statusOf, type AdminPost } from '../../lib/admin-posts';
 
-  const loading = document.getElementById('loadingStats')!;
-  const stats = document.getElementById('stats')!;
-  const errorBox = document.getElementById('statsError')!;
+  const pendingLine = document.getElementById('dashboardPending')!;
+  const errorBox = document.getElementById('dashboardError')!;
+  const countsSection = document.getElementById('countsSection')!;
+  const countList = document.getElementById('countList')!;
+  const latestSection = document.getElementById('latestSection')!;
+  const latestRows = document.getElementById('latestRows')!;
+  const latestEmpty = document.getElementById('latestEmpty')!;
+  const latestTable = latestRows.closest('table')!;
 
-  onAuthStateChanged(auth, async user => {
+  function countCell(label: string, count: number, href: string): HTMLLIElement {
+    const item = document.createElement('li');
+    item.className = 'flex min-w-[10rem] flex-1 bg-paper';
+    const link = document.createElement('a');
+    link.href = href;
+    link.className =
+      'flex w-full flex-col gap-3 px-4 py-4 transition-colors duration-150 hover:bg-paper-deep focus-visible:outline-offset-[-3px] sm:px-5';
+    const name = document.createElement('span');
+    name.className = 'text-[0.8125rem] font-semibold leading-tight text-form';
+    name.textContent = label;
+    const number = document.createElement('span');
+    number.className = 'text-[2rem] font-extrabold leading-none tabular-nums';
+    number.textContent = String(count);
+    link.append(name, number);
+    item.append(link);
+    return item;
+  }
+
+  function cell(...children: (Node | string)[]): HTMLTableCellElement {
+    const td = document.createElement('td');
+    td.setAttribute('role', 'cell');
+    td.append(...children);
+    return td;
+  }
+
+  function link(text: string, href: string, className: string, newTab = false): HTMLAnchorElement {
+    const anchor = document.createElement('a');
+    anchor.href = href;
+    anchor.className = className;
+    anchor.textContent = text;
+    if (newTab) {
+      anchor.target = '_blank';
+      anchor.rel = 'noopener noreferrer';
+      const note = document.createElement('span');
+      note.className = 'sr-only';
+      note.textContent = ' (opens in a new tab)';
+      anchor.append(note);
+    }
+    return anchor;
+  }
+
+  onAuthStateChanged(auth, async (user) => {
     if (!(await isAdmin(user))) return;
 
     try {
       const [statusesSnapshot, postsSnapshot] = await Promise.all([
         getDocs(query(collection(db, 'statuses'), orderBy('order', 'asc'))),
-        getDocs(collection(db, 'posts'))
+        getDocs(collection(db, 'posts')),
       ]);
-      const counts: Record<string, number> = {};
-      postsSnapshot.forEach(post => {
-        const status = post.data().status || 'draft';
-        counts[status] = (counts[status] || 0) + 1;
-      });
+      const statuses = statusesSnapshot.docs.map((status) => status.data()).filter((status) => status.isActive);
+      const statusNames = new Map(statuses.map((status) => [status.name, status.displayName]));
+      const posts = postsSnapshot.docs.map((post) => ({ id: post.id, ...post.data() }) as AdminPost);
 
-      const cards = [
-        { label: 'Total Posts', count: postsSnapshot.size, color: '#5eead4' },
-        ...statusesSnapshot.docs
-          .map(status => status.data())
-          .filter(status => status.isActive)
-          .map(status => ({ label: status.displayName, count: counts[status.name] || 0, color: status.color }))
-      ];
+      const counts = new Map<string, number>();
+      for (const post of posts) counts.set(statusOf(post), (counts.get(statusOf(post)) ?? 0) + 1);
+      countList.append(
+        countCell('All posts', posts.length, '/admin/posts'),
+        ...statuses.map((status) =>
+          countCell(String(status.displayName), counts.get(status.name) ?? 0, `/admin/posts?status=${encodeURIComponent(status.name)}`)
+        )
+      );
 
-      for (const card of cards) {
-        const element = document.createElement('div');
-        element.className = 'admin-metric';
-        const label = document.createElement('div');
-        label.className = 'admin-metric-label';
-        label.textContent = String(card.label);
-        const count = document.createElement('div');
-        count.className = 'admin-metric-value';
-        count.textContent = String(card.count);
-        element.append(label, count);
-        stats.append(element);
+      const latest = [...posts].sort(newestFirst).slice(0, 5);
+      for (const post of latest) {
+        const row = document.createElement('tr');
+        row.setAttribute('role', 'row');
+        row.className = tableRow;
+        row.append(
+          cell(
+            link(
+              post.title,
+              `/admin/posts/edit/${encodeURIComponent(post.id)}`,
+              'inline-block py-3 -my-3 font-bold leading-snug underline decoration-form/40 decoration-2 underline-offset-4 hover:decoration-form'
+            )
+          ),
+          cell(statusNames.get(statusOf(post)) ?? statusOf(post)),
+          cell(Object.assign(document.createElement('span'), { className: 'font-data text-[0.8125rem]', textContent: publishedOn(post) })),
+          cell(link('View', `/blog/${encodeURIComponent(post.slug)}`, textAction, true))
+        );
+        latestRows.append(row);
       }
+      latestTable.hidden = latest.length === 0;
+      latestEmpty.hidden = latest.length > 0;
 
-      loading.classList.add('hidden');
-      stats.classList.remove('hidden');
+      pendingLine.hidden = true;
+      countsSection.hidden = false;
+      latestSection.hidden = false;
     } catch (error) {
-      loading.classList.add('hidden');
-      errorBox.textContent = error instanceof Error ? error.message : 'Failed to load dashboard.';
-      errorBox.classList.remove('hidden');
+      pendingLine.hidden = true;
+      errorBox.textContent = `Couldn't load your posts: ${error instanceof Error ? error.message : 'unknown error'}. Reload the page to try again.`;
+      errorBox.hidden = false;
     }
   });
 </script>
