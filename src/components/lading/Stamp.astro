@@ -11,7 +11,7 @@ const { word, date, class: className } = Astro.props;
 
 <span
   class:list={[
-    'stamp inline-flex -rotate-6 flex-col items-center border-[3px] border-double border-stamp px-3 pb-1 pt-1.5 text-stamp mix-blend-multiply',
+    'stamp inline-flex -rotate-6 flex-col items-center border-[3px] border-double border-stamp px-3 pb-1 pt-1.5 text-stamp',
     className,
   ]}
 >
@@ -20,7 +20,9 @@ const { word, date, class: className } = Astro.props;
 </span>
 
 <style>
+  /* Multiplied into light paper by day; set on top of the dark paper at night (global.css) */
   .stamp {
     filter: url(#stamp-ink);
+    mix-blend-mode: var(--stamp-blend, multiply);
   }
 </style>

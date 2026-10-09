@@ -52,6 +52,19 @@ const socialImage = new URL(image.path, Astro.site);
 		<meta name="generator" content={Astro.generator} />
 		{noindex && <meta name="robots" content="noindex" />}
 		<meta name="theme-color" content="#24543f" />
+		{chrome === 'lading' && (
+			<>
+				<meta name="color-scheme" content="light dark" />
+				{/* A visitor's Dark switch choice (Strip.astro, src/lib/theme.ts) applies before the
+				    first paint, so the page never flashes the other look */}
+				<script is:inline>
+					try {
+						const theme = localStorage.getItem('theme');
+						if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+					} catch {}
+				</script>
+			</>
+		)}
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<meta name="author" content={author} />

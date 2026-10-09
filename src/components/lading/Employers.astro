@@ -21,7 +21,7 @@ import { formatPeriod } from '../../lib/format';
             <p class="mt-1 text-[0.9375rem] font-semibold leading-snug">{employer.role}</p>
           </div>
           <p class="lg:col-span-3">
-            <span class:list={['inline-block font-data text-sm', !employer.period.end && 'bg-signal px-2 py-1 font-semibold']}>
+            <span class:list={['inline-block font-data text-sm', !employer.period.end && 'signal-stock px-2 py-1 font-semibold']}>
               {formatPeriod(employer.period)}
             </span>
           </p>

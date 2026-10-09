@@ -12,7 +12,7 @@ interface Props extends HTMLAttributes<'div'> {
 const { n, label, live = false, class: className, ...rest } = Astro.props;
 ---
 
-<div class:list={['relative flex flex-col gap-2.5 px-4 py-4 sm:px-5 sm:py-5', live ? 'bg-signal' : 'bg-paper', className]} {...rest}>
+<div class:list={['relative flex flex-col gap-2.5 px-4 py-4 sm:px-5 sm:py-5', live ? 'signal-stock' : 'bg-paper', className]} {...rest}>
   <dt class="flex items-baseline gap-2 text-[0.8125rem] font-semibold leading-tight text-form">
     <span class="font-data text-xs font-medium">{String(n).padStart(2, '0')}</span>
     {label}

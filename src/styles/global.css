@@ -17,7 +17,8 @@
   --color-teal-400: #2dd4bf;
   --color-teal-300: #5eead4;
 
-  /* Bill of lading: security-tinted form paper printed in one green ink, data typed in carbon */
+  /* Bill of lading: security-tinted form paper printed in one green ink, data typed in carbon.
+     These are the day values; the night print (below) reprints the form on dark paper. */
   --color-paper: #e3ede3;
   --color-paper-deep: #d2e2d5;
   --color-form: #24543f;
@@ -33,6 +34,10 @@
   --color-signal: #f2c21b;
   /* Rubber-stamp ink */
   --color-stamp: #b3261e;
+  /* The day inks, which never change: signal yellow is the same stock by night, so what prints
+     on it (and on a text selection) keeps them */
+  --color-day-form: #24543f;
+  --color-day-ink: #17212b;
 
   --font-stencil: "Big Shoulders Stencil Variable", "Arial Narrow", sans-serif;
   --font-body: "Overpass Variable", "Segoe UI", system-ui, sans-serif;
@@ -46,7 +51,15 @@
    keeps its own dark look, where a carbon focus ring would vanish. */
 @layer base {
   html[data-world='lading'] {
+    color-scheme: light;
     scrollbar-color: var(--color-form-soft) var(--color-paper);
+    /* A stamp's ink soaks into light paper; the night print sets it on top */
+    --stamp-blend: multiply;
+    /* A form-green band is dark by day, so focus inside it turns signal yellow */
+    --band-ring: var(--color-signal);
+    /* A code block in a post: carbon by day */
+    --code-ground: var(--color-ink);
+    --code-text: var(--color-paper);
   }
 
   /* Smooth once the page has loaded (Layout.astro sets is-loaded), so arriving on a
@@ -59,7 +72,7 @@
 
   [data-world='lading'] ::selection {
     background-color: var(--color-signal);
-    color: var(--color-ink);
+    color: var(--color-day-ink);
   }
 
   [data-world='lading'] :focus-visible {
@@ -67,10 +80,67 @@
     outline-offset: 3px;
   }
 
-  /* On steel and on form-green bands a carbon ring disappears; use the signal there */
+  /* On steel a carbon ring disappears; use the signal there */
   [data-world='lading'] [data-dark] :focus-visible {
     outline-color: var(--color-signal);
   }
+
+  /* A form-green band is printed in the ink, so it is dark by day and light by night */
+  [data-world='lading'] [data-band] :focus-visible {
+    outline-color: var(--band-ring);
+  }
+}
+
+/* Night print: the same form on green-black paper, its inks lightened to keep their contrast
+   (form green 7.9:1 on the paper, carbon 14.8:1, stamp red 6.5:1). The steel and signal yellow
+   are unchanged. It follows a dark device unless the strip's Dark switch chose a look
+   (html[data-theme], see src/lib/theme.ts). The two blocks hold the same values;
+   tests/night-print.test.ts checks that. */
+@media (prefers-color-scheme: dark) {
+  html[data-world='lading']:not([data-theme='light']) {
+    color-scheme: dark;
+    --color-paper: #0f1a15;
+    --color-paper-deep: #1a2a22;
+    --color-form: #86b89b;
+    --color-form-soft: #557d69;
+    --color-ink: #e3ede3;
+    --color-stamp: #ef7a6b;
+    --stamp-blend: normal;
+    --band-ring: var(--color-paper);
+    --code-ground: var(--color-paper-deep);
+    --code-text: var(--color-ink);
+  }
+}
+
+html[data-world='lading'][data-theme='dark'] {
+  color-scheme: dark;
+  --color-paper: #0f1a15;
+  --color-paper-deep: #1a2a22;
+  --color-form: #86b89b;
+  --color-form-soft: #557d69;
+  --color-ink: #e3ede3;
+  --color-stamp: #ef7a6b;
+  --stamp-blend: normal;
+  --band-ring: var(--color-paper);
+  --code-ground: var(--color-paper-deep);
+  --code-text: var(--color-ink);
+}
+
+/* Flipping the switch reprints the page at once: colour transitions would make the links and
+   buttons fade while everything else snaps */
+html.is-reprinting *,
+html.is-reprinting *::before,
+html.is-reprinting *::after {
+  transition: none !important;
+}
+
+/* Signal yellow, for live facts. It is the same stock by night, so whatever prints on it keeps
+   the day inks: carbon data and form-green labels. */
+@utility signal-stock {
+  background-color: var(--color-signal);
+  --color-ink: var(--color-day-ink);
+  --color-form: var(--color-day-form);
+  color: var(--color-ink);
 }
 
 /* A Marks and numbers card and the Description of goods lines it carries light together (see
