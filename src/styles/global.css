@@ -49,8 +49,10 @@
     scrollbar-color: var(--color-form-soft) var(--color-paper);
   }
 
+  /* Smooth once the page has loaded (Layout.astro sets is-loaded), so arriving on a
+     /#section address jumps straight to it */
   @media (prefers-reduced-motion: no-preference) {
-    html[data-world='lading'] {
+    html[data-world='lading'].is-loaded {
       scroll-behavior: smooth;
     }
   }
