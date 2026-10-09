@@ -83,6 +83,15 @@ const socialImage = new URL(image.path, Astro.site);
 			</filter>
 		</svg>
 
+		<script>
+			// In-page links scroll smoothly (global.css) only once the page has loaded. Arriving on a
+			// /#section address jumps instead: a smooth scroll during load stopped up to 220px short of
+			// the section on phones in Chromium.
+			const settle = () => requestAnimationFrame(() => document.documentElement.classList.add('is-loaded'));
+			if (document.readyState === 'complete') settle();
+			else addEventListener('load', settle, { once: true });
+		</script>
+
 		<!-- Firebase Analytics -->
 		<script>
 			import { app } from '../lib/firebase-app';
