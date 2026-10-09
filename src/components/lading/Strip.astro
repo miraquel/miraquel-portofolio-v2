@@ -8,17 +8,28 @@ interface Props {
 const { onHome = false } = Astro.props;
 const base = onHome ? '' : '/';
 
-// Phones keep three: the work, the blog and the contact block. 'Work' is the phone's short
-// label for the case studies, which the manifest of all projects follows. Below 360px only
-// Work and Contact fit beside the name; Blog stays one tap away in the footer.
+// From 768px the strip names the sections a recruiter looks for.
 const links = [
-  { href: `${base}#containers`, label: 'Work', show: 'phone' },
-  { href: `${base}#containers`, label: 'Case studies', show: 'wide' },
-  { href: `${base}#manifest`, label: 'All projects', show: 'wide' },
-  { href: `${base}#employers`, label: 'Employers', show: 'wide' },
-  { href: '/blog', label: 'Blog', show: 'from-360' },
-  { href: `${base}#contact`, label: 'Contact', show: 'all' },
+  { href: `${base}#containers`, label: 'Case studies' },
+  { href: `${base}#manifest`, label: 'All projects' },
+  { href: `${base}#employers`, label: 'Employers' },
+  { href: '/blog', label: 'Blog' },
+  { href: `${base}#contact`, label: 'Contact' },
 ];
+
+// A phone has room beside the name for Contact and a menu only, so the menu indexes every
+// section in page order, numbered as their headings are, then the blog.
+const index = [
+  { n: 10, href: `${base}#containers`, label: 'Case studies' },
+  { n: 11, href: `${base}#manifest`, label: 'All projects' },
+  { n: 12, href: `${base}#employers`, label: 'Employers' },
+  { n: 13, href: `${base}#credentials`, label: 'Certificates and education' },
+  { n: 14, href: `${base}#contact`, label: 'Contact' },
+  { href: '/blog', label: 'Blog' },
+];
+
+const linkClass =
+  'inline-block px-2 py-[15px] text-sm font-semibold leading-none text-form underline-offset-4 transition-colors duration-150 hover:text-ink hover:underline md:px-2.5';
 ---
 
 <a
@@ -35,16 +46,57 @@ const links = [
     <nav aria-label="Page">
       <ul class="flex items-center">
         {links.map((link) => (
-          <li class:list={[link.show === 'wide' && 'hidden md:block', link.show === 'phone' && 'md:hidden', link.show === 'from-360' && 'max-[359px]:hidden']}>
-            <a
-              href={link.href}
-              class="inline-block px-2 py-[15px] text-sm font-semibold leading-none text-form underline-offset-4 transition-colors duration-150 hover:text-ink hover:underline md:px-2.5"
-            >
-              {link.label}
-            </a>
+          <li class="hidden md:block">
+            <a href={link.href} class={linkClass}>{link.label}</a>
           </li>
         ))}
+        <li class="md:hidden">
+          <a href={`${base}#contact`} class={linkClass}>Contact</a>
+        </li>
+        <li class="md:hidden">
+          <details class="group" data-strip-menu>
+            <summary class="flex min-h-11 cursor-pointer list-none items-center px-1.5 focus-visible:outline-offset-[-3px] [&::-webkit-details-marker]:hidden">
+              <span class="border-2 border-form px-2 py-[5px] text-sm font-semibold leading-none text-form transition-colors duration-150 group-open:bg-form group-open:text-paper">
+                Menu
+              </span>
+            </summary>
+            <div class="absolute inset-x-0 top-[calc(100%+2px)] max-h-[calc(100dvh-3rem)] overflow-y-auto border-b-2 border-form bg-paper">
+              <ul class="mx-auto max-w-[85rem] divide-y divide-form/30 px-4 sm:px-8">
+                {index.map((item) => (
+                  <li>
+                    <a
+                      href={item.href}
+                      class="-mx-4 flex min-h-12 items-baseline gap-3 px-4 py-3.5 text-[1.125rem] font-extrabold leading-tight text-ink transition-colors duration-150 hover:bg-paper-deep focus-visible:outline-offset-[-3px] sm:-mx-8 sm:px-8"
+                    >
+                      <span aria-hidden="true" class="w-6 shrink-0 font-mono text-xs font-medium text-form tabular-nums">
+                        {item.n}
+                      </span>
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </details>
+        </li>
       </ul>
     </nav>
   </div>
 </header>
+
+<script>
+  // The phone menu is a <details>, so it opens and closes without script; this shuts it once a
+  // link is chosen, on Escape, and on a tap anywhere else, as a menu is expected to.
+  document.querySelectorAll<HTMLDetailsElement>('details[data-strip-menu]').forEach((menu) => {
+    const summary = menu.querySelector('summary');
+    menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => (menu.open = false)));
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || !menu.open) return;
+      menu.open = false;
+      summary?.focus();
+    });
+    document.addEventListener('click', (event) => {
+      if (menu.open && !menu.contains(event.target as Node)) menu.open = false;
+    });
+  });
+</script>
