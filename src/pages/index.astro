@@ -36,19 +36,23 @@ import { containers } from '../data/work';
 </Layout>
 
 <script>
-	// A container mark and its manifest line light together on hover or focus
-	const marked = document.querySelectorAll<HTMLElement>('[data-mark]');
-	const cross = (id: string | undefined, on: boolean) => {
-		if (!id) return;
-		document.querySelectorAll(`[data-mark="${id}"]`).forEach((el) => el.classList.toggle('is-crossed', on));
+	// A Marks and numbers card and the Description of goods lines it carries light together: a card
+	// shows what the project used, and a line shows the projects that prove it. They sit next to
+	// each other, so both ends are in view. Touch is left out, where a tap would only flash them.
+	const cards = [...document.querySelectorAll<HTMLElement>('[data-carries]')];
+	const lines = [...document.querySelectorAll<HTMLElement>('[data-goods-line]')];
+	const carries = (card: HTMLElement, line: HTMLElement) =>
+		(card.dataset.carries ?? '').split(' ').includes(line.dataset.goodsLine ?? '');
+	const pair = (el: HTMLElement, partners: HTMLElement[]) => {
+		if (!partners.length) return;
+		const light = (on: boolean) => [el, ...partners].forEach((item) => item.classList.toggle('is-crossed', on));
+		el.addEventListener('pointerenter', (event) => event.pointerType !== 'touch' && light(true));
+		el.addEventListener('pointerleave', () => light(false));
+		el.addEventListener('focusin', () => light(true));
+		el.addEventListener('focusout', () => light(false));
 	};
-	marked.forEach((el) => {
-		const id = el.dataset.mark;
-		el.addEventListener('pointerenter', () => cross(id, true));
-		el.addEventListener('pointerleave', () => cross(id, false));
-		el.addEventListener('focusin', () => cross(id, true));
-		el.addEventListener('focusout', () => cross(id, false));
-	});
+	cards.forEach((card) => pair(card, lines.filter((line) => carries(card, line))));
+	lines.forEach((line) => pair(line, cards.filter((card) => carries(card, line))));
 
 	// Following a container link shuts that bay's doors while its route is off screen, then swings
 	// them open once the route comes into view: at once on a desktop, where the route sits beside

@@ -73,15 +73,17 @@
   }
 }
 
-/* A container mark and its manifest line light together (see the page script). A 2px form
-   frame, drawn inside the box, sets the pair apart from the standing tint of container lines.
+/* A Marks and numbers card and the Description of goods lines it carries light together (see
+   the page script). A 2px form frame, drawn inside the box, sets them apart from a plain hover.
    This rule is unlayered, so it would beat the focus ring in @layer base: a keyboard-focused
    card keeps the standard 3px carbon ring and only takes the tint. */
-[data-mark].is-crossed {
+[data-carries].is-crossed,
+[data-goods-line].is-crossed {
   background-color: var(--color-paper-deep);
 }
 
-[data-mark].is-crossed:not(:focus-visible) {
+[data-carries].is-crossed:not(:focus-visible),
+[data-goods-line].is-crossed {
   outline: 2px solid var(--color-form);
   outline-offset: -2px;
 }

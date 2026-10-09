@@ -20,7 +20,11 @@ export const profile = {
   revised: '2026-10-08',
 };
 
+export type GoodsId = 'dotnet' | 'fo' | 'ax2012' | 'bc' | 'mobile-data';
+
 export interface GoodsLine {
+  /** What a container's `carries` names this line by */
+  id: GoodsId;
   quantity?: string;
   goods: string;
   detail: string;
@@ -29,9 +33,9 @@ export interface GoodsLine {
 }
 
 export const goods: GoodsLine[] = [
-  { quantity: '8 years', goods: '.NET', detail: 'C#, ASP.NET Core, Web API, Blazor, Entity Framework Core' },
-  { quantity: '5 years', goods: 'Dynamics 365 Finance & Operations', short: 'Dynamics 365 F&O', detail: 'X++, LCS, Azure DevOps' },
-  { goods: 'Dynamics AX 2012', detail: 'X++, custom AIF services, reports' },
-  { goods: 'Dynamics 365 Business Central', detail: 'AL, Power Apps, Power Automate' },
-  { goods: 'Mobile and data', detail: 'Flutter and Dart, SQL Server, SSIS, MySQL' },
+  { id: 'dotnet', quantity: '8 years', goods: '.NET', detail: 'C#, ASP.NET Core, Web API, Blazor, Entity Framework Core' },
+  { id: 'fo', quantity: '5 years', goods: 'Dynamics 365 Finance & Operations', short: 'Dynamics 365 F&O', detail: 'X++, LCS, Azure DevOps' },
+  { id: 'ax2012', goods: 'Dynamics AX 2012', detail: 'X++, custom AIF services, reports' },
+  { id: 'bc', goods: 'Dynamics 365 Business Central', detail: 'AL, Power Apps, Power Automate' },
+  { id: 'mobile-data', goods: 'Mobile and data', detail: 'Flutter and Dart, SQL Server, SSIS, MySQL' },
 ];

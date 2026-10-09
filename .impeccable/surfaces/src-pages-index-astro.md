@@ -71,7 +71,7 @@ FIRST VIEWPORT: At 1440×900 the viewport is the document, under a thin strip.
 - **A row of three fields:** Port of loading, Port of discharge (yellow) and Current carrier (yellow).
 - **Marks & numbers:** runs full width, with four stencilled container marks, each a link carrying its project name and one line.
 
-SIGNATURE: Hovering or focusing a container mark lights its row in the manifest. Following the mark lands on its container, whose door leaves swing open in one exponential ease-out to reveal the route. Content is never hidden at rest, and reduced motion arrives with the doors already open.
+SIGNATURE: Hovering or focusing a container mark lights the Description of goods lines it carries, and a goods line lights the marks that prove it (retargeted 2026-10-09 from the manifest row, which sat off screen). Following the mark lands on its container, whose door leaves swing open in one exponential ease-out to reveal the route. Content is never hidden at rest, and reduced motion arrives with the doors already open.
 
 FORM: Bill of Lading. Grounded candidate #7 of 7, assigned by the roll; seed key 1f893e98.
 

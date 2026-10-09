@@ -33,7 +33,6 @@ import { formatPeriod } from '../../lib/format';
           <tr
             role="row"
             id={`manifest-${line.number}`}
-            data-mark={line.container?.mark.id}
             class:list={['border-t border-form/35 transition-colors duration-150 hover:bg-paper-deep', line.container && 'is-container']}
           >
             <td role="cell" class="font-data text-sm text-form">{String(line.number).padStart(2, '0')}</td>
