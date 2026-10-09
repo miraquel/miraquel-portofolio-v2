@@ -1,4 +1,5 @@
 import { containerMark, type ContainerMark } from '../lib/container-mark';
+import type { GoodsId } from './profile';
 
 export interface Period {
   /** YYYY-MM */
@@ -22,6 +23,8 @@ export interface CaseStudy {
   client: string;
   period: Period;
   cargo: string;
+  /** The Description of goods lines its route uses; card and lines light together on hover */
+  carries: GoodsId[];
   /** Stops in order; legs[i] is what travels from stops[i] to stops[i + 1] */
   route: { stops: RouteStop[]; legs: string[][]; returns: string[] };
   evidence: Evidence[];
@@ -55,6 +58,7 @@ const caseStudies: CaseStudy[] = [
     line: "A car-rental group's ERP, code and data, moved to Dynamics 365 F&O",
     client: 'PT Mitra Pinasthika Mustika Rent',
     period: { start: '2022-04', end: '2023-04' },
+    carries: ['fo', 'ax2012'],
     cargo:
       "I moved PT Mitra Pinasthika Mustika Rent's ERP from Dynamics AX 2012 R3 to Dynamics 365 Finance & Operations: I upgraded the X++ customisations to F&O extensions and migrated the master and transactional data.",
     route: {
@@ -77,6 +81,7 @@ const caseStudies: CaseStudy[] = [
     line: 'Invoice settlement from a phone, posted as AX 2012 R2 payment journals: about 60% less manual entry',
     client: 'PT Gandum Mas Kencana',
     period: { start: '2023-11', end: '2024-02' },
+    carries: ['dotnet', 'ax2012', 'mobile-data'],
     cargo:
       "A Flutter app and ASP.NET Web API that let finance staff settle vendor and customer invoices from a phone: scan each invoice's QR code, build a payment batch, and the API posts it into AX 2012 R2 as a payment journal through a custom AIF service written in X++.",
     route: {
@@ -108,6 +113,7 @@ const caseStudies: CaseStudy[] = [
     line: 'Warehouse scanners that receive, requisition and post into AX 2012 R2',
     client: 'PT Gandum Mas Kencana',
     period: { start: '2024-02', end: '2024-07' },
+    carries: ['dotnet', 'ax2012', 'mobile-data'],
     cargo:
       "An ASP.NET Web API and Flutter app that move the warehouse's spare-part work onto handheld scanners: receiving against purchase orders, work orders, item requisitions and stock lookups, with every posting going into AX 2012 R2 through a custom AIF service.",
     route: {
@@ -134,6 +140,7 @@ const caseStudies: CaseStudy[] = [
     line: 'Raw-material cost forecasting on the AX data warehouse',
     client: 'PT Gandum Mas Kencana',
     period: { start: '2025-01', end: '2025-05' },
+    carries: ['dotnet', 'mobile-data'],
     cargo:
       'An ASP.NET Core MVC application for forecasting raw-material costs: planners load forecasts and exchange rates, background jobs recompute each scenario against the AX data warehouse, and SignalR pushes the result to everyone watching.',
     route: {

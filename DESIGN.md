@@ -204,7 +204,7 @@ A single-ink form palette (paper, green ink, carbon) with two container-steel pa
 
 ### Neutral
 - **Security Paper** (paper): the page ground and the ground of every field.
-- **Deep Tint Paper** (paper-deep): the second paper tone. Hover and cross-highlight state for marks and manifest rows, the standing tint on manifest lines that are containers, the closing Notify party footer, blockquotes and inline code in posts.
+- **Deep Tint Paper** (paper-deep): the second paper tone. Hover state for marks and manifest rows, the cross-highlight between a mark card and its goods lines, the standing tint on manifest lines that are containers, the closing Notify party footer, blockquotes and inline code in posts.
 - **Carbon** (ink): all field data and reading text; the 2px frame of a route card; the code-block ground in posts; the default focus outline.
 - **Stencil White** (stencil): text and marks on container steel; labels there run at 85%.
 - **Faded Ink** (form-soft): the scrollbar thumb only.
@@ -306,7 +306,7 @@ A case study as a full-bleed band of steel: the title, client and period on the 
 A data-flow diagram drawn in code: lettered stops (A, B, C) as 2px carbon-framed paper boxes with name, role and mono tech line; between stops, 2px stroked down-arrows labelled with what travels; return flows listed under a form hairline with a return arrow.
 
 ### Container Mark and Cross-highlight
-An ISO 6346 mark (owner code, serial, boxed check digit). Standalone (bay header, manifest) it is an image named "Container CAAU 202204, check digit 0"; inside a link it is hidden, so the link is named by its project title first. Hovering or focusing a Marks and numbers card lights its manifest row, and the reverse: paper-deep with a 2px form frame drawn inside the box (an outline at -2px, not a shadow), so a crossed line stands apart from the standing tint of container lines. Each card also prints the line that carries it ("Manifest line 06": the words in Overpass, the number in mono), so the connection reads without the hover, which on a phone never happens.
+An ISO 6346 mark (owner code, serial, boxed check digit). Standalone (bay header, manifest) it is an image named "Container CAAU 202204, check digit 0"; inside a link it is hidden, so the link is named by its project title first. Hovering or focusing a Marks and numbers card lights the Description of goods lines its route uses (`carries` in `src/data/work.ts`), and hovering a goods line lights the cards that prove it: AXFinMobile lights .NET, Dynamics AX 2012 and Mobile and data together, and Mobile and data lights three cards. Both ends sit in adjacent fields, so they share a screen once the cards are in view. A lit card or line takes paper-deep with a 2px form frame drawn inside the box (an outline at -2px, not a shadow); from 640px the goods table reaches 12px into the field padding, with its cells padded to match, so the frame clears the text while the text keeps its column. A line no container carries (Business Central) stays unlit, and touch is left out, where a tap would only flash. Each card also prints the manifest line that carries it ("Manifest line 06": the words in Overpass, the number in mono) as a plain cross-reference.
 
 ### Stamp
 A rubber stamp in stamp red: stencil word over a mono date, 3px double border, rotated -6deg, multiply-blended and roughened by the stamp-ink displacement filter. It carries a status and a date and nothing else (Delivered on bays, Expired on a lapsed certificate).

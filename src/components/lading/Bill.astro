@@ -88,7 +88,7 @@ const [firstName, ...lastNames] = profile.name.split(' ');
             <li class="bg-paper">
               <a
                 href={`#${container.slug}`}
-                data-mark={container.mark.id}
+                data-carries={container.carries.join(' ')}
                 data-container-link={container.slug}
                 class="group flex h-full flex-col gap-2.5 px-4 py-5 transition-colors duration-150 hover:bg-paper-deep sm:px-5"
               >
@@ -113,15 +113,15 @@ const [firstName, ...lastNames] = profile.name.split(' ');
       </Field>
 
       <Field n={8} label="Description of goods" class="order-8 lg:order-none col-span-12" data-goods>
-        <table class="w-full text-left">
+        <table class="w-full text-left sm:-mx-3 sm:w-[calc(100%+1.5rem)]">
           <thead class="sr-only">
             <tr><th scope="col">Quantity</th><th scope="col">Goods</th></tr>
           </thead>
           <tbody>
             {goods.map((line) => (
-              <tr class="border-t border-form/25 first:border-t-0">
-                <td class="w-24 py-2 pr-4 align-baseline font-data text-sm font-semibold whitespace-nowrap sm:w-32">{line.quantity ?? ''}</td>
-                <td class="py-2 align-baseline leading-snug">
+              <tr data-goods-line={line.id} class="border-t border-form/25 first:border-t-0">
+                <td class="w-24 py-2 pr-4 align-baseline font-data text-sm font-semibold whitespace-nowrap sm:w-[8.75rem] sm:pl-3">{line.quantity ?? ''}</td>
+                <td class="py-2 align-baseline leading-snug sm:pr-3">
                   <span class="flex flex-wrap gap-x-3">
                     <span class="font-extrabold">{line.goods}</span>
                     <span class="text-ink/80">{line.detail}</span>
