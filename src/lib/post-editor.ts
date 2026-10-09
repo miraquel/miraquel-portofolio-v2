@@ -54,7 +54,10 @@ export async function startEditor(initialData = ''): Promise<ClassicEditor> {
     },
     root: { initialData },
   });
-  editor.ui.view.editable.element?.classList.add('post-body');
+  // The editing view owns the editable's class attribute and rewrites it on every focus change, so a
+  // class set on the element directly is gone once the writer clicks in. The view's writer keeps it.
+  const root = editor.editing.view.document.getRoot();
+  if (root) editor.editing.view.change((writer) => writer.addClass('post-body', root));
   content.value = editor.getData();
   editor.model.document.on('change:data', () => (content.value = editor.getData()));
   return editor;
