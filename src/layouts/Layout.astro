@@ -24,13 +24,15 @@ interface Props {
 
 const {
 	title = `${profile.name}: ${profile.title}`,
-	description = `${profile.title} based in ${profile.based}: Dynamics AX 2012 and Finance & Operations customisation, and the ASP.NET services and Flutter apps that connect to them. ${profile.relocation}.`,
+	description = `${profile.title} based in ${profile.based}: Dynamics AX 2012 and Finance & Operations customisation, and the ASP.NET services and Flutter apps that connect to them. ${profile.discharge.value} ${profile.discharge.detail.toLowerCase()}.`,
 	noindex = false,
 	chrome = 'lading',
 	ogTitle = title,
 	type = 'website',
 	image = {
-		path: '/og.png',
+		// Link previews cache an image by its URL, so the URL carries the card's version: the first
+		// 8 hex digits of public/og.png's SHA-256 (render.py prints it; tests/site-card.test.ts checks it)
+		path: '/og.png?v=5f1fbb42',
 		alt: `Bill of lading for ${profile.name}, ${profile.title}: port of loading ${profile.based}; port of discharge, ${profile.discharge.value.toLowerCase()} ${profile.discharge.detail.toLowerCase()}. Four container marks list the case studies.`,
 	},
 	publishedTime,
