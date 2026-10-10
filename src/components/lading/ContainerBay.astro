@@ -175,6 +175,11 @@ const evidenceLink = 'inline-block py-3 underline decoration-stencil/50 decorati
     transition: none;
   }
 
+  /* While the 3D doors (src/lib/bay-doors.ts) stand over the route, they replace these leaves */
+  .bay.has-3d-doors .bay-leaf {
+    display: none;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .bay-leaf {
       display: none;

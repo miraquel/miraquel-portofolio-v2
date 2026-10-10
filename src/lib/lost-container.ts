@@ -5,9 +5,6 @@ import {
   BackSide,
   Box3,
   BoxGeometry,
-  CanvasTexture,
-  Color,
-  CylinderGeometry,
   DirectionalLight,
   Group,
   HemisphereLight,
@@ -16,12 +13,12 @@ import {
   MeshStandardMaterial,
   PerspectiveCamera,
   Scene,
-  SRGBColorSpace,
   Vector3,
   WebGLRenderer,
   type Material,
 } from 'three';
 import { notFoundMark } from './container-mark';
+import { cssColor, lockingRods, paintLeaf } from './door-leaf';
 import { doorAngle, openAngle, swingMs } from './door-swing';
 
 // ISO 668 1CC outside dimensions, in metres
@@ -35,75 +32,16 @@ const viewElevation = MathUtils.degToRad(12);
 const turnLimit = MathUtils.degToRad(45);
 const fov = 30;
 
-function token(name: string, fallback: string): Color {
-  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  return new Color(value || fallback);
-}
-
 function box(width: number, height: number, depth: number, material: Material | Material[], x: number, y: number, z: number) {
   const mesh = new Mesh(new BoxGeometry(width, height, depth), material);
   mesh.position.set(x, y, z);
   return mesh;
 }
 
-/** A leaf's outer face: door steel with its corrugation, and its half of the stencilled mark */
-function leafFace(door: Color, stencil: Color, side: 'left' | 'right'): CanvasTexture {
-  const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 1024;
-  const ctx = canvas.getContext('2d')!;
-  ctx.fillStyle = `#${door.getHexString()}`;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  // The leaves' corrugation, as the bay doors print it: plain, a dark rib, a light edge
-  for (let x = 0; x < canvas.width; x += 30) {
-    ctx.fillStyle = 'rgb(0 0 0 / 0.16)';
-    ctx.fillRect(x + 20, 0, 5, canvas.height);
-    ctx.fillStyle = 'rgb(255 255 255 / 0.06)';
-    ctx.fillRect(x + 25, 0, 5, canvas.height);
-  }
-
-  // The owner code reads on the left leaf, the serial and boxed check digit on the right,
-  // so the mark runs across the doors as it does on the bays
-  ctx.fillStyle = `#${stencil.getHexString()}`;
-  ctx.strokeStyle = ctx.fillStyle;
-  ctx.textBaseline = 'alphabetic';
-  ctx.textAlign = 'left';
-  const serial = notFoundMark.serial;
-  const check = String(notFoundMark.check);
-  // One size on both leaves: the largest at which the serial and its box fit between the
-  // right leaf's locking rods, so no rod crosses the mark
-  const font = (size: number) => `800 ${size}px "Big Shoulders Stencil Variable", "Arial Narrow", sans-serif`;
-  ctx.font = font(100);
-  // The serial and digit, plus the gap (0.24) and the box's padding (0.12 each side), per pixel of size
-  const perPixel = (ctx.measureText(serial).width + ctx.measureText(check).width) / 100 + 0.48;
-  const size = Math.min(170, (canvas.width * 0.68) / perPixel);
-  ctx.font = font(size);
-  const baseline = 120 + size;
-  if (side === 'left') {
-    ctx.textAlign = 'center';
-    ctx.fillText(notFoundMark.owner, canvas.width / 2, baseline);
-  } else {
-    const gap = size * 0.24;
-    const pad = size * 0.12;
-    const serialWidth = ctx.measureText(serial).width;
-    const checkWidth = ctx.measureText(check).width;
-    const left = (canvas.width - (serialWidth + gap + checkWidth + pad * 2)) / 2;
-    ctx.fillText(serial, left, baseline);
-    ctx.fillText(check, left + serialWidth + gap + pad, baseline);
-    ctx.lineWidth = size * 0.07;
-    ctx.strokeRect(left + serialWidth + gap, baseline - size * 0.86, checkWidth + pad * 2, size * 0.98);
-  }
-
-  const texture = new CanvasTexture(canvas);
-  texture.colorSpace = SRGBColorSpace;
-  texture.anisotropy = 4;
-  return texture;
-}
-
 function buildContainer() {
-  const cobalt = token('--color-cobalt', '#1d4a96');
-  const cobaltDeep = token('--color-cobalt-deep', '#173c7a');
-  const stencil = token('--color-stencil', '#f5f7f2');
+  const cobalt = cssColor('--color-cobalt', '#1d4a96');
+  const cobaltDeep = cssColor('--color-cobalt-deep', '#173c7a');
+  const stencil = cssColor('--color-stencil', '#f5f7f2');
 
   const steel = new MeshStandardMaterial({ color: cobalt, roughness: 0.62, metalness: 0.25 });
   const frame = new MeshStandardMaterial({ color: cobaltDeep, roughness: 0.55, metalness: 0.3 });
@@ -163,18 +101,13 @@ function buildContainer() {
     const sign = side === 'left' ? -1 : 1;
     const pivot = new Group();
     pivot.position.set(sign * (W / 2 - 0.035), 0, hingeZ);
-    const face = new MeshStandardMaterial({ map: leafFace(cobaltDeep, stencil, side), roughness: 0.6, metalness: 0.25 });
+    const face = new MeshStandardMaterial({ map: paintLeaf(notFoundMark, cobaltDeep, stencil, side, 512, 1024), roughness: 0.6, metalness: 0.25 });
     // Box faces run +x, -x, +y, -y, +z, -z; the outer face is +z while the doors are shut
     const leaf = box(leafWidth, leafHeight, leafDepth, [frame, frame, frame, frame, face, frame], -sign * leafWidth / 2, H / 2 - 0.02, -leafDepth / 2);
     pivot.add(leaf);
-    for (const fromMeeting of [0.1, 0.87]) {
-      const x = -sign * leafWidth * (1 - fromMeeting);
-      const rod = new Mesh(new CylinderGeometry(0.022, 0.022, H - 0.2, 12), rodSteel);
-      rod.position.set(x, H / 2, 0.03);
-      pivot.add(rod);
-      pivot.add(box(0.035, 0.035, 0.05, rodSteel, x, 1.15, 0.05));
-      pivot.add(box(0.035, 0.32, 0.035, rodSteel, x + sign * 0.03, 1.0, 0.075));
-    }
+    const rods = lockingRods(rodSteel, side, leafWidth, H - 0.2, 1);
+    rods.position.y = H / 2;
+    pivot.add(rods);
     container.add(pivot);
     leaves.push(pivot);
   }

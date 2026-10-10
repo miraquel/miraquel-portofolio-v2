@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { doorAngle, easeOut, openAngle, swingMs } from '../src/lib/door-swing';
+import { bayOpenAngle, doorAngle, easeOut, leafOpacity, openAngle, swingMs } from '../src/lib/door-swing';
 
 test('the swing eases like the bays: cubic-bezier(0.16, 1, 0.3, 1)', () => {
   assert.equal(easeOut(0), 0);
@@ -24,4 +24,24 @@ test('the doors only ever open, most of the way in the first quarter', () => {
     previous = angle;
   }
   assert.ok(doorAngle(swingMs / 4) > openAngle * 0.75);
+});
+
+test('a bay\'s doors swing to 92deg, as far as its CSS leaves do', () => {
+  assert.equal(bayOpenAngle, (92 * Math.PI) / 180);
+  assert.equal(doorAngle(swingMs, bayOpenAngle), bayOpenAngle);
+  assert.equal(doorAngle(swingMs / 2, bayOpenAngle), bayOpenAngle * easeOut(0.5));
+});
+
+test('the leaves fade like the CSS ones: opacity 350ms ease-out from 700ms', () => {
+  assert.equal(leafOpacity(0), 1);
+  assert.equal(leafOpacity(700), 1);
+  assert.equal(leafOpacity(1050), 0);
+  assert.equal(leafOpacity(5000), 0);
+  // Halfway through the fade, CSS ease-out has covered 68% of it
+  assert.ok(Math.abs(leafOpacity(875) - 0.316) < 0.01, `leafOpacity(875) = ${leafOpacity(875)}`);
+  let previous = 1;
+  for (let ms = 700; ms <= 1050; ms += 10) {
+    assert.ok(leafOpacity(ms) <= previous, `opacity rose at ${ms}ms`);
+    previous = leafOpacity(ms);
+  }
 });

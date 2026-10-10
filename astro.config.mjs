@@ -54,6 +54,8 @@ export default defineConfig({
             }
             if (/[\\/]@?firebase[\\/]/.test(id)) return 'firebase';
             if (id.includes('/ckeditor5/')) return 'ckeditor';
+            // three.js, shared by the 404 container and the bays' 3D doors, both loaded on demand
+            if (/[\\/]node_modules[\\/]three[\\/]/.test(id)) return 'three';
           }
         }
       },

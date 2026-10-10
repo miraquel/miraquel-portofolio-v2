@@ -42,3 +42,10 @@ export function containerMark(startMonth: string): ContainerMark {
 
 // The empty container on the 404 page carries no project, so its serial is the status code
 export const notFoundMark = mark('CAAU', '000404');
+
+/** A mark read back from its compact id (a bay's data-bay), refused unless its check digit holds */
+export function markFromId(id: string): ContainerMark {
+  const parsed = mark(id.slice(0, 4), id.slice(4, 10));
+  if (parsed.id !== id) throw new Error(`Not a valid container mark: ${id}`);
+  return parsed;
+}

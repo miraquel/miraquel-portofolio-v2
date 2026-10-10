@@ -58,17 +58,56 @@ import { containers } from '../data/work';
 	// them open once the route comes into view: at once on a desktop, where the route sits beside
 	// the heading, and when a phone reader scrolls down to it. The doors only ever cover the route,
 	// so while they are shut nothing in view is hidden. At rest they stand open.
+	// The doors are 3D (three.js) once that has loaded. It loads on intent, when a container link
+	// is hovered, focused or touched, and only with WebGL 2, so plain scrolling never fetches it;
+	// until it is ready, and for good without WebGL, the CSS leaves swing instead.
 	if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+		let doors3d: Promise<typeof import('../lib/bay-doors') | null> | undefined;
+		const loadDoors = () => {
+			if (doors3d) return;
+			const probe = document.createElement('canvas').getContext('webgl2');
+			probe?.getExtension('WEBGL_lose_context')?.loseContext();
+			doors3d = probe ? import('../lib/bay-doors').catch(() => null) : Promise.resolve(null);
+		};
+
 		document.querySelectorAll<HTMLAnchorElement>('a[data-container-link]').forEach((link) => {
+			for (const intent of ['pointerenter', 'focus', 'touchstart']) {
+				link.addEventListener(intent, loadDoors, { once: true, passive: true });
+			}
 			link.addEventListener('click', () => {
 				const bay = document.getElementById(link.dataset.containerLink ?? '');
-				const hold = bay?.querySelector('.bay-hold');
-				if (!bay || !hold) return;
+				const hold = bay?.querySelector<HTMLElement>('.bay-hold');
+				if (!bay || !hold || bay.classList.contains('is-shut')) return;
 				bay.classList.add('is-shut');
 
+				// The 3D doors take over from the shut CSS leaves if they are up before the bay opens
+				let opened = false;
+				let doors: import('../lib/bay-doors').BayDoors | null = null;
+				const useCss = () => {
+					doors = null;
+					bay.classList.remove('has-3d-doors');
+				};
+				loadDoors();
+				doors3d
+					?.then((module) => module?.mountBayDoors(bay, hold, useCss))
+					.then((mounted) => {
+						if (!mounted) return;
+						if (opened) return mounted.dispose();
+						doors = mounted;
+						bay.classList.add('has-3d-doors');
+					})
+					.catch(() => {});
+
 				const open = () => {
+					if (opened) return;
+					opened = true;
 					observer.disconnect();
-					requestAnimationFrame(() => requestAnimationFrame(() => bay.classList.remove('is-shut')));
+					requestAnimationFrame(() =>
+						requestAnimationFrame(() => {
+							bay.classList.remove('is-shut');
+							doors?.open().then(useCss);
+						})
+					);
 				};
 				const observer = new IntersectionObserver(
 					(entries) => {
