@@ -89,7 +89,7 @@ A pure ERP consultant or a pure .NET engineer can't truthfully claim that combin
   - Never use "7+ years", "over four years", "Fortune 500" or "patented".
   - The Developer Associate certificate is current only with its end date: "valid until 3 October 2027". Never call it current after that day.
 - **Credentials:**
-  - Microsoft Certified: Dynamics 365 Finance and Operations Apps Developer Associate, issued October 2023 and renewed: **active until 3 October 2027** (Microsoft Learn, checked 9 October 2026; it had been listed as expired October 2025). `public/resume.pdf` still says "expired October 2025" until it is regenerated in career-ops;
+  - Microsoft Certified: Dynamics 365 Finance and Operations Apps Developer Associate, issued October 2023 and renewed: **active until 3 October 2027** (Microsoft Learn, checked 9 October 2026; it had been listed as expired October 2025). `public/resume.pdf` says "valid until October 2027" (regenerated in career-ops, 10 October 2026);
   - Microsoft Dynamics 365 Fundamentals, December 2019;
   - Exam 764 (SQL Database Infrastructure), August 2019;
   - Bachelor of Information Technology, Universitas Islam Syekh Yusuf, 2017;
