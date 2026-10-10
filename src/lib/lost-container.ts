@@ -23,6 +23,7 @@ import {
 } from 'three';
 import { notFoundMark } from './container-mark';
 import { doorAngle, openAngle, swingMs } from './door-swing';
+import { cssColor } from './css-color';
 
 // ISO 668 1CC outside dimensions, in metres
 const L = 6.058;
@@ -34,11 +35,6 @@ const viewAzimuth = MathUtils.degToRad(24);
 const viewElevation = MathUtils.degToRad(12);
 const turnLimit = MathUtils.degToRad(45);
 const fov = 30;
-
-function token(name: string, fallback: string): Color {
-  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  return new Color(value || fallback);
-}
 
 function box(width: number, height: number, depth: number, material: Material | Material[], x: number, y: number, z: number) {
   const mesh = new Mesh(new BoxGeometry(width, height, depth), material);
@@ -101,9 +97,9 @@ function leafFace(door: Color, stencil: Color, side: 'left' | 'right'): CanvasTe
 }
 
 function buildContainer() {
-  const cobalt = token('--color-cobalt', '#1d4a96');
-  const cobaltDeep = token('--color-cobalt-deep', '#173c7a');
-  const stencil = token('--color-stencil', '#f5f7f2');
+  const cobalt = cssColor('--color-cobalt', '#1d4a96');
+  const cobaltDeep = cssColor('--color-cobalt-deep', '#173c7a');
+  const stencil = cssColor('--color-stencil', '#f5f7f2');
 
   const steel = new MeshStandardMaterial({ color: cobalt, roughness: 0.62, metalness: 0.25 });
   const frame = new MeshStandardMaterial({ color: cobaltDeep, roughness: 0.55, metalness: 0.3 });
