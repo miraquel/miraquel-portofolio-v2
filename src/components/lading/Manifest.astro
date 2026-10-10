@@ -42,7 +42,7 @@ import { formatPeriod } from '../../lib/format';
             <td role="cell" class="font-data text-[0.8125rem] whitespace-nowrap">{formatPeriod(line.period)}</td>
             <td role="cell" class="font-bold leading-snug">
               {line.container ? (
-                <a href={`#${line.container.slug}`} data-container-link={line.container.slug} class="inline-block py-3 -my-3 underline decoration-form/40 decoration-2 underline-offset-4 hover:decoration-form">
+                <a href={`#${line.container.slug}`} class="inline-block py-3 -my-3 underline decoration-form/40 decoration-2 underline-offset-4 hover:decoration-form">
                   {line.title}
                 </a>
               ) : line.href ? (

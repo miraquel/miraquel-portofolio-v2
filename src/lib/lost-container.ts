@@ -1,6 +1,6 @@
 // The empty container on the 404 page: a 20 ft box in cobalt steel, built in code, whose
-// doors swing open (the bays' one motion) to show that the hold is empty. A visitor can drag
-// it to turn it. It only draws when something changes, so at rest it costs nothing.
+// doors swing open to show that the hold is empty. A visitor can drag it to turn it. It
+// only draws when something changes, so at rest it costs nothing.
 import {
   BackSide,
   Box3,
@@ -50,7 +50,7 @@ function leafFace(door: Color, stencil: Color, side: 'left' | 'right'): CanvasTe
   const ctx = canvas.getContext('2d')!;
   ctx.fillStyle = `#${door.getHexString()}`;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  // The leaves' corrugation, as the bay doors print it: plain, a dark rib, a light edge
+  // The leaves' corrugation: plain, a dark rib, a light edge
   for (let x = 0; x < canvas.width; x += 30) {
     ctx.fillStyle = 'rgb(0 0 0 / 0.16)';
     ctx.fillRect(x + 20, 0, 5, canvas.height);
