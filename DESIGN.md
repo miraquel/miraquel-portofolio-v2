@@ -185,7 +185,7 @@ The world rejects the developer-portfolio template (sticky sidebar, project card
 - Numbered dt/dd fields on a 12-column form grid, separated by 1px hairlines and framed by 2px rules.
 - Full-bleed steel container bands carrying stencilled ISO 6346 marks.
 - A condensed stencil face for marks, the name and printed band titles; a highway-signage grotesk for everything read; its mono for codes and dates.
-- One authored motion: container door leaves swinging open on arrival (a bay's, and the 404 page's container).
+- Two authored motions: container door leaves swinging open on arrival (a bay's, and the 404 page's container), and a crane loading the career stack once.
 - A night print of the same form for dark devices and for the strip's Dark switch.
 
 ## Colors
@@ -270,7 +270,7 @@ The manifest is a real table that stacks below 64rem into a two-column grid per 
 
 ## Elevation & Depth
 
-Flat. Depth is printed, not lit: the form stacks by rule weight and paper tone, and the only dimensional objects are the container door leaf during its swing and the lost container on the 404 page, which is lit but casts nothing onto the paper. Paper-deep is the single raised tone, used for state (hover, cross-highlight) and for the closing footer.
+Flat. Depth is printed, not lit: the form stacks by rule weight and paper tone, and the only dimensional objects are the container door leaf during its swing, the lost container on the 404 page and the career stack's painted containers, all lit and none casting anything onto the paper. Paper-deep is the single raised tone, used for state (hover, cross-highlight) and for the closing footer.
 
 ### Named Rules
 **The Printed Depth Rule.** No box-shadows on paper. Separation comes from a 2px rule, a 1px hairline, or the paper-deep tone. The one box-shadow in the system is the 2px light ring on a door leaf's locking rod.
@@ -331,6 +331,20 @@ A form-framed table with a form-green header row; container lines carry their sm
 ### Lost Container (404)
 The 404 page's one object, drawn in WebGL with three.js (`src/lib/lost-container.ts`). It's a 20 ft container built in code, with cobalt panels and corrugation ribs, a cobalt-deep frame, and corner castings and locking rods darker still. Its shut doors carry the mark CAAU 000404 7 in stencil white, the owner code on the left leaf and the serial with its boxed check digit on the right, sized to sit between the rods. Once 60% of the slot is in view, the doors pause for a beat so the mark can be read, then swing open on the bays' timing (1100ms, cubic-bezier(0.16, 1, 0.3, 1), `src/lib/door-swing.ts`) to 110deg, showing a dark, empty hold. A sideways drag turns the box up to 45deg either way (`touch-action: pan-y`, so a vertical swipe still scrolls). It draws only while something changes. The canvas is transparent and lit, but casts no shadow, so the paper of either print shows through; the steel is the same by day and by night. It sits in the right half of the 404 section from 1024px and under the buttons below that, and it's decorative (`aria-hidden`). It loads only on that page, after the browser is idle, and only if WebGL 2 is available. Until it's drawing, and for good without WebGL, the desktop column stays empty paper and the phone shows nothing. Under reduced motion the doors are open from the start.
 
+### Career Stack
+All projects as a 3D stack of containers on a quay, drawn with three.js (`src/lib/career-stack.ts`, layout in `src/lib/stack-layout.ts`), between the All projects heading and the manifest.
+
+- **Time** runs along the quay, January to January in whole years. A container spans its project's months, the end month not counted.
+- **Platform** runs across it in three lanes, back to front: Dynamics ERP, ERP + .NET, .NET. The lane is read from the manifest's platform text, and a platform naming neither side fails the build.
+- **Overlaps** stack as a crane drops them: in date order, each one level above the highest overlapping container in its lane.
+- **Paint:** the four case studies are their bay's steel, lit to show the paint exactly on the side facing the viewer, with their mark in stencil white. The rest are printed: paper faces, unlit, with form-green edges.
+- **The quay** is form-green lines: an outline, faint lane dividers, a tick at each January. The year labels (mono) and the lane names (0.75rem semibold in form green, just past the quay's newest end, pinned to the canvas edge when panned back) are HTML over the canvas.
+- **Hover or first tap:** a container slides 0.5 units toward the viewer over 150ms (a lift would push it into the containers stacked on it) and a field-style label gives its title, client, period and, for a case study, its mark. **Click or second tap:** goes to its manifest line. **Sideways drag:** pans the view below 1024px, which holds three years and opens on the most recent; from 1024px the whole quay is in view.
+- **Crane:** the first time 40% of it is in view, each container is lowered on a form-green cable over 420ms on the bays' curve, staggered so all have landed by 2s.
+- **Reduced motion:** stacked from the start, and the hover slide is instant.
+- **Night print:** the printed parts are redrawn in the night paper and ink; the steel is the same.
+- **Drawing and loading:** it draws only while something changes. It's decorative (`aria-hidden`); the manifest stays the complete list. Its slot is 15rem tall below 1024px and 18rem from 1024px, reserved on load and given back only without WebGL 2 or if three.js fails to load; three.js loads when it is a screen away.
+
 ### Admin Workspace
 The private screens for writing the blog (`/admin`): an Operate surface, so the world lends its type, palette, density and one signature, and the controls stay standard. It wears the site's page (Layout.astro, so the night print and the Dark switch come with it) and its strip, carrying Dashboard, Posts and New post (the current one underlined, `aria-current`), then View site, Sign out and Dark; below 1024px they fold into the same Menu as the site's phone strip. Headings are fixed sizes (2.5rem, 2rem on a phone), ruled off 2px in form green as section heads are, with the screen's one primary button at the right. The dashboard counts posts by status in a hairline field grid, each count opening the post list filtered to it, over a table of the latest posts. The post list filters with the blog's chips and lists posts in the All projects table style, each title opening its editor; a row stacks below 48rem. The editor puts the writing on the left and a Publishing panel at the right, headed by a form-green bar and sticky on a tall desktop; the post's text is written in the post body's own rules (`post-body.css`), so it reads as it will on the blog. **The signature:** the Publishing panel carries a rubber stamp of the chosen status and date ("Published, 8 October 2026"), following both fields as they change; it is hidden from screen readers, since the fields say the same. Admin pages are `noindex` and leave Firebase Analytics out.
 
@@ -343,7 +357,7 @@ The private screens for writing the blog (`/admin`): an Operate surface, so the 
 - **Do** carry case studies as full-bleed cobalt or oxide bands with a stencilled ISO 6346 mark and a code-drawn route.
 - **Do** keep every tap target at least 44px tall on mobile.
 - **Do** focus with a 3px carbon outline at a 3px offset (night carbon at night), switching to signal yellow on steel (marked `data-dark`). Inside a form-green band (marked `data-band`) it is signal yellow by day and night paper at night, since the band turns light. These base styles apply under `html[data-world='lading']`, which Layout.astro sets on every page, the admin workspace included.
-- **Do** keep smooth scrolling and the door swing behind `prefers-reduced-motion: no-preference`.
+- **Do** keep smooth scrolling, the door swing and the crane behind `prefers-reduced-motion: no-preference`.
 
 ### Don't:
 - **Don't** round a corner or cast a shadow on paper.
