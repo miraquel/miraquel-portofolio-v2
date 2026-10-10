@@ -1,0 +1,48 @@
+---
+// The empty container beside the 404 message, drawn with three.js. three.js loads only on
+// this page, once the browser is idle after the first paint. Until the scene is drawing, and
+// for good without WebGL, the slot stays empty: a reserved column on a desktop, nothing on a
+// phone, so the page reads exactly as it does without it.
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div data-lost-container class:list={['relative aspect-[3/2] w-full max-lg:hidden', className]} aria-hidden="true">
+  <canvas class="invisible absolute inset-0 size-full"></canvas>
+</div>
+
+<style>
+  /* A sideways drag turns the box; a vertical one still scrolls the page on touch */
+  canvas {
+    touch-action: pan-y;
+    cursor: grab;
+  }
+
+  canvas[data-dragging] {
+    cursor: grabbing;
+  }
+</style>
+
+<script>
+  const slot = document.querySelector<HTMLElement>('[data-lost-container]');
+  const canvas = slot?.querySelector('canvas');
+  // three.js draws with WebGL 2; without it, skip the download and leave the page as it is
+  const probe = document.createElement('canvas').getContext('webgl2');
+  probe?.getExtension('WEBGL_lose_context')?.loseContext();
+  if (slot && canvas && probe) {
+    const reveal = () => {
+      slot.classList.remove('max-lg:hidden');
+      canvas.classList.remove('invisible');
+    };
+    const start = () =>
+      import('../../lib/lost-container')
+        .then(({ mountLostContainer }) => mountLostContainer(slot, canvas, reveal))
+        // No WebGL, or the scene failed to load: the page stays as it is
+        .catch(() => {});
+    if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 2000 });
+    else setTimeout(start, 300);
+  }
+</script>
