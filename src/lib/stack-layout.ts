@@ -79,6 +79,23 @@ export function quayRange(boxes: readonly StackBox[]): { start: number; end: num
 }
 
 /**
+ * How many containers high a phone's view must stand to frame what's around `centre`: a stack
+ * within `reach` months counts in full, and one up to `fade` months further out counts less
+ * the further away it is, so the camera pulls back smoothly before a tall stack comes into
+ * view. Never less than one container.
+ */
+export function heightNear(boxes: readonly StackBox[], centre: number, reach: number, fade: number): number {
+  let height = 1;
+  for (const box of boxes) {
+    const away = Math.max(0, box.start - centre, centre - (box.start + box.length));
+    const t = Math.min(1, Math.max(0, (away - reach) / fade));
+    const weight = 1 - t * t * (3 - 2 * t);
+    height = Math.max(height, 1 + weight * box.level);
+  }
+  return height;
+}
+
+/**
  * The stack's proportions in world units (one month along the quay): a container's square
  * section, the pitch between lanes, the quay's margin around them, and how far a hovered
  * container slides toward the viewer

@@ -3,10 +3,11 @@
 // the quay, platform across it, overlaps stacked, the case studies painted with their marks.
 // It repeats the manifest below, which stays the complete, accessible list, so the stack is
 // decorative. Its space is kept unless the browser lacks WebGL 2; three.js loads on approach.
+// Where the view pans, a hint hangs under it until the first drag.
 import { manifest } from '../../data/work';
 import type { StackItem } from '../../lib/career-stack';
 import { formatPeriod } from '../../lib/format';
-import { stackLayout } from '../../lib/stack-layout';
+import { quayRange, stackLayout } from '../../lib/stack-layout';
 
 const items: StackItem[] = stackLayout(manifest).map((box) => {
   const line = manifest[box.number - 1];
@@ -18,9 +19,10 @@ const items: StackItem[] = stackLayout(manifest).map((box) => {
     ...(line.container && { mark: line.container.mark, steel: line.container.steel }),
   };
 });
+const firstYear = 2018 + quayRange(items).start / 12;
 ---
 
-<div data-career-stack data-stack={JSON.stringify(items)} aria-hidden="true" class="relative mt-8 h-[15rem] lg:h-[18rem]">
+<div data-career-stack data-stack={JSON.stringify(items)} aria-hidden="true" class="relative mt-8 h-[11rem] md:h-[15rem] lg:h-[18rem]">
   <canvas class="absolute inset-0 size-full"></canvas>
   <div data-stack-marks class="pointer-events-none absolute inset-0 overflow-hidden"></div>
   <div
@@ -29,6 +31,7 @@ const items: StackItem[] = stackLayout(manifest).map((box) => {
     class="pointer-events-none absolute left-0 top-0 z-10 w-max max-w-[17rem] border-2 border-form bg-paper px-3 py-2 text-ink"
   >
   </div>
+  <p data-stack-hint hidden class="absolute left-0 top-full mt-1 text-xs text-form">← Drag back to {firstYear}</p>
 </div>
 
 <style>

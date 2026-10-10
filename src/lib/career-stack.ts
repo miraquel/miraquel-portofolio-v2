@@ -29,7 +29,7 @@ import {
 } from 'three';
 import type { ContainerMark } from './container-mark';
 import { cssColor } from './css-color';
-import { dropProgress, geometry, hoverOffset, laneNames, lanes, loadMs, quayRange, type Lane, type StackBox } from './stack-layout';
+import { dropProgress, geometry, heightNear, hoverOffset, laneNames, lanes, loadMs, quayRange, type Lane, type StackBox } from './stack-layout';
 
 /** A container as the page hands it over: its place, and what its label says */
 export interface StackItem extends StackBox {
@@ -47,9 +47,11 @@ const { boxHeight, boxDepth, lanePitch, quayMargin, pullDepth } = geometry;
 const seam = 0.2;
 const pullMs = 150;
 const fov = 26;
+/** The camera's angle above the quay: the whole quay's, and a panning view's, steeper so the
+ *  quay's lanes take more of a short slot */
 const elevation = MathUtils.degToRad(30);
-/** Below 1024px the view holds three years and pans */
-const narrowMonths = 36;
+const phoneElevation = MathUtils.degToRad(40);
+const tanHalf = Math.tan(MathUtils.degToRad(fov / 2));
 
 /** Lanes run from the back (-z) to the front (+z) */
 const laneZ = (lane: Lane) => (lanes.indexOf(lane) - 1) * lanePitch;
@@ -150,6 +152,7 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
   const canvas = slot.querySelector('canvas')!;
   const marks = slot.querySelector<HTMLElement>('[data-stack-marks]')!;
   const label = slot.querySelector<HTMLElement>('[data-stack-label]')!;
+  const hint = slot.querySelector<HTMLElement>('[data-stack-hint]');
   // The case studies' marks are painted in the stencil face
   await document.fonts.load('800 100px "Big Shoulders Stencil Variable"');
 
@@ -224,37 +227,90 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     return { item, group, hit, restY, restZ, pull: 0, cable };
   });
 
-  // The camera looks along -z from above the front; the view holds `span` months around `centre`
+  // The camera looks along -z from above the front; the view holds `span` months around `centre`.
+  // A desktop shows the whole quay. Below 1024px, unless the whole quay fits, the view pans, and
+  // the camera stands as close as the stacks around it allow: in close over the newest years,
+  // pulled back to frame the 2020 tower.
   const camera = new PerspectiveCamera(fov, 1, 0.5, 2000);
-  const toCamera = new Vector3(0, Math.sin(elevation), Math.cos(elevation));
-  const up = new Vector3(0, Math.cos(elevation), -Math.sin(elevation));
+  const toCamera = new Vector3();
+  const up = new Vector3();
+  const tilt = (angle: number) => {
+    toCamera.set(0, Math.sin(angle), Math.cos(angle));
+    up.set(0, Math.cos(angle), -Math.sin(angle));
+  };
+  tilt(elevation);
   const targetY = top * 0.38;
   const wide = matchMedia('(min-width: 64rem)');
   let span = 0;
   let centre = 0;
   let distance = 0;
-  const pannable = () => span < viewRight - left;
+  let whole = true;
+  /** Within this many months of the view's centre a stack is framed in full */
+  let reach = 0;
+  let dragged = false;
+  const pannable = () => !whole;
 
   /** How far back the camera stands so `months` of the quay, the whole stack and the years fit */
   const fit = (months: number, aspect: number) => {
-    const vertical = Math.tan(MathUtils.degToRad(fov / 2));
-    const horizontal = vertical * aspect;
+    const horizontal = tanHalf * aspect;
     let needed = 0;
     for (const x of [-months / 2, months / 2]) {
       for (const y of [0, top]) {
         for (const z of [quayBack, quayFront + 2]) {
           const corner = new Vector3(x, y - targetY, z);
           const along = corner.dot(toCamera);
-          needed = Math.max(needed, along + Math.abs(corner.x) / (horizontal * 0.96), along + Math.abs(corner.dot(up)) / (vertical * 0.92));
+          needed = Math.max(needed, along + Math.abs(corner.x) / (horizontal * 0.96), along + Math.abs(corner.dot(up)) / (tanHalf * 0.92));
         }
       }
     }
     return needed;
   };
+  /** The months a camera `back` from its aim at `aimY` shows across the front lane's floor */
+  const monthsShown = (back: number, aimY: number) =>
+    2 * (back - new Vector3(0, -aimY, lanePitch).dot(toCamera)) * tanHalf * camera.aspect;
+  /** A panning view around `at`: the height it aims at, how far back it stands, the months it shows */
+  const standAt = (at: number, height = heightNear(items, at, reach, reach) * boxHeight) => {
+    // Aimed so the stack's top and the row of years stand equally far inside the frame
+    const need = (y: number, z: number) => {
+      const corner = new Vector3(0, y, z);
+      return corner.dot(toCamera) + Math.abs(corner.dot(up)) / (tanHalf * 0.92);
+    };
+    let low = 0;
+    let high = height;
+    for (let i = 0; i < 24; i++) {
+      const mid = (low + high) / 2;
+      if (need(height - mid, quayBack) > need(-mid, quayFront + 2)) low = mid;
+      else high = mid;
+    }
+    const aimY = (low + high) / 2;
+    const back = Math.max(need(height - aimY, quayBack), need(-aimY, quayFront + 2));
+    return { aimY, back, months: monthsShown(back, aimY) };
+  };
+  /** The newest a panning view goes: just past the quay's end by its lane names */
+  const newestAt = ({ aimY, back }: ReturnType<typeof standAt>) => {
+    const half = canvas.clientWidth / 2;
+    return Math.max(...laneLabels.map(({ lane, element }) => {
+      const depth = back - new Vector3(0, -aimY, laneZ(lane)).dot(toCamera);
+      const perMonth = half / (depth * tanHalf * camera.aspect);
+      return right - (half - element.offsetWidth - 6) / perMonth;
+    }));
+  };
   const aim = () => {
-    centre = pannable() ? MathUtils.clamp(centre, left + span / 2, viewRight - span / 2) : (left + viewRight) / 2;
-    camera.position.set(centre, targetY, 0).addScaledVector(toCamera, distance);
-    camera.lookAt(centre, targetY, 0);
+    if (whole) {
+      centre = (left + viewRight) / 2;
+      camera.position.set(centre, targetY, 0).addScaledVector(toCamera, distance);
+      camera.lookAt(centre, targetY, 0);
+      return;
+    }
+    // The view's width depends on where it stands, so settle the pan limits in a few steps
+    let stand = standAt(centre);
+    for (let i = 0; i < 3; i++) {
+      centre = MathUtils.clamp(centre, left + stand.months / 2, newestAt(stand));
+      stand = standAt(centre);
+    }
+    span = stand.months;
+    camera.position.set(centre, stand.aimY, 0).addScaledVector(toCamera, stand.back);
+    camera.lookAt(centre, stand.aimY, 0);
   };
 
   const project = (x: number, y: number, z: number) => {
@@ -288,10 +344,11 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
       element.style.left = `${at.x}px`;
       element.style.top = `${at.y}px`;
     }
-    // A lane's name stays pinned to the canvas edge while the view is panned back
+    // A lane's name stands past the quay's end, so a panning view slides it away with the quay
+    // rather than laying it over the containers
     for (const { lane, element } of laneLabels) {
       const at = project(right, 0, laneZ(lane));
-      element.style.left = `${Math.min(at.x, width - element.offsetWidth - 4)}px`;
+      element.style.left = `${whole ? Math.min(at.x, width - element.offsetWidth - 4) : at.x}px`;
       element.style.top = `${at.y}px`;
     }
     if (!hovered || label.hidden) return;
@@ -358,23 +415,26 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    const wasWhole = !pannable();
-    span = wide.matches ? viewRight - left : narrowMonths;
-    distance = fit(span, camera.aspect);
-    // A canvas wide for its height stands the camera back to fit the stack's height, so it
-    // shows more than three years. Count the months it shows across the front lane's floor
-    // (nearest the viewer, so the deeper lanes trail a drag by no more than about a tenth), so
-    // the pan limits, the opening view and the drag rate match the picture, and a view that
-    // shows the whole quay doesn't pan.
-    if (!wide.matches) {
-      const depth = distance - new Vector3(0, -targetY, lanePitch).dot(toCamera);
-      const shown = 2 * depth * Math.tan(MathUtils.degToRad(fov / 2)) * camera.aspect;
-      span = MathUtils.clamp(shown, narrowMonths, viewRight - left);
+    const wasWhole = whole;
+    // Months are counted across the front lane's floor (nearest the viewer, so the deeper lanes
+    // trail a drag by no more than about a tenth), so the pan limits and the drag rate match
+    // the picture. Pulled back to frame the tallest stack, a view showing the whole quay
+    // doesn't pan.
+    tilt(phoneElevation);
+    const far = standAt(-Infinity, top);
+    reach = monthsShown(far.back, far.aimY) / 2;
+    whole = wide.matches || 2 * reach >= viewRight - left;
+    if (whole) {
+      tilt(elevation);
+      span = viewRight - left;
+      distance = fit(span, camera.aspect);
+    } else if (wasWhole) {
+      // A panning view opens on the most recent years
+      centre = Infinity;
     }
-    // A narrow view opens on the most recent years
-    if (pannable() && (wasWhole || !centre)) centre = viewRight - span / 2;
     aim();
     canvas.style.cursor = pannable() ? 'grab' : '';
+    if (hint) hint.hidden = whole || dragged;
     requestRender();
   };
 
@@ -410,10 +470,10 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     else location.hash = id;
   };
 
-  let press: { x: number; centre: number; moved: boolean } | null = null;
+  let press: { x: number; moved: boolean } | null = null;
   canvas.addEventListener('pointerdown', (event) => {
     if (!loaded) return;
-    press = { x: event.clientX, centre, moved: false };
+    press = { x: event.clientX, moved: false };
     canvas.setPointerCapture(event.pointerId);
   });
   canvas.addEventListener('pointermove', (event) => {
@@ -421,8 +481,12 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     if (press) {
       const dx = event.clientX - press.x;
       if (Math.abs(dx) > 6) press.moved = true;
+      // The camera moves in and out as it pans, so each step pans by the months now in view
       if (press.moved && pannable()) {
-        centre = press.centre - (dx / canvas.clientWidth) * span;
+        centre -= (dx / canvas.clientWidth) * span;
+        press.x = event.clientX;
+        dragged = true;
+        if (hint) hint.hidden = true;
         aim();
         requestRender();
       }

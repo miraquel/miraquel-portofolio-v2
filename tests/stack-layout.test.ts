@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { manifest } from '../src/data/work';
-import { dropDelay, dropMs, dropProgress, geometry, hoverOffset, laneOf, loadMs, monthIndex, quayRange, stackLayout, type StackBox } from '../src/lib/stack-layout';
+import { dropDelay, dropMs, dropProgress, geometry, heightNear, hoverOffset, laneOf, loadMs, monthIndex, quayRange, stackLayout, type StackBox } from '../src/lib/stack-layout';
 
 const boxes = stackLayout(manifest);
 const overlap = (a: StackBox, b: StackBox) => a.start < b.start + b.length && b.start < a.start + a.length;
@@ -92,4 +92,37 @@ test('a hovered container slides toward the viewer, never up into the containers
   assert.deepEqual([dx, dy], [0, 0]);
   assert.ok(dz > 0 && dz < geometry.lanePitch - geometry.boxDepth, 'clear of the lane in front');
   assert.ok(dz < geometry.quayMargin, 'still on the quay');
+});
+
+test('a phone view of the newest years stands one container high', () => {
+  assert.equal(heightNear(boxes, 90, 20, 20), 1);
+});
+
+test('a phone view near 2020 stands as high as its five-high stack', () => {
+  assert.equal(heightNear(boxes, 30, 20, 20), 5);
+  assert.equal(heightNear(boxes, 50, 20, 20), 5, 'the stack is within reach, so it counts in full');
+});
+
+test('a stack beyond reach counts less the further away it is, and not at all past the fade', () => {
+  const tower: StackBox[] = [0, 1, 2, 3, 4].map((level) => ({ number: level + 1, lane: 'erp', start: 0, length: 10, level }));
+  assert.equal(heightNear(tower, 40, 10, 10), 1, 'past the fade');
+  let previous = 1;
+  for (let centre = 40; centre >= 10; centre -= 0.5) {
+    const height = heightNear(tower, centre, 10, 10);
+    assert.ok(height >= previous, `the height fell at month ${centre}`);
+    assert.ok(height - previous < 0.4, `the height jumped at month ${centre}`);
+    previous = height;
+  }
+  assert.equal(previous, 5, 'in full once within reach');
+  const halfway = heightNear(tower, 25, 10, 10);
+  assert.ok(halfway > 1 && halfway < 5, `halfway through the fade: ${halfway}`);
+});
+
+test('a long container counts from its nearer end', () => {
+  const long: StackBox[] = [
+    { number: 1, lane: 'dotnet', start: 0, length: 40, level: 0 },
+    { number: 2, lane: 'dotnet', start: 0, length: 40, level: 1 },
+  ];
+  assert.equal(heightNear(long, 45, 6, 6), 2);
+  assert.equal(heightNear(long, 20, 0, 6), 2, 'standing over it');
 });
