@@ -29,7 +29,7 @@ import {
 } from 'three';
 import type { ContainerMark } from './container-mark';
 import { cssColor } from './css-color';
-import { dropProgress, laneNames, lanes, loadMs, quayRange, type Lane, type StackBox } from './stack-layout';
+import { dropProgress, geometry, hoverOffset, laneNames, lanes, loadMs, quayRange, type Lane, type StackBox } from './stack-layout';
 
 /** A container as the page hands it over: its place, and what its label says */
 export interface StackItem extends StackBox {
@@ -43,12 +43,9 @@ export interface StackItem extends StackBox {
 }
 
 // World units: one month along the quay (x); a container's height and depth in the same units
-const boxHeight = 2.6;
-const boxDepth = 2.6;
-const lanePitch = 3.8;
+const { boxHeight, boxDepth, lanePitch, quayMargin, pullDepth } = geometry;
 const seam = 0.2;
-const liftHeight = 0.5;
-const liftMs = 150;
+const pullMs = 150;
 const fov = 26;
 const elevation = MathUtils.degToRad(30);
 /** Below 1024px the view holds three years and pans */
@@ -56,8 +53,8 @@ const narrowMonths = 36;
 
 /** Lanes run from the back (-z) to the front (+z) */
 const laneZ = (lane: Lane) => (lanes.indexOf(lane) - 1) * lanePitch;
-const quayBack = -lanePitch - boxDepth / 2 - 0.8;
-const quayFront = lanePitch + boxDepth / 2 + 0.8;
+const quayBack = -lanePitch - boxDepth / 2 - quayMargin;
+const quayFront = lanePitch + boxDepth / 2 + quayMargin;
 
 type Point = [number, number, number];
 
@@ -138,9 +135,12 @@ function labelContent(item: StackItem): HTMLElement[] {
 interface Container {
   item: StackItem;
   group: Group;
-  mesh: Mesh;
+  /** The container's shape at rest, for picking, so a container sliding out never slips from under the pointer */
+  hit: Mesh;
   restY: number;
-  lift: number;
+  restZ: number;
+  /** How far it has slid toward the viewer, 0 to pullDepth */
+  pull: number;
   cable: LineSegments;
 }
 
@@ -198,29 +198,30 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
   const dividers = [-0.5, 0.5].flatMap((between): Point[] => [[left, 0, between * lanePitch], [right, 0, between * lanePitch]]);
   scene.add(segments([...outline, ...ticks], ink), segments(dividers, faintInk));
 
-  const top = Math.max(...items.map((item) => item.level + 1)) * boxHeight + liftHeight;
+  const top = Math.max(...items.map((item) => item.level + 1)) * boxHeight;
   const dropHeight = top * 1.5 + 4;
   const containers: Container[] = items.map((item) => {
     const length = item.length - seam;
     const geometry = new BoxGeometry(length, boxHeight, boxDepth);
     const group = new Group();
-    let mesh: Mesh;
     if (item.mark && item.steel) {
       const paint = new MeshLambertMaterial({ color: paints[item.steel] });
       const side = new MeshLambertMaterial({ map: paintSide(item.mark, paints[item.steel], stencil, length) });
       // Box faces run +x, -x, +y, -y, +z, -z; the long side facing the viewer (+z) carries the mark
-      mesh = new Mesh(geometry, [paint, paint, paint, paint, side, paint]);
-      group.add(mesh);
+      group.add(new Mesh(geometry, [paint, paint, paint, paint, side, paint]));
     } else {
-      mesh = new Mesh(geometry, printedFace);
-      group.add(mesh, new LineSegments(new EdgesGeometry(geometry), ink));
+      group.add(new Mesh(geometry, printedFace), new LineSegments(new EdgesGeometry(geometry), ink));
     }
     const restY = boxHeight / 2 + item.level * boxHeight;
-    group.position.set(item.start + item.length / 2, restY, laneZ(item.lane));
+    const restZ = laneZ(item.lane);
+    group.position.set(item.start + item.length / 2, restY, restZ);
+    const hit = new Mesh(geometry);
+    hit.position.copy(group.position);
+    hit.updateMatrixWorld();
     const cable = segments([[0, 0, 0], [0, 0, 0]], ink);
     cable.visible = false;
     scene.add(group, cable);
-    return { item, group, mesh, restY, lift: 0, cable };
+    return { item, group, hit, restY, restZ, pull: 0, cable };
   });
 
   // The camera looks along -z from above the front; the view holds `span` months around `centre`
@@ -303,7 +304,7 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     label.style.top = `${above >= 4 ? above : Math.min(anchor.y + 10, canvas.clientHeight - labelHeight - 4)}px`;
   };
 
-  // Drawing on demand: the crane, the lifts and anything that moved
+  // Drawing on demand: the crane, the hover slides and anything that moved
   let loaded = reduced;
   let loadStart = -1;
   let frame = 0;
@@ -331,13 +332,16 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
       if (elapsed >= loadMs) loaded = true;
       else busy = true;
     }
+    // A hovered container slides toward the viewer; lifting it would push it into the
+    // containers stacked on it
     for (const container of containers) {
-      const target = container === hovered ? liftHeight : 0;
-      if (container.lift === target) continue;
-      const step = reduced ? liftHeight : (liftHeight * dt) / liftMs;
-      container.lift = target > container.lift ? Math.min(target, container.lift + step) : Math.max(target, container.lift - step);
-      container.group.position.y = container.restY + container.lift;
-      if (container.lift !== target) busy = true;
+      const target = container === hovered ? pullDepth : 0;
+      if (container.pull === target) continue;
+      const step = reduced ? pullDepth : (pullDepth * dt) / pullMs;
+      container.pull = target > container.pull ? Math.min(target, container.pull + step) : Math.max(target, container.pull - step);
+      const [, , dz] = hoverOffset(container.pull);
+      container.group.position.z = container.restZ + dz;
+      if (container.pull !== target) busy = true;
     }
     renderer.render(scene, camera);
     placeLabels();
@@ -357,6 +361,16 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     const wasWhole = !pannable();
     span = wide.matches ? viewRight - left : narrowMonths;
     distance = fit(span, camera.aspect);
+    // A canvas wide for its height stands the camera back to fit the stack's height, so it
+    // shows more than three years. Count the months it shows across the front lane's floor
+    // (nearest the viewer, so the deeper lanes trail a drag by no more than about a tenth), so
+    // the pan limits, the opening view and the drag rate match the picture, and a view that
+    // shows the whole quay doesn't pan.
+    if (!wide.matches) {
+      const depth = distance - new Vector3(0, -targetY, lanePitch).dot(toCamera);
+      const shown = 2 * depth * Math.tan(MathUtils.degToRad(fov / 2)) * camera.aspect;
+      span = MathUtils.clamp(shown, narrowMonths, viewRight - left);
+    }
     // A narrow view opens on the most recent years
     if (pannable() && (wasWhole || !centre)) centre = viewRight - span / 2;
     aim();
@@ -364,11 +378,11 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     requestRender();
   };
 
-  // Hover (mouse) or first tap (touch) lifts a container and shows its label; a click or a
+  // Hover (mouse) or first tap (touch) slides a container out and shows its label; a click or a
   // second tap goes to its row in the manifest; a sideways drag pans a narrow view
   const raycaster = new Raycaster();
   const pointer = new Vector2();
-  const meshes = containers.map((container) => container.mesh);
+  const meshes = containers.map((container) => container.hit);
   const containerAt = (event: PointerEvent) => {
     const rect = canvas.getBoundingClientRect();
     pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
@@ -390,7 +404,10 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
   };
   const goTo = (container: Container) => {
     hover(null);
-    location.hash = `manifest-${container.item.number}`;
+    const id = `manifest-${container.item.number}`;
+    // Setting the hash it already has does nothing, so scroll back to the row instead
+    if (location.hash === `#${id}`) document.getElementById(id)?.scrollIntoView();
+    else location.hash = id;
   };
 
   let press: { x: number; centre: number; moved: boolean } | null = null;

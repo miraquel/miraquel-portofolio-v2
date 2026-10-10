@@ -78,6 +78,18 @@ export function quayRange(boxes: readonly StackBox[]): { start: number; end: num
   return { start: Math.floor(start / 12) * 12, end: Math.ceil(end / 12) * 12 };
 }
 
+/**
+ * The stack's proportions in world units (one month along the quay): a container's square
+ * section, the pitch between lanes, the quay's margin around them, and how far a hovered
+ * container slides toward the viewer
+ */
+export const geometry = { boxHeight: 2.6, boxDepth: 2.6, lanePitch: 3.8, quayMargin: 0.8, pullDepth: 0.5 } as const;
+
+/** Where a hovered container moves: toward the viewer (+z), never up into the containers it carries */
+export function hoverOffset(amount: number): [number, number, number] {
+  return [0, 0, amount];
+}
+
 /** The crane: each container takes dropMs to come down, and the last one lands at loadMs */
 export const dropMs = 420;
 export const loadMs = 2000;

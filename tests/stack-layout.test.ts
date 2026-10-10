@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { manifest } from '../src/data/work';
-import { dropDelay, dropMs, dropProgress, laneOf, loadMs, monthIndex, quayRange, stackLayout, type StackBox } from '../src/lib/stack-layout';
+import { dropDelay, dropMs, dropProgress, geometry, hoverOffset, laneOf, loadMs, monthIndex, quayRange, stackLayout, type StackBox } from '../src/lib/stack-layout';
 
 const boxes = stackLayout(manifest);
 const overlap = (a: StackBox, b: StackBox) => a.start < b.start + b.length && b.start < a.start + a.length;
@@ -85,4 +85,11 @@ test('the crane lands every container within about two seconds, in loading order
     assert.equal(dropProgress(i, count, dropDelay(i, count)), 0);
     assert.equal(dropProgress(i, count, loadMs), 1);
   }
+});
+
+test('a hovered container slides toward the viewer, never up into the containers stacked on it', () => {
+  const [dx, dy, dz] = hoverOffset(geometry.pullDepth);
+  assert.deepEqual([dx, dy], [0, 0]);
+  assert.ok(dz > 0 && dz < geometry.lanePitch - geometry.boxDepth, 'clear of the lane in front');
+  assert.ok(dz < geometry.quayMargin, 'still on the quay');
 });

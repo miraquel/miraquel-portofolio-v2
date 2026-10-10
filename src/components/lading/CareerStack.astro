@@ -32,9 +32,10 @@ const items: StackItem[] = stackLayout(manifest).map((box) => {
 </div>
 
 <style>
-  /* A sideways drag pans the quay on a phone; a vertical one still scrolls the page */
+  /* A sideways drag pans the quay on a phone; a vertical one still scrolls the page, and a
+     pinch still zooms it */
   canvas {
-    touch-action: pan-y;
+    touch-action: pan-y pinch-zoom;
   }
 </style>
 
