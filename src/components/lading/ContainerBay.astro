@@ -2,7 +2,6 @@
 // One case study as a container: the painted door end with its mark on the left, the
 // route inside, and the same cross-check order every time: route, cargo, evidence (or record).
 // The route card is the paper its Delivered stamp needs, so the status is stamped on it.
-// The door leaves rest folded open; following a container mark plays them open on arrival.
 import Mark from './Mark.astro';
 import Route from './Route.astro';
 import Stamp from './Stamp.astro';
@@ -23,7 +22,7 @@ const evidenceLink = 'inline-block py-3 underline decoration-stencil/50 decorati
   data-dark
   data-bay={container.mark.id}
   aria-labelledby={`${container.slug}-title`}
-  class:list={['bay scroll-mt-[46px] overflow-x-clip text-stencil', container.steel === 'cobalt' ? 'bay-cobalt bg-cobalt' : 'bay-oxide bg-oxide']}
+  class:list={['bay scroll-mt-[46px] overflow-x-clip text-stencil', container.steel === 'cobalt' ? 'bg-cobalt' : 'bg-oxide']}
 >
   <div class="bay-grid mx-auto grid max-w-[85rem] gap-x-14 gap-y-10 px-4 py-14 sm:px-8 lg:py-20">
     <header class="[grid-area:head]">
@@ -37,17 +36,13 @@ const evidenceLink = 'inline-block py-3 underline decoration-stencil/50 decorati
       </div>
     </header>
 
-    <section class="bay-hold relative [grid-area:route]" aria-labelledby={`${container.slug}-route`}>
+    <section class="[grid-area:route]" aria-labelledby={`${container.slug}-route`}>
       <div class="border-2 border-ink bg-paper px-4 py-5 text-ink sm:px-7 sm:py-7">
         <div class="flex items-start justify-between gap-4">
           <h4 id={`${container.slug}-route`} class="text-[0.8125rem] font-semibold leading-tight text-form">Route</h4>
           <p class="mr-1"><span class="sr-only">Status: </span><Stamp word="Delivered" date={formatMonth(container.period.end)} /></p>
         </div>
         <Route route={container.route} />
-      </div>
-      <div class="bay-doors" aria-hidden="true">
-        <span class="bay-leaf bay-leaf-left"></span>
-        <span class="bay-leaf bay-leaf-right"></span>
       </div>
     </section>
 
@@ -93,91 +88,6 @@ const evidenceLink = 'inline-block py-3 underline decoration-stencil/50 decorati
       grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
       grid-template-areas: 'head route' 'fields route';
       grid-template-rows: auto 1fr;
-    }
-  }
-
-  /* Door leaves: corrugated steel a shade deeper than the bay, with a locking rod each */
-  /* The hold is as tall as its route, so the leaves cover the route and nothing more */
-  .bay-hold {
-    align-self: start;
-  }
-
-  .bay-doors {
-    position: absolute;
-    inset: 0;
-    /* Deep enough that a leaf swung edge-on projects into the column gap, never over the cargo text */
-    perspective: 4000px;
-    pointer-events: none;
-  }
-
-  .bay-leaf {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 50%;
-    background-color: var(--leaf);
-    background-image: repeating-linear-gradient(90deg, transparent 0 14px, rgb(0 0 0 / 0.16) 14px 18px, rgb(255 255 255 / 0.06) 18px 22px);
-    border: 2px solid rgb(0 0 0 / 0.35);
-    backface-visibility: visible;
-    /* At rest the leaves are swung open and hidden: edge-on under perspective they would
-       still project over the cargo column. They exist only for the arrival swing. */
-    visibility: hidden;
-    opacity: 0;
-    transition:
-      transform 1100ms cubic-bezier(0.16, 1, 0.3, 1),
-      opacity 350ms ease-out 700ms,
-      visibility 0s linear 1100ms;
-  }
-
-  .bay-leaf::after {
-    content: '';
-    position: absolute;
-    top: 6%;
-    bottom: 6%;
-    width: 6px;
-    background: rgb(0 0 0 / 0.4);
-    box-shadow: 0 0 0 2px rgb(255 255 255 / 0.12);
-  }
-
-  .bay-leaf-left {
-    left: 0;
-    transform-origin: left center;
-    transform: rotateY(-92deg);
-  }
-
-  .bay-leaf-left::after {
-    right: 18%;
-  }
-
-  .bay-leaf-right {
-    right: 0;
-    transform-origin: right center;
-    transform: rotateY(92deg);
-  }
-
-  .bay-leaf-right::after {
-    left: 18%;
-  }
-
-  .bay-cobalt {
-    --leaf: var(--color-cobalt-deep);
-  }
-
-  .bay-oxide {
-    --leaf: var(--color-oxide-deep);
-  }
-
-  /* Shut instantly while off screen, then swing open once the bay is in view */
-  .bay.is-shut .bay-leaf {
-    visibility: visible;
-    opacity: 1;
-    transform: rotateY(0deg);
-    transition: none;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .bay-leaf {
-      display: none;
     }
   }
 </style>

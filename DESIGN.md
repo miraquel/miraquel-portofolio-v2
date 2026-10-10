@@ -185,7 +185,7 @@ The world rejects the developer-portfolio template (sticky sidebar, project card
 - Numbered dt/dd fields on a 12-column form grid, separated by 1px hairlines and framed by 2px rules.
 - Full-bleed steel container bands carrying stencilled ISO 6346 marks.
 - A condensed stencil face for marks, the name and printed band titles; a highway-signage grotesk for everything read; its mono for codes and dates.
-- One authored motion: container door leaves swinging open on arrival (a bay's, and the 404 page's container).
+- One authored motion: the 404 page's container swinging its doors open.
 - A night print of the same form for dark devices and for the strip's Dark switch.
 
 ## Colors
@@ -196,8 +196,8 @@ A single-ink form palette (paper, green ink, carbon) with two container-steel pa
 - **Form Green Ink** (form): the printing ink. Frames, section rules, field labels and numbers, the form band and table header grounds, link underlines (at 40% at rest, full on hover), the primary button. It is also the ground that shows through as the 1px hairlines between fields.
 
 ### Secondary
-- **Container Cobalt** (cobalt) and **Cobalt Door Steel** (cobalt-deep): one of the two steel paints. Cobalt is the ground of a container band and its swatch beside a mark; the deep shade is reserved for that bay's door leaves.
-- **Oxide Red** (oxide) and **Oxide Door Steel** (oxide-deep): the second steel paint, used exactly like cobalt. Bays alternate between the two by data, not by decoration.
+- **Container Cobalt** (cobalt) and **Cobalt Door Steel** (cobalt-deep): one of the two steel paints. Cobalt is the ground of a container band and its swatch beside a mark; the deep shade is the frame of the 404 page's container.
+- **Oxide Red** (oxide) and **Oxide Door Steel** (oxide-deep): the second steel paint, used like cobalt. Bays alternate between the two by data, not by decoration. No surface uses the deep shade at present.
 
 ### Tertiary
 - **Signal Yellow** (signal): reserved for live facts. Port of discharge and Current carrier print on it as whole fields, and the current employer's period and a current certificate's "Valid until" date sit on yellow slips. It also serves as the interaction mark: text selection, the focus outline on steel and, by day, on form-green bands, and the focused skip link. Whatever prints on it keeps the day inks in either look (the `signal-stock` utility).
@@ -270,10 +270,10 @@ The manifest is a real table that stacks below 64rem into a two-column grid per 
 
 ## Elevation & Depth
 
-Flat. Depth is printed, not lit: the form stacks by rule weight and paper tone, and the only dimensional objects are the container door leaf during its swing and the lost container on the 404 page, which is lit but casts nothing onto the paper. Paper-deep is the single raised tone, used for state (hover, cross-highlight) and for the closing footer.
+Flat. Depth is printed, not lit: the form stacks by rule weight and paper tone, and the only dimensional object is the lost container on the 404 page, which is lit but casts nothing onto the paper. Paper-deep is the single raised tone, used for state (hover, cross-highlight) and for the closing footer.
 
 ### Named Rules
-**The Printed Depth Rule.** No box-shadows on paper. Separation comes from a 2px rule, a 1px hairline, or the paper-deep tone. The one box-shadow in the system is the 2px light ring on a door leaf's locking rod.
+**The Printed Depth Rule.** No box-shadows on paper. Separation comes from a 2px rule, a 1px hairline, or the paper-deep tone. There is no box-shadow anywhere in the system.
 
 **The Two Rules Rule.** Two weights only: 2px for frames and section rules, 1px for the hairlines between fields, drawn as a 1px grid gap over the form-green ground rather than as borders. In-field row dividers inside tables may use form green at 25 to 40%.
 
@@ -312,10 +312,6 @@ The Dark switch: the page follows the device's light or dark setting until a vis
 ### Container Bay (signature)
 A case study as a full-bleed band of steel: the title, client and period on the left, then the medium mark; on the right the hold, a paper card framed 2px in carbon carrying the Route; below the head, Cargo and Evidence as stencil-white labelled fields. The field is titled Evidence only when something in it can be opened (source, a write-up, a file to download); a bay holding only facts on file and cross-references titles it Record. Links to other sites open a new tab and say so to screen readers; links within the site and downloads stay in the tab. The route card carries the status: a "Delivered" stamp with its end month, pressed at its top right beside the Route label (spoken as "Status: Delivered Apr 2023"). The card is the paper the stamp needs, so a bay has no Status field or separate slip. Below 1024px a bay stacks head, then its fields (cargo first), then the route, so the one-sentence explanation leads and the diagram follows as the detail. Focus outlines inside a bay turn signal yellow.
 
-**Door-leaf material** (component-local, not palette): each leaf is painted in its bay's -deep steel (cobalt-deep or oxide-deep), corrugated by a repeating 90deg gradient of 14px plain, a 4px rib at rgb(0 0 0 / 0.16) and a 4px highlight at rgb(255 255 255 / 0.06); its edge is a 2px border at rgb(0 0 0 / 0.35); a 6px locking rod at rgb(0 0 0 / 0.4) runs from 6% to 94% of its height, 18% in from the meeting edge, ringed by the rod-ring shadow. These translucent values exist only on the leaves.
-
-**Door arrival.** Following a container link shuts that bay's two door leaves (deeper steel, corrugated by a repeating gradient, each with a locking rod) while it is off-screen, then swings them open once 35% of the hold (the route the leaves cover) is in view, which on a phone is when the reader scrolls down to it: rotateY to 92deg over 1100ms on cubic-bezier(0.16, 1, 0.3, 1) under 4000px perspective, fading out over 350ms from 700ms and hidden at rest so they never cover content. Under reduced motion the leaves are `display: none`.
-
 ### Route
 A data-flow diagram drawn in code: lettered stops (A, B, C) as 2px carbon-framed paper boxes with name, role and mono tech line; between stops, 2px stroked down-arrows labelled with what travels; return flows listed under a form hairline with a return arrow.
 
@@ -329,7 +325,7 @@ A rubber stamp in stamp red: stencil word over a mono date, 3px double border, r
 A form-framed table with a form-green header row; container lines carry their small mark and a standing paper-deep tint, and link to their bay. A link that lands on a line (a bay's record cross-references one) stops 5rem below the top, clear of the strip, and tints that line paper-deep. Stacks per row below 64rem, since its six columns need about 820px.
 
 ### Lost Container (404)
-The 404 page's one object, drawn in WebGL with three.js (`src/lib/lost-container.ts`). It's a 20 ft container built in code, with cobalt panels and corrugation ribs, a cobalt-deep frame, and corner castings and locking rods darker still. Its shut doors carry the mark CAAU 000404 7 in stencil white, the owner code on the left leaf and the serial with its boxed check digit on the right, sized to sit between the rods. Once 60% of the slot is in view, the doors pause for a beat so the mark can be read, then swing open on the bays' timing (1100ms, cubic-bezier(0.16, 1, 0.3, 1), `src/lib/door-swing.ts`) to 110deg, showing a dark, empty hold. A sideways drag turns the box up to 45deg either way (`touch-action: pan-y`, so a vertical swipe still scrolls). It draws only while something changes. The canvas is transparent and lit, but casts no shadow, so the paper of either print shows through; the steel is the same by day and by night. It sits in the right half of the 404 section from 1024px and under the buttons below that, and it's decorative (`aria-hidden`). It loads only on that page, after the browser is idle, and only if WebGL 2 is available. Until it's drawing, and for good without WebGL, the desktop column stays empty paper and the phone shows nothing. Under reduced motion the doors are open from the start.
+The 404 page's one object, drawn in WebGL with three.js (`src/lib/lost-container.ts`). It's a 20 ft container built in code, with cobalt panels and corrugation ribs, a cobalt-deep frame, and corner castings and locking rods darker still. Its shut doors carry the mark CAAU 000404 7 in stencil white, the owner code on the left leaf and the serial with its boxed check digit on the right, sized to sit between the rods. Once 60% of the slot is in view, the doors pause for a beat so the mark can be read, then swing open over 1100ms on cubic-bezier(0.16, 1, 0.3, 1) (`src/lib/door-swing.ts`) to 110deg, showing a dark, empty hold. A sideways drag turns the box up to 45deg either way (`touch-action: pan-y`, so a vertical swipe still scrolls). It draws only while something changes. The canvas is transparent and lit, but casts no shadow, so the paper of either print shows through; the steel is the same by day and by night. It sits in the right half of the 404 section from 1024px and under the buttons below that, and it's decorative (`aria-hidden`). It loads only on that page, after the browser is idle, and only if WebGL 2 is available. Until it's drawing, and for good without WebGL, the desktop column stays empty paper and the phone shows nothing. Under reduced motion the doors are open from the start.
 
 ### Admin Workspace
 The private screens for writing the blog (`/admin`): an Operate surface, so the world lends its type, palette, density and one signature, and the controls stay standard. It wears the site's page (Layout.astro, so the night print and the Dark switch come with it) and its strip, carrying Dashboard, Posts and New post (the current one underlined, `aria-current`), then View site, Sign out and Dark; below 1024px they fold into the same Menu as the site's phone strip. Headings are fixed sizes (2.5rem, 2rem on a phone), ruled off 2px in form green as section heads are, with the screen's one primary button at the right. The dashboard counts posts by status in a hairline field grid, each count opening the post list filtered to it, over a table of the latest posts. The post list filters with the blog's chips and lists posts in the All projects table style, each title opening its editor; a row stacks below 48rem. The editor puts the writing on the left and a Publishing panel at the right, headed by a form-green bar and sticky on a tall desktop; the post's text is written in the post body's own rules (`post-body.css`), so it reads as it will on the blog. **The signature:** the Publishing panel carries a rubber stamp of the chosen status and date ("Published, 8 October 2026"), following both fields as they change; it is hidden from screen readers, since the fields say the same. Admin pages are `noindex` and leave Firebase Analytics out.
@@ -343,7 +339,7 @@ The private screens for writing the blog (`/admin`): an Operate surface, so the 
 - **Do** carry case studies as full-bleed cobalt or oxide bands with a stencilled ISO 6346 mark and a code-drawn route.
 - **Do** keep every tap target at least 44px tall on mobile.
 - **Do** focus with a 3px carbon outline at a 3px offset (night carbon at night), switching to signal yellow on steel (marked `data-dark`). Inside a form-green band (marked `data-band`) it is signal yellow by day and night paper at night, since the band turns light. These base styles apply under `html[data-world='lading']`, which Layout.astro sets on every page, the admin workspace included.
-- **Do** keep smooth scrolling and the door swing behind `prefers-reduced-motion: no-preference`.
+- **Do** keep smooth scrolling and the 404 container's door swing behind `prefers-reduced-motion: no-preference`.
 
 ### Don't:
 - **Don't** round a corner or cast a shadow on paper.
