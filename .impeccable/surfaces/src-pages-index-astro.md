@@ -28,7 +28,7 @@ related_targets: ["src/pages/blog/index.astro","src/pages/blog/[slug].astro"]
   Each carries a code-drawn data-flow diagram, plus an image slot for screenshots later.
 - **Manifest:** the other 15 projects.
 - **Employers:** three.
-- **Credentials:** the F&O Developer Associate is stamped expired (October 2025).
+- **Credentials:** the F&O Developer Associate is current, "Valid until 3 October 2027" on a signal slip; it takes an Expired stamp from that day (renewed; it had been stamped expired October 2025).
 - **Claims:** only PRODUCT.md's allowed numbers.
 - **Profile links:** GitHub and LinkedIn only.
 - **Notices:** one live field showing the latest post, hidden when there are no posts or the read fails. The homepage stays free of the Firestore and Auth SDKs.

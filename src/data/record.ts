@@ -34,15 +34,17 @@ export const employers: Employer[] = [
 export interface Credential {
   name: string;
   detail: string;
-  /** Shown as a rubber stamp, e.g. an expiry */
-  stamp?: { word: string; date: string };
+  /** A certificate that lapses: the day it expires (YYYY-MM-DD, as Microsoft Learn shows it). Until
+      then the page prints it as current on a signal slip; from then on, stamped Expired. */
+  expires?: string;
 }
 
 export const credentials: Credential[] = [
   {
     name: 'Microsoft Certified: Dynamics 365 Finance and Operations Apps Developer Associate',
     detail: 'Issued October 2023',
-    stamp: { word: 'Expired', date: 'Oct 2025' },
+    // Renewed; Microsoft Learn shows it active until 3 October 2027 06:59 UTC+7 (checked 9 October 2026)
+    expires: '2027-10-03',
   },
   { name: 'Microsoft Dynamics 365 Fundamentals', detail: 'December 2019' },
   { name: 'Exam 764: Administering a SQL Database Infrastructure', detail: 'August 2019' },

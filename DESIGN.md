@@ -200,7 +200,7 @@ A single-ink form palette (paper, green ink, carbon) with two container-steel pa
 - **Oxide Red** (oxide) and **Oxide Door Steel** (oxide-deep): the second steel paint, used exactly like cobalt. Bays alternate between the two by data, not by decoration.
 
 ### Tertiary
-- **Signal Yellow** (signal): reserved for live facts. Port of discharge and Current carrier print on it as whole fields, and the current employer's period sits on a yellow slip. It also serves as the interaction mark: text selection, the focus outline on steel and, by day, on form-green bands, and the focused skip link. Whatever prints on it keeps the day inks in either look (the `signal-stock` utility).
+- **Signal Yellow** (signal): reserved for live facts. Port of discharge and Current carrier print on it as whole fields, and the current employer's period and a current certificate's "Valid until" date sit on yellow slips. It also serves as the interaction mark: text selection, the focus outline on steel and, by day, on form-green bands, and the focused skip link. Whatever prints on it keeps the day inks in either look (the `signal-stock` utility).
 - **Stamp Red** (stamp): rubber-stamp ink only, used at full strength with the stamp-ink displacement filter, multiply-blended into light paper by day.
 
 ### Neutral
@@ -213,7 +213,7 @@ A single-ink form palette (paper, green ink, carbon) with two container-steel pa
 ### Named Rules
 **The One Ink Rule.** Every printed element of the form (rules, labels, numbers, band grounds) is Form Green. Data is Carbon. A third text color on paper is a defect.
 
-**The Live Fact Rule.** Signal Yellow marks only what is current: an open port of discharge, the current carrier, the current employer's period, plus selection and focus. A static fact on yellow is a lie about the document.
+**The Live Fact Rule.** Signal Yellow marks only what is current: an open port of discharge, the current carrier, the current employer's period, a certificate before its expiry day, plus selection and focus. A static fact on yellow is a lie about the document, so a certificate leaves its slip for an Expired stamp on its expiry day (`src/lib/credential.ts`, from the first deploy after it).
 
 **The Two Paints Rule.** Cobalt and oxide appear only as container steel (a bay ground or the small swatch beside its mark). They are never text accents, buttons or borders on paper.
 
@@ -336,7 +336,7 @@ The private screens for writing the blog (`/admin`): an Operate surface, so the 
 ### Do:
 - **Do** put every claim in a numbered field: a form-green label with its two-digit mono number over carbon data.
 - **Do** draw grids of fields as a 1px gap over the form-green ground inside a 2px form frame.
-- **Do** reserve signal yellow for live facts (the open port, the current carrier, the current employer's period) and for selection and focus.
+- **Do** reserve signal yellow for live facts (the open port, the current carrier, the current employer's period, a current certificate's end date) and for selection and focus.
 - **Do** carry case studies as full-bleed cobalt or oxide bands with a stencilled ISO 6346 mark and a code-drawn route.
 - **Do** keep every tap target at least 44px tall on mobile.
 - **Do** focus with a 3px carbon outline at a 3px offset (night carbon at night), switching to signal yellow on steel (marked `data-dark`). Inside a form-green band (marked `data-band`) it is signal yellow by day and night paper at night, since the band turns light. These base styles apply under `html[data-world='lading']`, which Layout.astro sets on every page, the admin workspace included.
