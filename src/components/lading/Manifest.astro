@@ -2,6 +2,7 @@
 // Every project as a manifest line, newest first. Lines that are containers above carry
 // their mark and lead to them. Below 64rem the rows stack; explicit roles keep the table
 // semantics that display changes would otherwise strip.
+import CareerStack from './CareerStack.astro';
 import Mark from './Mark.astro';
 import SectionHead from './SectionHead.astro';
 import { manifest } from '../../data/work';
@@ -16,6 +17,8 @@ import { formatPeriod } from '../../lib/format';
       title="All projects"
       note={`The manifest: all ${manifest.length} projects, newest first. Marked lines are the case studies above.`}
     />
+
+    <CareerStack />
 
     <table role="table" class="manifest mt-8 w-full border-2 border-form text-left" aria-labelledby="manifest-title">
       <thead role="rowgroup" class="bg-form text-paper">

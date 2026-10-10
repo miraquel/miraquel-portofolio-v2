@@ -1,0 +1,62 @@
+---
+// All projects as a 3D stack of containers on a quay (src/lib/career-stack.ts): time along
+// the quay, platform across it, overlaps stacked, the case studies painted with their marks.
+// It repeats the manifest below, which stays the complete, accessible list, so the stack is
+// decorative. Its space is kept unless the browser lacks WebGL 2; three.js loads on approach.
+import { manifest } from '../../data/work';
+import type { StackItem } from '../../lib/career-stack';
+import { formatPeriod } from '../../lib/format';
+import { stackLayout } from '../../lib/stack-layout';
+
+const items: StackItem[] = stackLayout(manifest).map((box) => {
+  const line = manifest[box.number - 1];
+  return {
+    ...box,
+    title: line.title,
+    client: line.client,
+    period: formatPeriod(line.period),
+    ...(line.container && { mark: line.container.mark, steel: line.container.steel }),
+  };
+});
+---
+
+<div data-career-stack data-stack={JSON.stringify(items)} aria-hidden="true" class="relative mt-8 h-[15rem] lg:h-[18rem]">
+  <canvas class="absolute inset-0 size-full"></canvas>
+  <div data-stack-marks class="pointer-events-none absolute inset-0 overflow-hidden"></div>
+  <div
+    data-stack-label
+    hidden
+    class="pointer-events-none absolute left-0 top-0 z-10 w-max max-w-[17rem] border-2 border-form bg-paper px-3 py-2 text-ink"
+  >
+  </div>
+</div>
+
+<style>
+  /* A sideways drag pans the quay on a phone; a vertical one still scrolls the page */
+  canvas {
+    touch-action: pan-y;
+  }
+</style>
+
+<script>
+  const slot = document.querySelector<HTMLElement>('[data-career-stack]');
+  if (slot) {
+    // three.js draws with WebGL 2; without it the slot gives its space back to the table
+    const probe = document.createElement('canvas').getContext('webgl2');
+    probe?.getExtension('WEBGL_lose_context')?.loseContext();
+    if (!probe) slot.hidden = true;
+    else {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          observer.disconnect();
+          import('../../lib/career-stack')
+            .then(({ mountCareerStack }) => mountCareerStack(slot))
+            .catch(() => (slot.hidden = true));
+        },
+        { rootMargin: '100% 0px' }
+      );
+      observer.observe(slot);
+    }
+  }
+</script>

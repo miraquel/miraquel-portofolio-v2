@@ -43,14 +43,14 @@ export interface StackItem extends StackBox {
 }
 
 // World units: one month along the quay (x); a container's height and depth in the same units
-const boxHeight = 2;
-const boxDepth = 2.2;
-const lanePitch = 3.2;
+const boxHeight = 2.6;
+const boxDepth = 2.6;
+const lanePitch = 3.8;
 const seam = 0.2;
 const liftHeight = 0.5;
 const liftMs = 150;
 const fov = 26;
-const elevation = MathUtils.degToRad(24);
+const elevation = MathUtils.degToRad(30);
 /** Below 1024px the view holds three years and pans */
 const narrowMonths = 36;
 
@@ -185,6 +185,8 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
   const quay = quayRange(items);
   const left = quay.start - 1;
   const right = quay.end + 1;
+  /** The view reaches past the quay's end by a margin that holds the lane names */
+  const viewRight = right + 8;
   const years = Array.from({ length: (quay.end - quay.start) / 12 + 1 }, (_, i) => quay.start + i * 12);
   const outline: Point[] = [
     [left, 0, quayBack], [right, 0, quayBack],
@@ -230,7 +232,7 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
   let span = 0;
   let centre = 0;
   let distance = 0;
-  const pannable = () => span < right - left;
+  const pannable = () => span < viewRight - left;
 
   /** How far back the camera stands so `months` of the quay, the whole stack and the years fit */
   const fit = (months: number, aspect: number) => {
@@ -249,7 +251,7 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     return needed;
   };
   const aim = () => {
-    centre = pannable() ? MathUtils.clamp(centre, left + span / 2, right - span / 2) : (left + right) / 2;
+    centre = pannable() ? MathUtils.clamp(centre, left + span / 2, viewRight - span / 2) : (left + viewRight) / 2;
     camera.position.set(centre, targetY, 0).addScaledVector(toCamera, distance);
     camera.lookAt(centre, targetY, 0);
   };
@@ -259,7 +261,8 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     return { x: ((point.x + 1) / 2) * canvas.clientWidth, y: ((1 - point.y) / 2) * canvas.clientHeight };
   };
 
-  // Printed labels laid over the canvas: years under the ticks, lane names at the newest end
+  // Printed labels laid over the canvas: years under the ticks, lane names just past the
+  // quay's newest end, where no container stands
   const yearLabels = years.map((x) => {
     const element = document.createElement('span');
     element.className = 'absolute -translate-x-1/2 font-data text-xs text-form';
@@ -269,7 +272,7 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
   });
   const laneLabels = lanes.map((lane) => {
     const element = document.createElement('span');
-    element.className = 'absolute -translate-x-full -translate-y-1/2 whitespace-nowrap pr-2 text-[0.8125rem] font-semibold leading-tight text-form';
+    element.className = 'absolute -translate-y-1/2 whitespace-nowrap pl-2 text-xs font-semibold leading-tight text-form';
     element.textContent = laneNames[lane];
     marks.append(element);
     return { lane, element };
@@ -286,8 +289,8 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     }
     // A lane's name stays pinned to the canvas edge while the view is panned back
     for (const { lane, element } of laneLabels) {
-      const at = project(quay.end, 0, laneZ(lane));
-      element.style.left = `${Math.min(at.x, width - 4)}px`;
+      const at = project(right, 0, laneZ(lane));
+      element.style.left = `${Math.min(at.x, width - element.offsetWidth - 4)}px`;
       element.style.top = `${at.y}px`;
     }
     if (!hovered || label.hidden) return;
@@ -352,10 +355,10 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     const wasWhole = !pannable();
-    span = wide.matches ? right - left : narrowMonths;
+    span = wide.matches ? viewRight - left : narrowMonths;
     distance = fit(span, camera.aspect);
     // A narrow view opens on the most recent years
-    if (pannable() && (wasWhole || !centre)) centre = right - span / 2;
+    if (pannable() && (wasWhole || !centre)) centre = viewRight - span / 2;
     aim();
     canvas.style.cursor = pannable() ? 'grab' : '';
     requestRender();
