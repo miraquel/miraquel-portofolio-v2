@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Strip from '../components/lading/Strip.astro';
+import LostContainer from '../components/lading/LostContainer.astro';
 
 const button = 'inline-flex min-h-11 items-center border-2 border-form px-5 text-sm font-semibold transition-colors duration-150';
 ---
@@ -12,15 +13,18 @@ const button = 'inline-flex min-h-11 items-center border-2 border-form px-5 text
       <p class="font-stencil text-[1.375rem] font-extrabold uppercase leading-none tracking-[0.08em]">Bill of lading</p>
       <p class="font-data text-xs">Status 404</p>
     </div>
-    <section class="border-2 border-form bg-paper px-4 py-10 sm:px-6 sm:py-14">
-      <h1 class="text-[clamp(2.25rem,6vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.02em]">Page not found</h1>
-      <p class="mt-4 max-w-[48ch] text-lg leading-relaxed">
-        There's no page at this address. The link may be mistyped, or the page may have moved.
-      </p>
-      <div class="mt-8 flex flex-wrap gap-3">
-        <a href="/" class:list={[button, 'bg-form text-paper hover:border-ink hover:bg-ink']}>Go to the homepage</a>
-        <a href="/blog" class:list={[button, 'bg-paper text-form hover:bg-paper-deep']}>Read the blog</a>
+    <section class="grid gap-10 border-2 border-form bg-paper px-4 py-10 sm:px-6 sm:py-14 lg:grid-cols-12 lg:items-center">
+      <div class="lg:col-span-6">
+        <h1 class="text-[clamp(2.25rem,6vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.02em]">Page not found</h1>
+        <p class="mt-4 max-w-[48ch] text-lg leading-relaxed">
+          There's no page at this address. The link may be mistyped, or the page may have moved.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="/" class:list={[button, 'bg-form text-paper hover:border-ink hover:bg-ink']}>Go to the homepage</a>
+          <a href="/blog" class:list={[button, 'bg-paper text-form hover:bg-paper-deep']}>Read the blog</a>
+        </div>
       </div>
+      <LostContainer class="lg:col-span-6" />
     </section>
   </main>
 </Layout>

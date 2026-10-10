@@ -185,7 +185,7 @@ The world rejects the developer-portfolio template (sticky sidebar, project card
 - Numbered dt/dd fields on a 12-column form grid, separated by 1px hairlines and framed by 2px rules.
 - Full-bleed steel container bands carrying stencilled ISO 6346 marks.
 - A condensed stencil face for marks, the name and printed band titles; a highway-signage grotesk for everything read; its mono for codes and dates.
-- One authored motion: container door leaves swinging open on arrival.
+- One authored motion: container door leaves swinging open on arrival (a bay's, and the 404 page's container).
 - A night print of the same form for dark devices and for the strip's Dark switch.
 
 ## Colors
@@ -270,7 +270,7 @@ The manifest is a real table that stacks below 64rem into a two-column grid per 
 
 ## Elevation & Depth
 
-Flat. Depth is printed, not lit: the form stacks by rule weight and paper tone, and the only dimensional object is the container door leaf during its swing. Paper-deep is the single raised tone, used for state (hover, cross-highlight) and for the closing footer.
+Flat. Depth is printed, not lit: the form stacks by rule weight and paper tone, and the only dimensional objects are the container door leaf during its swing and the lost container on the 404 page, which is lit but casts nothing onto the paper. Paper-deep is the single raised tone, used for state (hover, cross-highlight) and for the closing footer.
 
 ### Named Rules
 **The Printed Depth Rule.** No box-shadows on paper. Separation comes from a 2px rule, a 1px hairline, or the paper-deep tone. The one box-shadow in the system is the 2px light ring on a door leaf's locking rod.
@@ -327,6 +327,9 @@ A rubber stamp in stamp red: stencil word over a mono date, 3px double border, r
 
 ### Manifest
 A form-framed table with a form-green header row; container lines carry their small mark and a standing paper-deep tint, and link to their bay. A link that lands on a line (a bay's record cross-references one) stops 5rem below the top, clear of the strip, and tints that line paper-deep. Stacks per row below 64rem, since its six columns need about 820px.
+
+### Lost Container (404)
+The 404 page's one object, drawn in WebGL with three.js (`src/lib/lost-container.ts`). It's a 20 ft container built in code, with cobalt panels and corrugation ribs, a cobalt-deep frame, and corner castings and locking rods darker still. Its shut doors carry the mark CAAU 000404 7 in stencil white, the owner code on the left leaf and the serial with its boxed check digit on the right, sized to sit between the rods. Once 60% of the slot is in view, the doors pause for a beat so the mark can be read, then swing open on the bays' timing (1100ms, cubic-bezier(0.16, 1, 0.3, 1), `src/lib/door-swing.ts`) to 110deg, showing a dark, empty hold. A sideways drag turns the box up to 45deg either way (`touch-action: pan-y`, so a vertical swipe still scrolls). It draws only while something changes. The canvas is transparent and lit, but casts no shadow, so the paper of either print shows through; the steel is the same by day and by night. It sits in the right half of the 404 section from 1024px and under the buttons below that, and it's decorative (`aria-hidden`). It loads only on that page, after the browser is idle, and only if WebGL 2 is available. Until it's drawing, and for good without WebGL, the desktop column stays empty paper and the phone shows nothing. Under reduced motion the doors are open from the start.
 
 ### Admin Workspace
 The private screens for writing the blog (`/admin`): an Operate surface, so the world lends its type, palette, density and one signature, and the controls stay standard. It wears the site's page (Layout.astro, so the night print and the Dark switch come with it) and its strip, carrying Dashboard, Posts and New post (the current one underlined, `aria-current`), then View site, Sign out and Dark; below 1024px they fold into the same Menu as the site's phone strip. Headings are fixed sizes (2.5rem, 2rem on a phone), ruled off 2px in form green as section heads are, with the screen's one primary button at the right. The dashboard counts posts by status in a hairline field grid, each count opening the post list filtered to it, over a table of the latest posts. The post list filters with the blog's chips and lists posts in the All projects table style, each title opening its editor; a row stacks below 48rem. The editor puts the writing on the left and a Publishing panel at the right, headed by a form-green bar and sticky on a tall desktop; the post's text is written in the post body's own rules (`post-body.css`), so it reads as it will on the blog. **The signature:** the Publishing panel carries a rubber stamp of the chosen status and date ("Published, 8 October 2026"), following both fields as they change; it is hidden from screen readers, since the fields say the same. Admin pages are `noindex` and leave Firebase Analytics out.

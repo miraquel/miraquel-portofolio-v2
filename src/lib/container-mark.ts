@@ -29,11 +29,16 @@ export interface ContainerMark {
   id: string;
 }
 
-// Owner code CAA (Chaidir Ali Assegaf) in category U (freight container); the serial is
-// the project's start month, so the mark doubles as a date stamp.
-export function containerMark(startMonth: string): ContainerMark {
-  const serial = startMonth.replace('-', '');
-  const owner = 'CAAU';
+function mark(owner: string, serial: string): ContainerMark {
   const check = checkDigit(owner, serial);
   return { owner, serial, check, id: `${owner}${serial}${check}` };
 }
+
+// Owner code CAA (Chaidir Ali Assegaf) in category U (freight container); the serial is
+// the project's start month, so the mark doubles as a date stamp.
+export function containerMark(startMonth: string): ContainerMark {
+  return mark('CAAU', startMonth.replace('-', ''));
+}
+
+// The empty container on the 404 page carries no project, so its serial is the status code
+export const notFoundMark = mark('CAAU', '000404');
