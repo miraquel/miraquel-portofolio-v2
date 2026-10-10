@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { doorAngle, easeOut, openAngle, swingMs } from '../src/lib/door-swing';
 
-test('the swing eases like the bays: cubic-bezier(0.16, 1, 0.3, 1)', () => {
+test('the swing eases on cubic-bezier(0.16, 1, 0.3, 1)', () => {
   assert.equal(easeOut(0), 0);
   assert.equal(easeOut(1), 1);
   // Halfway through the time the curve is 97% of the way, as the CSS timing function is

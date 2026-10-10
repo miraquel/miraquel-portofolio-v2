@@ -1,5 +1,5 @@
-// The bays' door swing, cubic-bezier(0.16, 1, 0.3, 1) over 1100ms (ContainerBay.astro), as
-// functions the 3D doors on the 404 page can step through frame by frame.
+// The 404 container's door swing, cubic-bezier(0.16, 1, 0.3, 1) over 1100ms, as functions
+// its scene can step through frame by frame.
 export const swingMs = 1100;
 
 /** Past square, so the leaves fan back from the open end the way real container doors do */
