@@ -88,6 +88,26 @@ import { formatPeriod } from '../../lib/format';
     scroll-margin-top: 5rem;
   }
 
+  /* Where the career stack sticks under the strip (CareerStack.astro: 46px, then 11rem, 15rem
+     from 48rem wide and 18rem from 64rem), a line lands just under it instead */
+  @media (min-height: 36rem) {
+    :global(#manifest:has([data-career-stack]:not([hidden])) .manifest tbody tr) {
+      scroll-margin-top: calc(46px + 11rem + 1rem);
+    }
+  }
+
+  @media (min-height: 36rem) and (min-width: 48rem) {
+    :global(#manifest:has([data-career-stack]:not([hidden])) .manifest tbody tr) {
+      scroll-margin-top: calc(46px + 15rem + 1rem);
+    }
+  }
+
+  @media (min-height: 36rem) and (min-width: 64rem) {
+    :global(#manifest:has([data-career-stack]:not([hidden])) .manifest tbody tr) {
+      scroll-margin-top: calc(46px + 18rem + 1rem);
+    }
+  }
+
   .manifest tr:target {
     outline: 2px solid var(--color-form);
     outline-offset: -2px;

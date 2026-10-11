@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { manifest } from '../src/data/work';
-import { dropDelay, dropMs, dropProgress, geometry, heightNear, hoverOffset, laneOf, loadMs, monthIndex, quayRange, stackLayout, type StackBox } from '../src/lib/stack-layout';
+import { dropDelay, dropMs, dropProgress, followMonth, geometry, heightNear, hoverOffset, laneOf, listProgress, loadMs, monthIndex, quayRange, stackLayout, type StackBox } from '../src/lib/stack-layout';
 
 const boxes = stackLayout(manifest);
 const overlap = (a: StackBox, b: StackBox) => a.start < b.start + b.length && b.start < a.start + a.length;
@@ -125,4 +125,51 @@ test('a long container counts from its nearer end', () => {
   ];
   assert.equal(heightNear(long, 45, 6, 6), 2);
   assert.equal(heightNear(long, 20, 0, 6), 2, 'standing over it');
+});
+
+test('the list stands at -1 until its top reaches the reading line, then counts rows past it', () => {
+  // The table's top at 100, its rows at 140, 200, 260 and 320
+  const rows = [140, 200, 260, 320];
+  assert.equal(listProgress(100, rows, 50), -1, 'the list still below the line');
+  assert.equal(listProgress(100, rows, 100), -1, 'its top on the line');
+  assert.equal(listProgress(100, rows, 120), -0.5, 'halfway down its head');
+  assert.equal(listProgress(100, rows, 140), 0, 'the first row on the line');
+  assert.equal(listProgress(100, rows, 215), 1.25, 'a quarter of the way through the second row');
+  assert.equal(listProgress(100, rows, 320), 3, 'the last row on the line');
+  assert.equal(listProgress(100, rows, 900), 3, 'past the end it stays on the last row');
+});
+
+test('the list moves on smoothly and never backwards as it scrolls', () => {
+  const rows = [140, 200, 260, 320];
+  let previous = -1;
+  for (let line = 0; line <= 400; line += 1) {
+    const progress = listProgress(100, rows, line);
+    assert.ok(progress >= previous, `went back at ${line}`);
+    assert.ok(progress - previous <= 0.05, `jumped at ${line}`);
+    previous = progress;
+  }
+});
+
+test('a head the same height as nothing goes straight to the first row', () => {
+  assert.equal(listProgress(140, [140, 200], 139), -1);
+  assert.equal(listProgress(140, [140, 200], 140), 0);
+});
+
+test("the camera centres on the middle of the row's container, gliding to the next", () => {
+  const middle = (number: number) => {
+    const box = boxes.find((b) => b.number === number)!;
+    return box.start + box.length / 2;
+  };
+  assert.equal(followMonth(boxes, 0), middle(1), 'line 01');
+  assert.equal(followMonth(boxes, 4), middle(5), 'line 05');
+  assert.equal(followMonth(boxes, 4.5), (middle(5) + middle(6)) / 2, 'halfway to line 06');
+  assert.equal(followMonth(boxes, 18), middle(19), 'the last line');
+  assert.equal(followMonth(boxes, 40), middle(19), 'past the last line');
+  assert.equal(followMonth(boxes, -1), middle(1), 'before the first line');
+});
+
+test('scrolling down the list travels back in time', () => {
+  assert.ok(followMonth(boxes, 0) > followMonth(boxes, 18));
+  assert.ok(followMonth(boxes, 0) >= 84, 'opens in 2025');
+  assert.ok(followMonth(boxes, 18) < 12, 'ends in 2018');
 });

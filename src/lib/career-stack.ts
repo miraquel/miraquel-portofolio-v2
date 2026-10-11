@@ -29,7 +29,7 @@ import {
 } from 'three';
 import type { ContainerMark } from './container-mark';
 import { cssColor } from './css-color';
-import { dropProgress, geometry, heightNear, hoverOffset, laneNames, lanes, loadMs, quayRange, type Lane, type StackBox } from './stack-layout';
+import { dropProgress, followMonth, geometry, heightNear, hoverOffset, laneNames, lanes, listProgress, loadMs, quayRange, type Lane, type StackBox } from './stack-layout';
 
 /** A container as the page hands it over: its place, and what its label says */
 export interface StackItem extends StackBox {
@@ -144,6 +144,8 @@ interface Container {
   /** How far it has slid toward the viewer, 0 to pullDepth */
   pull: number;
   cable: LineSegments;
+  /** Marks it as the current row's: paper-deep faces if printed, a stencil-white outline if painted */
+  mark: (on: boolean) => void;
 }
 
 /** Draws the stack into its slot, with its labels laid over the canvas. Throws without WebGL. */
@@ -152,7 +154,6 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
   const canvas = slot.querySelector('canvas')!;
   const marks = slot.querySelector<HTMLElement>('[data-stack-marks]')!;
   const label = slot.querySelector<HTMLElement>('[data-stack-label]')!;
-  const hint = slot.querySelector<HTMLElement>('[data-stack-hint]');
   // The case studies' marks are painted in the stencil face
   await document.fonts.load('800 100px "Big Shoulders Stencil Variable"');
 
@@ -172,16 +173,19 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
 
   // The printed parts take the page's paper and ink, and are recoloured for the night print
   const printedFace = new MeshBasicMaterial({ polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+  const markedFace = printedFace.clone();
   const ink = new LineBasicMaterial();
   const faintInk = new LineBasicMaterial({ transparent: true, opacity: 0.35 });
   const recolor = () => {
     printedFace.color.copy(cssColor('--color-paper', '#e3ede3'));
+    markedFace.color.copy(cssColor('--color-paper-deep', '#d2e2d5'));
     const form = cssColor('--color-form', '#24543f');
     ink.color.copy(form);
     faintInk.color.copy(form);
   };
   recolor();
   const stencil = cssColor('--color-stencil', '#f5f7f2');
+  const stencilInk = new LineBasicMaterial({ color: stencil });
   const paints = { cobalt: cssColor('--color-cobalt', '#1d4a96'), oxide: cssColor('--color-oxide', '#9a3a25') };
 
   // The quay: its outline, faint lane dividers, and a tick at each January on the front edge
@@ -207,13 +211,19 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     const length = item.length - seam;
     const geometry = new BoxGeometry(length, boxHeight, boxDepth);
     const group = new Group();
+    let mark: (on: boolean) => void;
     if (item.mark && item.steel) {
       const paint = new MeshLambertMaterial({ color: paints[item.steel] });
       const side = new MeshLambertMaterial({ map: paintSide(item.mark, paints[item.steel], stencil, length) });
+      const outline = new LineSegments(new EdgesGeometry(geometry), stencilInk);
+      outline.visible = false;
       // Box faces run +x, -x, +y, -y, +z, -z; the long side facing the viewer (+z) carries the mark
-      group.add(new Mesh(geometry, [paint, paint, paint, paint, side, paint]));
+      group.add(new Mesh(geometry, [paint, paint, paint, paint, side, paint]), outline);
+      mark = (on) => (outline.visible = on);
     } else {
-      group.add(new Mesh(geometry, printedFace), new LineSegments(new EdgesGeometry(geometry), ink));
+      const face = new Mesh(geometry, printedFace);
+      group.add(face, new LineSegments(new EdgesGeometry(geometry), ink));
+      mark = (on) => (face.material = on ? markedFace : printedFace);
     }
     const restY = boxHeight / 2 + item.level * boxHeight;
     const restZ = laneZ(item.lane);
@@ -224,13 +234,14 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     const cable = segments([[0, 0, 0], [0, 0, 0]], ink);
     cable.visible = false;
     scene.add(group, cable);
-    return { item, group, hit, restY, restZ, pull: 0, cable };
+    return { item, group, hit, restY, restZ, pull: 0, cable, mark };
   });
 
-  // The camera looks along -z from above the front; the view holds `span` months around `centre`.
-  // A desktop shows the whole quay. Below 1024px, unless the whole quay fits, the view pans, and
-  // the camera stands as close as the stacks around it allow: in close over the newest years,
-  // pulled back to frame the 2020 tower.
+  // The camera looks along -z from above the front, at the month `centre`.
+  // A desktop shows the whole quay. Below 1024px, unless the whole quay fits or the screen is too
+  // short for the stack to stick, the camera follows the manifest: it centres on the container of
+  // the row at the stack's foot, standing as close as the stacks around it allow, in close over
+  // the newest years and pulled back to frame the 2020 tower.
   const camera = new PerspectiveCamera(fov, 1, 0.5, 2000);
   const toCamera = new Vector3();
   const up = new Vector3();
@@ -241,14 +252,13 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
   tilt(elevation);
   const targetY = top * 0.38;
   const wide = matchMedia('(min-width: 64rem)');
-  let span = 0;
+  /** The stack sticks under the strip only where that leaves room for the list (CareerStack.astro) */
+  const tall = matchMedia('(min-height: 36rem)');
   let centre = 0;
   let distance = 0;
   let whole = true;
   /** Within this many months of the view's centre a stack is framed in full */
   let reach = 0;
-  let dragged = false;
-  const pannable = () => !whole;
 
   /** How far back the camera stands so `months` of the quay, the whole stack and the years fit */
   const fit = (months: number, aspect: number) => {
@@ -268,7 +278,7 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
   /** The months a camera `back` from its aim at `aimY` shows across the front lane's floor */
   const monthsShown = (back: number, aimY: number) =>
     2 * (back - new Vector3(0, -aimY, lanePitch).dot(toCamera)) * tanHalf * camera.aspect;
-  /** A panning view around `at`: the height it aims at, how far back it stands, the months it shows */
+  /** A following view around `at`: the height it aims at, how far back it stands, the months it shows */
   const standAt = (at: number, height = heightNear(items, at, reach, reach) * boxHeight) => {
     // Aimed so the stack's top and the row of years stand equally far inside the frame
     const need = (y: number, z: number) => {
@@ -286,7 +296,7 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     const back = Math.max(need(height - aimY, quayBack), need(-aimY, quayFront + 2));
     return { aimY, back, months: monthsShown(back, aimY) };
   };
-  /** The newest a panning view goes: just past the quay's end by its lane names */
+  /** The newest a following view goes: just past the quay's end by its lane names */
   const newestAt = ({ aimY, back }: ReturnType<typeof standAt>) => {
     const half = canvas.clientWidth / 2;
     return Math.max(...laneLabels.map(({ lane, element }) => {
@@ -295,6 +305,16 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
       return right - (half - element.offsetWidth - 6) / perMonth;
     }));
   };
+  /** A following view as near `at` as the quay allows: from the oldest year to just past the
+   *  newest end. Its width depends on where it stands, so the limits settle in a few steps. */
+  const settle = (at: number) => {
+    let stand = standAt(at);
+    for (let i = 0; i < 3; i++) {
+      at = MathUtils.clamp(at, left + stand.months / 2, newestAt(stand));
+      stand = standAt(at);
+    }
+    return { at, stand };
+  };
   const aim = () => {
     if (whole) {
       centre = (left + viewRight) / 2;
@@ -302,13 +322,8 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
       camera.lookAt(centre, targetY, 0);
       return;
     }
-    // The view's width depends on where it stands, so settle the pan limits in a few steps
-    let stand = standAt(centre);
-    for (let i = 0; i < 3; i++) {
-      centre = MathUtils.clamp(centre, left + stand.months / 2, newestAt(stand));
-      stand = standAt(centre);
-    }
-    span = stand.months;
+    const { at, stand } = settle(centre);
+    centre = at;
     camera.position.set(centre, stand.aimY, 0).addScaledVector(toCamera, stand.back);
     camera.lookAt(centre, stand.aimY, 0);
   };
@@ -344,7 +359,7 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
       element.style.left = `${at.x}px`;
       element.style.top = `${at.y}px`;
     }
-    // A lane's name stands past the quay's end, so a panning view slides it away with the quay
+    // A lane's name stands past the quay's end, so a following view slides it away with the quay
     // rather than laying it over the containers
     for (const { lane, element } of laneLabels) {
       const at = project(right, 0, laneZ(lane));
@@ -361,7 +376,36 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     label.style.top = `${above >= 4 ? above : Math.min(anchor.y + 10, canvas.clientHeight - labelHeight - 4)}px`;
   };
 
-  // Drawing on demand: the crane, the hover slides and anything that moved
+  // The manifest under the stack: the row at the stack's foot is the current one. Its container
+  // slides forward and is marked; a following camera centres on it, gliding between rows as the list scrolls
+  // (stepping from row to row under reduced motion). While the stack is stuck, a rule marks its foot.
+  const table = slot.parentElement?.querySelector('table');
+  const rows = table ? [...table.tBodies[0].rows] : [];
+  let current: Container | null = null;
+  const follow = () => {
+    if (!table || !rows.length) return;
+    const foot = slot.getBoundingClientRect();
+    const progress = listProgress(table.getBoundingClientRect().top, rows.map((row) => row.getBoundingClientRect().top), foot.bottom);
+    const step = reduced ? Math.round(progress) : progress;
+    const now = progress > -0.5 ? (containers.find((container) => container.item.number === Math.round(progress) + 1) ?? null) : null;
+    if (now !== current) {
+      current?.mark(false);
+      now?.mark(true);
+      current = now;
+    }
+    slot.classList.toggle('is-stuck', tall.matches && progress > -1 && Math.abs(foot.top - parseFloat(getComputedStyle(slot).top)) < 1);
+    if (whole) return;
+    if (step <= -1) {
+      centre = Infinity;
+    } else {
+      const target = followMonth(items, step);
+      const opening = settle(Infinity).at;
+      centre = step >= 0 ? target : opening + (target - opening) * (step + 1);
+    }
+    aim();
+  };
+
+  // Drawing on demand: the crane, the slides, the list scrolling and anything that moved
   let loaded = reduced;
   let loadStart = -1;
   let frame = 0;
@@ -371,6 +415,7 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     const dt = last ? now - last : 16;
     last = now;
     let busy = false;
+    follow();
     if (!loaded && loadStart >= 0) {
       const elapsed = now - loadStart;
       containers.forEach((container, index) => {
@@ -389,10 +434,10 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
       if (elapsed >= loadMs) loaded = true;
       else busy = true;
     }
-    // A hovered container slides toward the viewer; lifting it would push it into the
-    // containers stacked on it
+    // A hovered or current container slides toward the viewer; lifting it would push it into
+    // the containers stacked on it
     for (const container of containers) {
-      const target = container === hovered ? pullDepth : 0;
+      const target = container === hovered || container === current ? pullDepth : 0;
       if (container.pull === target) continue;
       const step = reduced ? pullDepth : (pullDepth * dt) / pullMs;
       container.pull = target > container.pull ? Math.min(target, container.pull + step) : Math.max(target, container.pull - step);
@@ -415,31 +460,26 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    const wasWhole = whole;
-    // Months are counted across the front lane's floor (nearest the viewer, so the deeper lanes
-    // trail a drag by no more than about a tenth), so the pan limits and the drag rate match
-    // the picture. Pulled back to frame the tallest stack, a view showing the whole quay
-    // doesn't pan.
+    // Months are counted across the front lane's floor, nearest the viewer, so the limits match
+    // the picture. A view that shows the whole quay pulled back to frame the tallest stack, or a
+    // stack that can't stick, doesn't follow the list.
     tilt(phoneElevation);
     const far = standAt(-Infinity, top);
     reach = monthsShown(far.back, far.aimY) / 2;
-    whole = wide.matches || 2 * reach >= viewRight - left;
+    whole = wide.matches || !tall.matches || 2 * reach >= viewRight - left;
     if (whole) {
       tilt(elevation);
-      span = viewRight - left;
-      distance = fit(span, camera.aspect);
-    } else if (wasWhole) {
-      // A panning view opens on the most recent years
+      distance = fit(viewRight - left, camera.aspect);
+    } else {
+      // A following view opens on the most recent years
       centre = Infinity;
     }
     aim();
-    canvas.style.cursor = pannable() ? 'grab' : '';
-    if (hint) hint.hidden = whole || dragged;
     requestRender();
   };
 
   // Hover (mouse) or first tap (touch) slides a container out and shows its label; a click or a
-  // second tap goes to its row in the manifest; a sideways drag pans a narrow view
+  // second tap goes to its row in the manifest, and a following camera goes with it
   const raycaster = new Raycaster();
   const pointer = new Vector2();
   const meshes = containers.map((container) => container.hit);
@@ -453,7 +493,7 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
   const hover = (container: Container | null) => {
     if (container === hovered) return;
     hovered = container;
-    canvas.style.cursor = container ? 'pointer' : pannable() ? 'grab' : '';
+    canvas.style.cursor = container ? 'pointer' : '';
     if (container) {
       label.replaceChildren(...labelContent(container.item));
       label.hidden = false;
@@ -479,17 +519,8 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
   canvas.addEventListener('pointermove', (event) => {
     if (!loaded) return;
     if (press) {
-      const dx = event.clientX - press.x;
-      if (Math.abs(dx) > 6) press.moved = true;
-      // The camera moves in and out as it pans, so each step pans by the months now in view
-      if (press.moved && pannable()) {
-        centre -= (dx / canvas.clientWidth) * span;
-        press.x = event.clientX;
-        dragged = true;
-        if (hint) hint.hidden = true;
-        aim();
-        requestRender();
-      }
+      // A finger that moves is scrolling or swiping, not tapping
+      if (Math.abs(event.clientX - press.x) > 6) press.moved = true;
       return;
     }
     if (event.pointerType === 'mouse') hover(containerAt(event));
@@ -525,6 +556,8 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
   containers.forEach((container) => (container.group.visible = loaded));
   new ResizeObserver(resize).observe(canvas);
   wide.addEventListener('change', resize);
+  tall.addEventListener('change', resize);
+  addEventListener('scroll', requestRender, { passive: true });
   resize();
 
   if (!loaded) {
