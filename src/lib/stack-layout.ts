@@ -79,6 +79,46 @@ export function quayRange(boxes: readonly StackBox[]): { start: number; end: num
 }
 
 /**
+ * How many containers high a phone's view must stand to frame what's around `centre`: a stack
+ * within `reach` months counts in full, and one up to `fade` months further out counts less
+ * the further away it is, so the camera pulls back smoothly before a tall stack comes into
+ * view. Never less than one container.
+ */
+export function heightNear(boxes: readonly StackBox[], centre: number, reach: number, fade: number): number {
+  let height = 1;
+  for (const box of boxes) {
+    const away = Math.max(0, box.start - centre, centre - (box.start + box.length));
+    const t = Math.min(1, Math.max(0, (away - reach) / fade));
+    const weight = 1 - t * t * (3 - 2 * t);
+    height = Math.max(height, 1 + weight * box.level);
+  }
+  return height;
+}
+
+/**
+ * How far the manifest has scrolled past a reading line, as a row count: -1 until the table's
+ * `top` reaches the line, then `i` when row i's top is on it and `i + t` on the way to the
+ * next, never past the last row. Positions are in any one coordinate space, rows in order.
+ */
+export function listProgress(top: number, rows: readonly number[], line: number): number {
+  if (line < rows[0]) return line <= top ? -1 : -1 + (line - top) / (rows[0] - top);
+  for (let i = 0; i < rows.length - 1; i++) {
+    if (line < rows[i + 1]) return i + (line - rows[i]) / (rows[i + 1] - rows[i]);
+  }
+  return rows.length - 1;
+}
+
+/** The month a following camera centres on at list progress `progress`: the middle of that
+ *  row's container, gliding to the next row's */
+export function followMonth(boxes: readonly StackBox[], progress: number): number {
+  const middles = [...boxes].sort((a, b) => a.number - b.number).map((box) => box.start + box.length / 2);
+  const at = Math.min(Math.max(progress, 0), middles.length - 1);
+  const row = Math.floor(at);
+  const next = middles[Math.min(row + 1, middles.length - 1)];
+  return middles[row] + (next - middles[row]) * (at - row);
+}
+
+/**
  * The stack's proportions in world units (one month along the quay): a container's square
  * section, the pitch between lanes, the quay's margin around them, and how far a hovered
  * container slides toward the viewer

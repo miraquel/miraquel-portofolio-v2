@@ -3,6 +3,7 @@
 // the quay, platform across it, overlaps stacked, the case studies painted with their marks.
 // It repeats the manifest below, which stays the complete, accessible list, so the stack is
 // decorative. Its space is kept unless the browser lacks WebGL 2; three.js loads on approach.
+// While the manifest scrolls, it sticks under the strip and follows the list.
 import { manifest } from '../../data/work';
 import type { StackItem } from '../../lib/career-stack';
 import { formatPeriod } from '../../lib/format';
@@ -20,7 +21,7 @@ const items: StackItem[] = stackLayout(manifest).map((box) => {
 });
 ---
 
-<div data-career-stack data-stack={JSON.stringify(items)} aria-hidden="true" class="relative mt-8 h-[15rem] lg:h-[18rem]">
+<div data-career-stack data-stack={JSON.stringify(items)} aria-hidden="true" class="relative mt-8 h-[11rem] md:h-[15rem] lg:h-[18rem]">
   <canvas class="absolute inset-0 size-full"></canvas>
   <div data-stack-marks class="pointer-events-none absolute inset-0 overflow-hidden"></div>
   <div
@@ -32,10 +33,24 @@ const items: StackItem[] = stackLayout(manifest).map((box) => {
 </div>
 
 <style>
-  /* A sideways drag pans the quay on a phone; a vertical one still scrolls the page, and a
-     pinch still zooms it */
-  canvas {
-    touch-action: pan-y pinch-zoom;
+  /* Where the screen leaves room for the list under it, the stack sticks under the strip (46px)
+     on its own paper while the manifest scrolls, until the list ends. Rows that a link lands on
+     clear it (Manifest.astro). While it is stuck, a 2px rule marks its foot, just under it. */
+  @media (min-height: 36rem) {
+    [data-career-stack] {
+      position: sticky;
+      top: 46px;
+      z-index: 20;
+      background-color: var(--color-paper);
+    }
+  }
+
+  [data-career-stack].is-stuck::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 -2px;
+    height: 2px;
+    background-color: var(--color-form);
   }
 </style>
 
