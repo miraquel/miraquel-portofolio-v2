@@ -44,7 +44,8 @@ export interface ManifestLine {
   title: string;
   client: string;
   platform: string;
-  period: Period;
+  /** No end while the project is in progress */
+  period: { start: string; end?: string };
   href?: string;
   /** Set when the line is one of the containers above */
   caseStudy?: string;
@@ -157,6 +158,7 @@ const caseStudies: CaseStudy[] = [
 ];
 
 const lines: ManifestLine[] = [
+  { title: 'Dynamics AX 2012 R2 migration to Dynamics 365 Finance and Operations', client: 'PT Gandum Mas Kencana', platform: 'Dynamics 365 F&O, X++', period: { start: '2026-08' } },
   { title: 'Generated Information Service Level System (GiselX)', client: 'PT Gandum Mas Kencana', platform: 'ASP.NET Core MVC, Entity Framework Core, SQL Server', period: { start: '2025-07', end: '2025-09' }, href: 'https://github.com/miraquel/GiselX' },
   { title: 'Futurist', client: 'PT Gandum Mas Kencana', platform: 'ASP.NET Core MVC, Hangfire, SignalR', period: { start: '2025-01', end: '2025-05' }, caseStudy: 'futurist' },
   { title: 'Sparepart Management System v2', client: 'PT Gandum Mas Kencana', platform: 'Dynamics AX 2012 R2, ASP.NET Web API, Flutter', period: { start: '2024-02', end: '2024-07' }, caseStudy: 'sparepart-management' },

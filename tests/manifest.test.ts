@@ -12,3 +12,11 @@ test('the Natural Java Spice reports ran March to December 2019', () => {
   const line = manifest.find((entry) => entry.client === 'PT Natural Java Spice');
   assert.deepEqual(line?.period, { start: '2019-03', end: '2019-12' });
 });
+
+test('the AX 2012 R2 migration to Dynamics 365 F&O at PT Gandum Mas Kencana runs from August 2026, in progress', () => {
+  const [line] = manifest;
+  assert.equal(line.title, 'Dynamics AX 2012 R2 migration to Dynamics 365 Finance and Operations');
+  assert.equal(line.client, 'PT Gandum Mas Kencana');
+  assert.equal(line.platform, 'Dynamics 365 F&O, X++');
+  assert.deepEqual(line.period, { start: '2026-08' });
+});

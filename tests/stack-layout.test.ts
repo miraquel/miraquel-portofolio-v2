@@ -1,15 +1,18 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { manifest } from '../src/data/work';
-import { dropDelay, dropMs, dropProgress, followMonth, geometry, heightNear, hoverOffset, laneOf, listProgress, loadMs, monthIndex, quayRange, stackLayout, type StackBox } from '../src/lib/stack-layout';
+import { dropDelay, dropMs, dropProgress, followMonth, geometry, heightNear, hoverOffset, laneOf, listProgress, loadMs, monthIndex, monthOf, quayRange, stackLayout, type StackBox } from '../src/lib/stack-layout';
 
-const boxes = stackLayout(manifest);
+// A project in progress runs to the month of the build, so the tests build in October 2026
+const boxes = stackLayout(manifest, '2026-10');
+const lineOf = (title: string) => manifest.find((line) => line.title === title)!.number;
+const last = manifest.length;
 const overlap = (a: StackBox, b: StackBox) => a.start < b.start + b.length && b.start < a.start + a.length;
 
 test('each project stands in the lane its platform names', () => {
   assert.deepEqual(manifest.map((line) => laneOf(line.platform)), [
-    'dotnet', 'dotnet', 'both', 'both', 'erp', 'erp', 'dotnet', 'dotnet', 'erp', 'erp',
-    'erp', 'erp', 'erp', 'dotnet', 'erp', 'erp', 'erp', 'dotnet', 'erp',
+    'erp', 'dotnet', 'dotnet', 'both', 'both', 'erp', 'erp', 'dotnet', 'dotnet', 'erp',
+    'erp', 'erp', 'erp', 'erp', 'dotnet', 'erp', 'erp', 'erp', 'dotnet', 'erp',
   ]);
 });
 
@@ -36,8 +39,8 @@ test('a project runs from its start month up to its end month, at least one mont
 });
 
 test('a project that starts the month another ends stands beside it, not on it', () => {
-  const axfinmobile = boxes.find((box) => box.number === 4)!;
-  const sparepart = boxes.find((box) => box.number === 3)!;
+  const axfinmobile = boxes.find((box) => box.number === lineOf('AXFinMobile'))!;
+  const sparepart = boxes.find((box) => box.number === lineOf('Sparepart Management System v2'))!;
   assert.equal(axfinmobile.start + axfinmobile.length, sparepart.start);
   assert.deepEqual([axfinmobile.level, sparepart.level], [0, 0]);
 });
@@ -65,14 +68,28 @@ test('2020, the Business Central year, stacks five high in the ERP lane', () => 
 });
 
 test('the layout is the same on every run, in loading order', () => {
-  assert.deepEqual(stackLayout(manifest), boxes);
+  assert.deepEqual(stackLayout(manifest, '2026-10'), boxes);
   assert.equal(boxes.length, manifest.length);
   const starts = boxes.map((box) => box.start);
   assert.deepEqual(starts, [...starts].sort((a, b) => a - b));
 });
 
-test('the quay spans whole years around the projects: January 2018 to January 2026', () => {
-  assert.deepEqual(quayRange(boxes), { start: 0, end: 96 });
+test('the quay spans whole years around the projects: January 2018 to January 2027', () => {
+  assert.deepEqual(quayRange(boxes), { start: 0, end: 108 });
+});
+
+test('a project in progress runs to the month of the build, at least one month, and says so', () => {
+  const lines = [{ number: 1, platform: 'Dynamics 365 F&O, X++', period: { start: '2026-08' } }];
+  assert.deepEqual(stackLayout(lines, '2026-10'), [{ number: 1, lane: 'erp', start: 103, length: 2, level: 0, ongoing: true }]);
+  assert.equal(stackLayout(lines, '2026-08')[0].length, 1, 'in its first month');
+  assert.equal(stackLayout(lines, '2026-06')[0].length, 1, 'built before it starts');
+  assert.equal(stackLayout(lines, '2027-03')[0].length, 7, 'and longer with each later build');
+  assert.equal('ongoing' in boxes.find((box) => box.number === 2)!, false, 'a finished project says nothing');
+});
+
+test('the build month is read in UTC', () => {
+  assert.equal(monthOf(new Date('2026-10-31T23:30:00Z')), '2026-10');
+  assert.equal(monthOf(new Date('2027-01-01T00:00:00Z')), '2027-01');
 });
 
 test('the crane lands every container within about two seconds, in loading order', () => {
@@ -163,13 +180,13 @@ test("the camera centres on the middle of the row's container, gliding to the ne
   assert.equal(followMonth(boxes, 0), middle(1), 'line 01');
   assert.equal(followMonth(boxes, 4), middle(5), 'line 05');
   assert.equal(followMonth(boxes, 4.5), (middle(5) + middle(6)) / 2, 'halfway to line 06');
-  assert.equal(followMonth(boxes, 18), middle(19), 'the last line');
-  assert.equal(followMonth(boxes, 40), middle(19), 'past the last line');
+  assert.equal(followMonth(boxes, last - 1), middle(last), 'the last line');
+  assert.equal(followMonth(boxes, 40), middle(last), 'past the last line');
   assert.equal(followMonth(boxes, -1), middle(1), 'before the first line');
 });
 
 test('scrolling down the list travels back in time', () => {
-  assert.ok(followMonth(boxes, 0) > followMonth(boxes, 18));
-  assert.ok(followMonth(boxes, 0) >= 84, 'opens in 2025');
-  assert.ok(followMonth(boxes, 18) < 12, 'ends in 2018');
+  assert.ok(followMonth(boxes, 0) > followMonth(boxes, last - 1));
+  assert.ok(followMonth(boxes, 0) >= 96, 'opens in 2026, where line 01 runs');
+  assert.ok(followMonth(boxes, last - 1) < 12, 'ends in 2018');
 });
