@@ -9,7 +9,7 @@ const overlap = (a: StackBox, b: StackBox) => a.start < b.start + b.length && b.
 test('each project stands in the lane its platform names', () => {
   assert.deepEqual(manifest.map((line) => laneOf(line.platform)), [
     'dotnet', 'dotnet', 'both', 'both', 'erp', 'erp', 'dotnet', 'dotnet', 'erp', 'erp',
-    'erp', 'erp', 'erp', 'dotnet', 'erp', 'erp', 'dotnet', 'erp', 'erp',
+    'erp', 'erp', 'erp', 'dotnet', 'erp', 'erp', 'erp', 'dotnet', 'erp',
   ]);
 });
 
