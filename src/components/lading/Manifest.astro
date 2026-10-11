@@ -1,6 +1,6 @@
 ---
 // Every project as a manifest line, newest first. Lines that are containers above carry
-// their mark and lead to them. Below 64rem the rows stack; explicit roles keep the table
+// their mark and lead to them. A project in progress prints its period on signal stock. Below 64rem the rows stack; explicit roles keep the table
 // semantics that display changes would otherwise strip.
 import CareerStack from './CareerStack.astro';
 import Mark from './Mark.astro';
@@ -39,7 +39,9 @@ import { formatPeriod } from '../../lib/format';
             class:list={['border-t border-form/35 transition-colors duration-150 hover:bg-paper-deep', line.container && 'is-container']}
           >
             <td role="cell" class="font-data text-sm text-form">{String(line.number).padStart(2, '0')}</td>
-            <td role="cell" class="font-data text-[0.8125rem] whitespace-nowrap">{formatPeriod(line.period)}</td>
+            <td role="cell" class="font-data text-[0.8125rem] whitespace-nowrap">
+              {line.period.end ? formatPeriod(line.period) : <span class="signal-stock inline-block px-2 py-1 font-semibold">{formatPeriod(line.period)}</span>}
+            </td>
             <td role="cell" class="font-bold leading-snug">
               {line.container ? (
                 <a href={`#${line.container.slug}`} class="inline-block py-3 -my-3 underline decoration-form/40 decoration-2 underline-offset-4 hover:decoration-form">

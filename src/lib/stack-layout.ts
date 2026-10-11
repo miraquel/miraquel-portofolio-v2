@@ -29,10 +29,16 @@ export function monthIndex(month: string): number {
   return (Number(match[1]) - 2018) * 12 + Number(match[2]) - 1;
 }
 
+/** The YYYY-MM month of a moment, in UTC */
+export function monthOf(date: Date): string {
+  return date.toISOString().slice(0, 7);
+}
+
 export interface StackInput {
   number: number;
   platform: string;
-  period: { start: string; end: string };
+  /** No end while the project is in progress */
+  period: { start: string; end?: string };
 }
 
 export interface StackBox {
@@ -45,28 +51,32 @@ export interface StackBox {
   length: number;
   /** How many containers it stands on; 0 is the quay */
   level: number;
+  /** Set while the project is in progress: it runs to the month of the build */
+  ongoing?: true;
 }
 
 /**
  * Every project placed as the crane loads them: in date order (start, then longer first, then
  * line number), each one level above the highest container already in its lane whose months
- * overlap its own, or on the quay. Returned in that loading order.
+ * overlap its own, or on the quay. A project in progress runs to `now`, the month of the build.
+ * Returned in that loading order.
  */
-export function stackLayout(lines: readonly StackInput[]): StackBox[] {
+export function stackLayout(lines: readonly StackInput[], now = monthOf(new Date())): StackBox[] {
   const spans = lines.map((line) => {
     const start = monthIndex(line.period.start);
-    const end = monthIndex(line.period.end);
+    const ongoing = !line.period.end;
+    const end = line.period.end ? monthIndex(line.period.end) : Math.max(monthIndex(now), start);
     if (end < start) throw new Error(`Manifest line ${line.number} ends before it starts`);
-    return { line, start, length: Math.max(1, end - start) };
+    return { line, start, length: Math.max(1, end - start), ongoing };
   });
   spans.sort((a, b) => a.start - b.start || b.length - a.length || a.line.number - b.line.number);
 
   const placed: StackBox[] = [];
-  for (const { line, start, length } of spans) {
+  for (const { line, start, length, ongoing } of spans) {
     const lane = laneOf(line.platform);
     const beneath = placed.filter((box) => box.lane === lane && box.start < start + length && start < box.start + box.length);
     const level = beneath.length ? Math.max(...beneath.map((box) => box.level)) + 1 : 0;
-    placed.push({ number: line.number, lane, start, length, level });
+    placed.push({ number: line.number, lane, start, length, level, ...(ongoing && { ongoing: true as const }) });
   }
   return placed;
 }

@@ -144,7 +144,8 @@ interface Container {
   /** How far it has slid toward the viewer, 0 to pullDepth */
   pull: number;
   cable: LineSegments;
-  /** Marks it as the current row's: paper-deep faces if printed, a stencil-white outline if painted */
+  /** Marks it as the current row's: paper-deep faces if printed, a stencil-white outline if painted,
+   *  nothing more if it is the yellow one in progress */
   mark: (on: boolean) => void;
 }
 
@@ -186,6 +187,9 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
   recolor();
   const stencil = cssColor('--color-stencil', '#f5f7f2');
   const stencilInk = new LineBasicMaterial({ color: stencil });
+  // A project in progress is printed on signal stock, the same by night, so it keeps the day ink
+  const signalFace = new MeshBasicMaterial({ color: cssColor('--color-signal', '#f2c21b'), polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+  const dayInk = new LineBasicMaterial({ color: cssColor('--color-day-form', '#24543f') });
   const paints = { cobalt: cssColor('--color-cobalt', '#1d4a96'), oxide: cssColor('--color-oxide', '#9a3a25') };
 
   // The quay: its outline, faint lane dividers, and a tick at each January on the front edge
@@ -220,6 +224,10 @@ export async function mountCareerStack(slot: HTMLElement): Promise<void> {
       // Box faces run +x, -x, +y, -y, +z, -z; the long side facing the viewer (+z) carries the mark
       group.add(new Mesh(geometry, [paint, paint, paint, paint, side, paint]), outline);
       mark = (on) => (outline.visible = on);
+    } else if (item.ongoing) {
+      // The one live fact on the quay is already yellow: as the current row's it only slides out
+      group.add(new Mesh(geometry, signalFace), new LineSegments(new EdgesGeometry(geometry), dayInk));
+      mark = () => {};
     } else {
       const face = new Mesh(geometry, printedFace);
       group.add(face, new LineSegments(new EdgesGeometry(geometry), ink));
