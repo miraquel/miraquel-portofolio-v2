@@ -173,8 +173,8 @@ const lines: ManifestLine[] = [
   { title: 'DTS migration, phase 2: SSIS data-flow automation', client: 'PT Bank Central Asia Finance', platform: 'SQL Server, SSIS, C#', period: { start: '2020-03', end: '2020-06' } },
   { title: 'Human Resources custom development', client: 'PT Intikom Berlian Mustika', platform: 'Dynamics 365 Human Resources', period: { start: '2020-02', end: '2020-09' } },
   { title: 'Transfer order and transactional demand reports', client: 'PT Indotruck Utama', platform: 'Dynamics 365 Business Central, AL', period: { start: '2020-01', end: '2020-12' } },
+  { title: 'Shipping order and invoice reports', client: 'PT Natural Java Spice', platform: 'Dynamics AX 2012 R3, X++', period: { start: '2019-03', end: '2019-12' } },
   { title: 'DTS migration, phase 1: SSIS data-flow automation', client: 'PT Bank Central Asia Finance', platform: 'SQL Server, SSIS, C#', period: { start: '2019-01', end: '2019-02' } },
-  { title: 'Shipping order and invoice reports', client: 'PT Natural Java Spice', platform: 'Dynamics AX 2012 R3, X++', period: { start: '2018-03', end: '2018-12' } },
   { title: 'Dynamics AX 2012 R3 implementation', client: 'PT Visionet International', platform: 'Dynamics AX 2012 R3, X++', period: { start: '2018-03', end: '2018-12' } },
 ];
 
