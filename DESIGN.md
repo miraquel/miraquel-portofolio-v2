@@ -268,6 +268,8 @@ Container bands break out full-bleed. Inside, a 5/7 two-column grid (head and fi
 
 The manifest is a real table that stacks below 64rem into a two-column grid per row (line number left, the rest right), its header visually hidden but kept for assistive technology.
 
+A post is a form band over a full-width title box, then its fields (Published, Written by, Tags) and its image. The text never centres in the container: from 640px it starts on the title's own left edge (the box's 2px rule plus its 20px padding), so the title and every paragraph hang from one line. Below 1280px the fields are a 4/4/4 row under the title box (stacked on a phone). From 1280px they become a 20rem rail at the right, the width of the editor's Publishing panel, hung from the title box (or its image) without a top rule and held under the strip while the text scrolls, where the strip's rule closes it.
+
 ## Elevation & Depth
 
 Flat. Depth is printed, not lit: the form stacks by rule weight and paper tone, and the only dimensional objects are the lost container on the 404 page and the career stack's painted containers, both lit and neither casting anything onto the paper. Paper-deep is the single raised tone, used for state (hover, cross-highlight) and for the closing footer.

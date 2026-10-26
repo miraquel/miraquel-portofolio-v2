@@ -49,43 +49,45 @@ import '../../styles/post-body.css';
     </div>
 
     {post ? (
-      <article>
-        <header>
-          <div class="border-2 border-b-0 border-form bg-paper px-4 py-6 sm:px-5 sm:py-8">
-            <h1 class="max-w-[24ch] text-[clamp(2.25rem,5.5vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.02em]">{post.title}</h1>
-            {post.excerpt && <p class="mt-4 max-w-[48ch] text-lg leading-relaxed">{post.excerpt}</p>}
-          </div>
-          <dl class="grid grid-cols-12 gap-px border-2 border-form bg-form">
-            <div class:list={[field, 'col-span-12 sm:col-span-4']}>
-              <dt class={label}>Published</dt>
-              <dd class="mt-1.5 font-data text-sm font-semibold">{formatDay(post.publishedAt)}</dd>
-            </div>
-            <div class:list={[field, 'col-span-12 sm:col-span-4']}>
-              <dt class={label}>Written by</dt>
-              <dd class="mt-1.5 font-extrabold">{post.author}</dd>
-            </div>
-            <div class:list={[field, 'col-span-12 sm:col-span-4']}>
-              <dt class={label}>Tags</dt>
-              <dd class="mt-0.5 flex flex-wrap gap-x-4">
-                {post.tags.length > 0
-                  ? post.tags.map((tag) => (
-                      <a href={`/blog?tag=${encodeURIComponent(tag)}`} class="inline-block py-1.5 font-semibold underline decoration-form/40 underline-offset-4 hover:decoration-form">
-                        {tag}
-                      </a>
-                    ))
-                  : <span class="py-1.5">None</span>}
-              </dd>
-            </div>
-          </dl>
-
-          {post.imageUrl && (
-            <div class="border-2 border-t-0 border-form bg-paper-deep">
-              <img src={post.imageUrl} alt="" class="aspect-[21/9] w-full object-cover" />
-            </div>
-          )}
+      <article class="xl:grid xl:grid-cols-[minmax(0,1fr)_20rem] xl:[grid-template-areas:'head_head'_'image_image'_'body_rail']">
+        {/* The text starts where the title does. From 1280px the fields leave the row under the title for a
+            rail beside the text, as wide as the editor's Publishing panel, hung from the title box (or its
+            image) and held under the strip while the text scrolls. */}
+        <header class="border-2 border-b-0 border-form bg-paper px-4 py-6 sm:px-5 sm:py-8 xl:border-b-2 xl:[grid-area:head]">
+          <h1 class="max-w-[24ch] text-[clamp(2.25rem,5.5vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.02em]">{post.title}</h1>
+          {post.excerpt && <p class="mt-4 max-w-[48ch] text-lg leading-relaxed">{post.excerpt}</p>}
         </header>
 
-        <div class="post-body mx-auto mt-12 max-w-[42rem] text-[1.125rem] leading-[1.75]" set:html={safeContent} />
+        <dl class="grid grid-cols-12 gap-px border-2 border-form bg-form xl:sticky xl:top-[2.875rem] xl:self-start xl:border-t-0 xl:[grid-area:rail]">
+          <div class:list={[field, 'col-span-12 sm:col-span-4 xl:col-span-12']}>
+            <dt class={label}>Published</dt>
+            <dd class="mt-1.5 font-data text-sm font-semibold">{formatDay(post.publishedAt)}</dd>
+          </div>
+          <div class:list={[field, 'col-span-12 sm:col-span-4 xl:col-span-12']}>
+            <dt class={label}>Written by</dt>
+            <dd class="mt-1.5 font-extrabold">{post.author}</dd>
+          </div>
+          <div class:list={[field, 'col-span-12 sm:col-span-4 xl:col-span-12']}>
+            <dt class={label}>Tags</dt>
+            <dd class="mt-0.5 flex flex-wrap gap-x-4">
+              {post.tags.length > 0
+                ? post.tags.map((tag) => (
+                    <a href={`/blog?tag=${encodeURIComponent(tag)}`} class="inline-block py-1.5 font-semibold underline decoration-form/40 underline-offset-4 hover:decoration-form">
+                      {tag}
+                    </a>
+                  ))
+                : <span class="py-1.5">None</span>}
+            </dd>
+          </div>
+        </dl>
+
+        {post.imageUrl && (
+          <div class="border-2 border-t-0 border-form bg-paper-deep xl:[grid-area:image]">
+            <img src={post.imageUrl} alt="" class="aspect-[21/9] w-full object-cover" />
+          </div>
+        )}
+
+        <div class="post-body mt-12 max-w-[42rem] text-[1.125rem] leading-[1.75] sm:ml-[calc(1.25rem+2px)] xl:[grid-area:body]" set:html={safeContent} />
       </article>
     ) : (
       <section class="border-2 border-form bg-paper px-4 py-10 sm:px-6">
